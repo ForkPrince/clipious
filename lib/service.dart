@@ -391,9 +391,13 @@ class Service {
 
   Future<bool> testDeArrowThumbnail(String? url) async {
     if (url != null) {
-      final response = await httpClient.head(Uri.parse(url));
-      log.fine("calling $url => ${response.statusCode}");
-      return response.statusCode == 200;
+      try {
+        final response = await httpClient.head(Uri.parse(url));
+        log.fine("calling $url => ${response.statusCode}");
+        return response.statusCode == 200;
+      } catch (err) {
+        return false;
+      }
     } else {
       return false;
     }

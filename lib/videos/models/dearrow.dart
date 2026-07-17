@@ -1,3 +1,4 @@
+import 'package:clipious/extensions.dart';
 import 'package:clipious/globals.dart';
 import 'package:clipious/videos/models/db/dearrow_cache.dart';
 import 'package:clipious/videos/models/video.dart';
@@ -11,17 +12,38 @@ part 'dearrow.g.dart';
 class DeArrow {
   final List<DeArrowTitle> titles;
   final List<DeArrowThumbnail> thumbnails;
+  final double? randomTime;
+  final double? videoDuration;
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   late final String videoId;
 
-  String? get thumbnailUrl => thumbnails.isNotEmpty
-      ? 'https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=:id&time=:time'
+  String? get thumbnailUrl {
+    for (var thumb in thumbnails) {
+      if (thumb.votes >= 0 || thumb.locked) {
+        if (thumb.original) return null;
+        if (thumb.timestamp != null) {
+          return 'https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=:id&time=:time'
+              .replaceAll(':id', videoId)
+              .replaceAll(":time", thumb.timestamp.toString());
+        }
+      }
+    }
+    if (videoDuration != null && randomTime != null) {
+      var time = videoDuration! * randomTime!;
+      return 'https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=:id&time=:time'
           .replaceAll(':id', videoId)
-          .replaceAll(":time", thumbnails.first.timestamp.toString())
-      : null;
+          .replaceAll(":time", time.toString());
+    }
+    return null;
+  }
 
-  DeArrow({required this.titles, required this.thumbnails});
+  DeArrow({
+    required this.titles,
+    required this.thumbnails,
+    this.randomTime,
+    this.videoDuration,
+  });
 
   factory DeArrow.fromJson(Map<String, dynamic> json) =>
       _$DeArrowFromJson(json);
@@ -43,49 +65,51 @@ class DeArrow {
   }
 
   static Future<Video> _deArrowVideo(Video video, bool doThumbnails) async {
-    var cache = db.getDeArrowCache(video.videoId);
+    try {
+      var cache = db.getDeArrowCache(video.videoId);
 
-    var vid = video.copyWith();
+      var vid = video.copyWith();
 
-    if (cache != null) {
-      if (cache.title != null) {
-        vid = vid.copyWith(title: cache.title!);
+      if (cache != null) {
+        if (cache.title != null) {
+          vid = vid.copyWith(title: cache.title!, deArrowed: true);
+        }
+
+        if (!doThumbnails) return vid;
+
+        if (cache.url != null) {
+          vid = vid.copyWith(deArrowThumbnailUrl: cache.url, deArrowed: true);
+          return vid;
+        }
       }
 
-      // if we just need the title, we're done
-      if (!doThumbnails) return vid;
-
-      if (cache.url != null) {
-        // bool isThumbnailAvailable = await service.testDeArrowThumbnail(cache.url);
-        // if (isThumbnailAvailable) {
-        vid = vid.copyWith(deArrowThumbnailUrl: cache.url);
-        // if we've set both things from cache, we stop otherwise we go through normal process
-        return vid;
-        // }
+      var deArrow = await service.getDeArrow(video.videoId);
+      var validTitle =
+          deArrow?.titles.firstWhereOrNull((t) => t.votes >= 0 || t.locked);
+      if (validTitle != null) {
+        vid = vid.copyWith(
+            title: validTitle.title ?? video.title, deArrowed: true);
       }
-    }
-
-    var deArrow = await service.getDeArrow(video.videoId);
-    var titles = deArrow?.titles ?? [];
-    if (titles.isNotEmpty) {
-      vid = vid.copyWith(title: deArrow!.titles.first.title ?? video.title);
-    }
-    if (doThumbnails) {
-      var thumbnail = deArrow?.thumbnailUrl;
-      bool isThumbnailAvailable = await service.testDeArrowThumbnail(thumbnail);
-      if (isThumbnailAvailable) {
-        vid = vid.copyWith(deArrowThumbnailUrl: thumbnail);
+      if (doThumbnails) {
+        var thumbnail = deArrow?.thumbnailUrl;
+        bool isThumbnailAvailable =
+            await service.testDeArrowThumbnail(thumbnail);
+        if (isThumbnailAvailable) {
+          vid = vid.copyWith(deArrowThumbnailUrl: thumbnail, deArrowed: true);
+        }
       }
-    }
 
-    DeArrowCache newCache = DeArrowCache(video.videoId);
-    newCache.title = deArrow?.titles.firstOrNull?.title;
-    newCache.url = deArrow?.thumbnailUrl;
-    if (newCache.title != null || newCache.url != null) {
-      await db.upsertDeArrowCache(newCache);
-    }
+      DeArrowCache newCache = DeArrowCache(video.videoId);
+      newCache.title = deArrow?.titles.firstOrNull?.title;
+      newCache.url = deArrow?.thumbnailUrl;
+      if (newCache.title != null || newCache.url != null) {
+        await db.upsertDeArrowCache(newCache);
+      }
 
-    return vid;
+      return vid;
+    } catch (err) {
+      return video;
+    }
   }
 }
 

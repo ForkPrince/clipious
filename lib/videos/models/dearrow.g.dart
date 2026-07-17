@@ -13,11 +13,15 @@ DeArrow _$DeArrowFromJson(Map<String, dynamic> json) => DeArrow(
       thumbnails: (json['thumbnails'] as List<dynamic>)
           .map((e) => DeArrowThumbnail.fromJson(e as Map<String, dynamic>))
           .toList(),
+      randomTime: (json['randomTime'] as num?)?.toDouble(),
+      videoDuration: (json['videoDuration'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$DeArrowToJson(DeArrow instance) => <String, dynamic>{
       'titles': instance.titles,
       'thumbnails': instance.thumbnails,
+      'randomTime': instance.randomTime,
+      'videoDuration': instance.videoDuration,
     };
 
 DeArrowTitle _$DeArrowTitleFromJson(Map<String, dynamic> json) => DeArrowTitle(
