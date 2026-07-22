@@ -13,65 +13,54 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up JDK
+      - name: Java
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'adopt'
 
-      - name: Install Nix
+      - name: Nix
         uses: cachix/install-nix-action@v22
         with:
           nix_path: nixpkgs=channel:nixos-23.11
 
-      - name: Initialize submodules
-        run: git submodule init
-      - name: Update submodules
-        run: git submodule update
-      - name: Set error handling
-        run: set -e
+      - name: Submodules
+        run: git submodule update --init
 
-      - name: Decode keystore
+      - name: Signing
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/keystore.jks
-
-      - name: Create key.properties
-        run: |
           echo "storeFile=$(pwd)/android/app/keystore.jks" > android/key.properties
           echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
           echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
 
-      - name: Flutter doctor
+      - name: Doctor
         run: ./submodules/flutter/bin/flutter doctor
-      - name: Configure Flutter analytics
+      - name: Config
         run: ./submodules/flutter/bin/flutter config --no-analytics
-      - name: Get dependencies
+      - name: Dependencies
         run: ./submodules/flutter/bin/flutter pub get
-      - name: Check formatting
+      - name: Format
         run: ./submodules/flutter/bin/dart format --output=none --set-exit-if-changed ./lib
       - name: Analyze
         run: ./submodules/flutter/bin/dart analyze --no-fatal-warnings ./lib
-      - name: Generate native splash
+      - name: Splash
         run: ./submodules/flutter/bin/flutter pub run flutter_native_splash:create
 
-      - name: Build APK
+      - name: Build
         run: |
           export ANDROID_KEY_FILE=$(pwd)/android/key.properties
           ./submodules/flutter/bin/flutter build apk --release --split-per-abi
 
-      - name: Extract repository name
-        run: echo "NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
-
-      - name: Upload Build
+      - name: Upload
         uses: marvinpinto/action-automatic-releases@master
         with:
-          title: "${{ env.NAME }}"
+          title: "${{ github.event.repository.name }}"
           automatic_release_tag: "latest"
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
