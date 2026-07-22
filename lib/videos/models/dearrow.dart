@@ -78,8 +78,7 @@ class DeArrow {
         if (!doThumbnails) return vid;
 
         if (cache.url != null) {
-          bool cachedAvailable =
-              await service.testDeArrowThumbnail(cache.url);
+          bool cachedAvailable = await service.testDeArrowThumbnail(cache.url);
           if (cachedAvailable) {
             vid = vid.copyWith(deArrowThumbnailUrl: cache.url, deArrowed: true);
             return vid;
