@@ -1,4 +1,5 @@
 import 'package:clipious/videos/models/video.dart';
+import 'package:clipious/videos/states/hidden_videos.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:clipious/globals.dart';
@@ -10,6 +11,8 @@ import 'package:clipious/videos/views/components/download_modal_sheet.dart';
 
 import '../../../main.dart';
 import 'add_to_queue_button.dart';
+
+const _sheetActionWidth = 84.0;
 
 class VideoModalSheet extends StatelessWidget {
   final Video video;
@@ -67,7 +70,7 @@ class VideoModalSheet extends StatelessWidget {
 
   void hideVideo(BuildContext context) async {
     Navigator.of(context).pop();
-    var ok = await service.hideVideo(video.videoId);
+    var ok = await HiddenVideosCubit.instance.hideVideo(video.videoId);
     final ScaffoldMessengerState? scaffold = scaffoldKey.currentState;
     scaffold?.showSnackBar(SnackBar(
       content: Text(ok ? 'Video hidden' : 'Could not hide video'),
@@ -77,7 +80,7 @@ class VideoModalSheet extends StatelessWidget {
 
   void unhideVideo(BuildContext context) async {
     Navigator.of(context).pop();
-    var ok = await service.unhideVideo(video.videoId);
+    var ok = await HiddenVideosCubit.instance.unhideVideo(video.videoId);
     final ScaffoldMessengerState? scaffold = scaffoldKey.currentState;
     scaffold?.showSnackBar(SnackBar(
       content: Text(ok ? 'Video unhidden' : 'Could not unhide video'),
@@ -85,91 +88,99 @@ class VideoModalSheet extends StatelessWidget {
     ));
   }
 
+  Widget _action(Widget button, String label) {
+    return SizedBox(
+      width: _sheetActionWidth,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          button,
+          Text(label,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis)
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
+    HiddenVideosCubit.instance.ensureLoaded();
     final hiddenFuture = service.supportsHidden();
     return FractionallySizedBox(
       widthFactor: 1,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Wrap(
-          spacing: 16,
-          runSpacing: 8,
-          alignment: WrapAlignment.center,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            AddToPlayListButton(
-              videoId: video.videoId,
-              type: AddToPlayListButtonType.modalSheet,
-              afterAdd: () => Navigator.pop(context),
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                IconButton.filledTonal(
-                    onPressed: AddToQueueButton.canAddToQueue(context, [video])
-                        ? () => addToQueue(context)
-                        : null,
-                    icon: const Icon(Icons.playlist_play)),
-                Text(locals.addToQueueList)
+                SizedBox(
+                  width: _sheetActionWidth,
+                  child: AddToPlayListButton(
+                    videoId: video.videoId,
+                    type: AddToPlayListButtonType.modalSheet,
+                    afterAdd: () => Navigator.pop(context),
+                  ),
+                ),
+                _action(
+                    IconButton.filledTonal(
+                        onPressed:
+                            AddToQueueButton.canAddToQueue(context, [video])
+                                ? () => addToQueue(context)
+                                : null,
+                        icon: const Icon(Icons.playlist_play)),
+                    locals.addToQueueList),
+                _action(
+                    IconButton.filledTonal(
+                        onPressed: () => playNext(context),
+                        icon: const Icon(Icons.play_arrow)),
+                    locals.playNext),
+                _action(
+                    IconButton.filledTonal(
+                        onPressed: () => downloadVideo(context),
+                        icon: const Icon(Icons.download)),
+                    locals.download),
               ],
             ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                IconButton.filledTonal(
-                    onPressed: () => playNext(context),
-                    icon: const Icon(Icons.play_arrow)),
-                Text(locals.playNext)
+                _action(
+                    IconButton.filledTonal(
+                        onPressed: () => _showSharingSheet(context),
+                        icon: const Icon(Icons.share)),
+                    locals.share),
+                FutureBuilder<bool>(
+                  future: hiddenFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.data != true) {
+                      return const SizedBox.shrink();
+                    }
+                    return BlocBuilder<HiddenVideosCubit, HiddenVideosState>(
+                      bloc: HiddenVideosCubit.instance,
+                      builder: (context, hiddenState) {
+                        var hidden =
+                            hiddenState.hiddenIds.contains(video.videoId);
+                        return _action(
+                            IconButton.filledTonal(
+                                onPressed: () => hidden
+                                    ? unhideVideo(context)
+                                    : hideVideo(context),
+                                icon: Icon(hidden
+                                    ? Icons.visibility
+                                    : Icons.visibility_off)),
+                            hidden ? 'Unhide' : 'Hide');
+                      },
+                    );
+                  },
+                ),
               ],
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton.filledTonal(
-                    onPressed: () => downloadVideo(context),
-                    icon: const Icon(Icons.download)),
-                Text(locals.download)
-              ],
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton.filledTonal(
-                    onPressed: () => _showSharingSheet(context),
-                    icon: const Icon(Icons.share)),
-                Text(locals.share)
-              ],
-            ),
-            FutureBuilder<bool>(
-              future: hiddenFuture,
-              builder: (context, snapshot) {
-                if (snapshot.data != true) return const SizedBox.shrink();
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton.filledTonal(
-                            onPressed: () => hideVideo(context),
-                            icon: const Icon(Icons.visibility_off)),
-                        const Text('Hide')
-                      ],
-                    ),
-                    const SizedBox(width: 16),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton.filledTonal(
-                            onPressed: () => unhideVideo(context),
-                            icon: const Icon(Icons.visibility)),
-                        const Text('Unhide')
-                      ],
-                    ),
-                  ],
-                );
-              },
             ),
           ],
         ),

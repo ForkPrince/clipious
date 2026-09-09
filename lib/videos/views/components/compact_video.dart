@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:clipious/downloads/models/downloaded_video.dart';
 import 'package:clipious/globals.dart';
-import 'package:clipious/utils/models/image_object.dart';
 import 'package:clipious/videos/states/compact_video.dart';
 import 'package:clipious/videos/views/components/video_thumbnail.dart';
 
@@ -94,12 +93,7 @@ class CompactVideo extends StatelessWidget {
                               : video != null
                                   ? VideoThumbnailView(
                                       videoId: videoId,
-                                      thumbnails: video?.deArrowThumbnailUrl !=
-                                              null
-                                          ? [video!.deArrowThumbnailUrl!]
-                                          : ImageObject
-                                              .getThumbnailUrlsByPreferredOrder(
-                                                  video?.videoThumbnails))
+                                      thumbnails: video!.thumbnails)
                                   : offlineVideo != null
                                       ? OfflineVideoThumbnail(
                                           video: offlineVideo!,

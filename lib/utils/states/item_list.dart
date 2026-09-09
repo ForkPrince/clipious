@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:clipious/settings/models/errors/invidious_service_error.dart';
+import 'package:clipious/videos/models/video.dart';
+import 'package:clipious/videos/states/hidden_videos.dart';
 import 'package:logging/logging.dart';
 
 import '../models/paginated_list.dart';
@@ -15,13 +19,21 @@ var log = Logger('ItemListCubit');
 
 class ItemListCubit<T> extends Cubit<ItemListState<T>> {
   ScrollController scrollController = ScrollController();
+  StreamSubscription? _hiddenSub;
 
   ItemListCubit(super.initialState) {
     onReady();
+    if (state.itemList is SubscriptionVideoList) {
+      _hiddenSub = HiddenVideosCubit.instance.stream.listen((hiddenState) {
+        removeWhere((item) =>
+            item is Video && hiddenState.hiddenIds.contains(item.videoId));
+      });
+    }
   }
 
   @override
   close() async {
+    await _hiddenSub?.cancel();
     scrollController.dispose();
     super.close();
   }
@@ -53,6 +65,14 @@ class ItemListCubit<T> extends Cubit<ItemListState<T>> {
 
   refreshItems() async {
     loadItems(state.itemList.refresh);
+  }
+
+  void removeWhere(bool Function(T) test) {
+    if (isClosed) return;
+    var items = state.items.where((e) => !test(e)).toList();
+    if (items.length != state.items.length) {
+      emit(state.copyWith(items: items));
+    }
   }
 
   getItems() async {

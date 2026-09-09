@@ -126,9 +126,11 @@ sealed class Video with _$Video implements ShareLinks, IdedVideo {
   }
 
   List<String> get thumbnails {
+    var originals =
+        ImageObject.getThumbnailUrlsByPreferredOrder(videoThumbnails);
     return deArrowThumbnailUrl != null
-        ? [deArrowThumbnailUrl!]
-        : ImageObject.getThumbnailUrlsByPreferredOrder(videoThumbnails);
+        ? [deArrowThumbnailUrl!, ...originals]
+        : originals;
   }
 }
 

@@ -1,5 +1,6 @@
 import 'package:clipious/videos/models/ided_video.dart';
 import 'package:clipious/videos/models/video.dart';
+import 'package:clipious/videos/states/hidden_videos.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:clipious/l10n/generated/app_localizations.dart';
@@ -58,92 +59,103 @@ class VideoList<T extends IdedVideo> extends StatelessWidget {
     return BlocProvider(
       create: (context) =>
           ItemListCubit<T>(ItemListState<T>(itemList: paginatedVideoList)),
-      child: BlocBuilder<ItemListCubit<T>, ItemListState<T>>(
-        builder: (context, state) {
-          var cubit = context.read<ItemListCubit<T>>();
-
-          List<IdedVideo> items = state.items;
-          if (items.isNotEmpty && items[0] is Video) {
-            items = filteredVideos(state.items.cast());
-          }
-
-          var gridCount = small ? 1 : getGridCount(context);
-          return Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              if (!small && state.loading) const TopListLoading(),
-              state.error != ItemListErrors.none
-                  ? Container(
-                      alignment: Alignment.center,
-                      color: colorScheme.surface,
-                      child: InkWell(
-                          onTap: () => cubit.getItems(),
-                          child: Text(
-                            locals.couldntFetchVideos,
-                            style: small
-                                ? textTheme.labelSmall
-                                : textTheme.bodyMedium,
-                          )),
-                    )
-                  : items.isEmpty && !state.loading
-                      ? FilledButton.tonal(
-                          onPressed: cubit.refreshItems,
-                          child: Text(locals.refresh))
-                      : Padding(
-                          padding: EdgeInsets.only(top: small ? 0.0 : 4.0),
-                          child: RefreshIndicator(
-                            onRefresh: () async =>
-                                !small && state.itemList.hasRefresh()
-                                    ? await cubit.refreshItems()
-                                    : Future.delayed(Duration.zero),
-                            child: GridView.count(
-                              crossAxisCount: gridCount,
-                              controller: cubit.scrollController,
-                              scrollDirection: scrollDirection,
-                              crossAxisSpacing: small ? 8 : 5,
-                              mainAxisSpacing: small ? 8 : 5,
-                              childAspectRatio: small
-                                  ? smallVideoAspectRatio
-                                  : getGridAspectRatio(context),
-                              children: [
-                                ...items.map((v) {
-                                  Video? onlineVideo;
-                                  DownloadedVideo? offlineVideo;
-
-                                  if (v is Video) {
-                                    onlineVideo = v;
-                                  }
-
-                                  if (v is DownloadedVideo) {
-                                    offlineVideo = v;
-                                  }
-
-                                  return VideoListItem(
-                                    small: small,
-                                    showMetrics: showMetrics,
-                                    key: ValueKey(
-                                        '${v.videoId}-${small.toString()}'),
-                                    video: onlineVideo,
-                                    offlineVideo: offlineVideo,
-                                    animateDownload: animateDownload,
-                                    showVideoModalSheet: showVideoModalSheet,
-                                    allowModalSheet: allowModalSheet,
-                                    openVideoOverride: openVideoOverride,
-                                  );
-                                }),
-                                if (state.loading)
-                                  ...repeatWidget(
-                                      () => VideoListItemPlaceHolder(
-                                            small: small,
-                                          ),
-                                      count: 5 * gridCount)
-                              ],
-                            ),
-                          ),
-                        )
-            ],
-          );
+      child: BlocListener<HiddenVideosCubit, HiddenVideosState>(
+        bloc: HiddenVideosCubit.instance,
+        listenWhen: (previous, current) =>
+            previous.hiddenIds != current.hiddenIds,
+        listener: (context, hiddenState) {
+          try {
+            context.read<ItemListCubit<T>>().removeWhere((item) =>
+                item is Video && hiddenState.hiddenIds.contains(item.videoId));
+          } catch (_) {}
         },
+        child: BlocBuilder<ItemListCubit<T>, ItemListState<T>>(
+          builder: (context, state) {
+            var cubit = context.read<ItemListCubit<T>>();
+
+            List<IdedVideo> items = state.items;
+            if (items.isNotEmpty && items[0] is Video) {
+              items = filteredVideos(state.items.cast());
+            }
+
+            var gridCount = small ? 1 : getGridCount(context);
+            return Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                if (!small && state.loading) const TopListLoading(),
+                state.error != ItemListErrors.none
+                    ? Container(
+                        alignment: Alignment.center,
+                        color: colorScheme.surface,
+                        child: InkWell(
+                            onTap: () => cubit.getItems(),
+                            child: Text(
+                              locals.couldntFetchVideos,
+                              style: small
+                                  ? textTheme.labelSmall
+                                  : textTheme.bodyMedium,
+                            )),
+                      )
+                    : items.isEmpty && !state.loading
+                        ? FilledButton.tonal(
+                            onPressed: cubit.refreshItems,
+                            child: Text(locals.refresh))
+                        : Padding(
+                            padding: EdgeInsets.only(top: small ? 0.0 : 4.0),
+                            child: RefreshIndicator(
+                              onRefresh: () async =>
+                                  !small && state.itemList.hasRefresh()
+                                      ? await cubit.refreshItems()
+                                      : Future.delayed(Duration.zero),
+                              child: GridView.count(
+                                crossAxisCount: gridCount,
+                                controller: cubit.scrollController,
+                                scrollDirection: scrollDirection,
+                                crossAxisSpacing: small ? 8 : 5,
+                                mainAxisSpacing: small ? 8 : 5,
+                                childAspectRatio: small
+                                    ? smallVideoAspectRatio
+                                    : getGridAspectRatio(context),
+                                children: [
+                                  ...items.map((v) {
+                                    Video? onlineVideo;
+                                    DownloadedVideo? offlineVideo;
+
+                                    if (v is Video) {
+                                      onlineVideo = v;
+                                    }
+
+                                    if (v is DownloadedVideo) {
+                                      offlineVideo = v;
+                                    }
+
+                                    return VideoListItem(
+                                      small: small,
+                                      showMetrics: showMetrics,
+                                      key: ValueKey(
+                                          '${v.videoId}-${small.toString()}'),
+                                      video: onlineVideo,
+                                      offlineVideo: offlineVideo,
+                                      animateDownload: animateDownload,
+                                      showVideoModalSheet: showVideoModalSheet,
+                                      allowModalSheet: allowModalSheet,
+                                      openVideoOverride: openVideoOverride,
+                                    );
+                                  }),
+                                  if (state.loading)
+                                    ...repeatWidget(
+                                        () => VideoListItemPlaceHolder(
+                                              small: small,
+                                            ),
+                                        count: 5 * gridCount)
+                                ],
+                              ),
+                            ),
+                          )
+              ],
+            );
+          },
+        ),
       ),
     );
   }

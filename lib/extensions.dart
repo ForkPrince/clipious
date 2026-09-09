@@ -12,6 +12,8 @@ extension Iterables<E> on Iterable<E> {
 }
 
 extension Lists<E> on List<E> {
+  E? get firstOrNull => isEmpty ? null : first;
+
   E? firstWhereOrNull(bool Function(E e) condition) {
     try {
       return firstWhere((element) => condition(element));

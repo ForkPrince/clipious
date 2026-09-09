@@ -15,7 +15,6 @@ import 'package:logging/logging.dart';
 
 import '../../../downloads/models/downloaded_video.dart';
 import '../../../utils.dart';
-import '../../../utils/models/image_object.dart';
 import 'video_metrics.dart';
 
 final log = Logger('VideoInList');
@@ -149,12 +148,7 @@ class VideoListItem extends StatelessWidget {
                         : displayVideo != null
                             ? VideoThumbnailView(
                                 videoId: displayVideo.videoId,
-                                thumbnails:
-                                    displayVideo.deArrowThumbnailUrl != null
-                                        ? [displayVideo.deArrowThumbnailUrl!]
-                                        : ImageObject
-                                            .getThumbnailUrlsByPreferredOrder(
-                                                displayVideo.videoThumbnails),
+                                thumbnails: displayVideo.thumbnails,
                                 decoration: BoxDecoration(
                                     borderRadius:
                                         BorderRadius.circular(small ? 5 : 10)),
