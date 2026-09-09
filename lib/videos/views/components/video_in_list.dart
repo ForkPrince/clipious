@@ -80,320 +80,324 @@ class VideoListItem extends StatelessWidget {
           String title = displayVideo?.title ?? offlineVideo?.title ?? '';
           String author = displayVideo?.author ?? offlineVideo?.author ?? '';
           return BlocListener<PlayerCubit, PlayerState>(
-          listenWhen: (previous, current) =>
-              displayVideo != null &&
-              current.currentlyPlaying?.videoId == displayVideo.videoId &&
-              previous.position != current.position,
-          listener: (context, state) =>
-              context.read<VideoInListCubit>().updateProgress(),
-          child: InkWell(
-            onTap: () => openVideo(context),
-            onLongPress: (displayVideo?.isUpcoming ?? false) ||
-                    !allowModalSheet ||
-                    displayVideo == null ||
-                    displayVideo.filtered
-                ? null
-                : () => showVideoModalSheet != null
-                    ? showVideoModalSheet!(context, displayVideo)
-                    : VideoModalSheet.showVideoModalSheet(
-                        context, displayVideo),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                (state.video?.filtered ?? false)
-                    ? AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: colorScheme.secondaryContainer,
-                            borderRadius: BorderRadius.circular(small ? 5 : 10),
-                          ),
-                          child: small
-                              ? Icon(
-                                  Icons.visibility_off,
-                                  size: 10,
-                                  color: colorScheme.secondary,
-                                )
-                              : Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Text(
-                                        locals.videoFiltered,
-                                        style: filterStyle,
-                                      ),
-                                      ...video!.matchedFilters.map((e) => Text(
-                                            e.localizedLabel(locals, context),
-                                            style: filterStyle,
-                                          )),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 16.0),
-                                        child: Text(
-                                          locals.videoFilterTapToReveal,
-                                          style: filterStyle,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                        ),
-                      )
-                    : displayVideo != null
-                        ? VideoThumbnailView(
-                            videoId: displayVideo.videoId,
-                            thumbnails: displayVideo.deArrowThumbnailUrl != null
-                                ? [displayVideo.deArrowThumbnailUrl!]
-                                : ImageObject.getThumbnailUrlsByPreferredOrder(
-                                    displayVideo.videoThumbnails),
-                            decoration: BoxDecoration(
+              listenWhen: (previous, current) =>
+                  displayVideo != null &&
+                  current.currentlyPlaying?.videoId == displayVideo.videoId &&
+                  previous.position != current.position,
+              listener: (context, state) =>
+                  context.read<VideoInListCubit>().updateProgress(),
+              child: InkWell(
+                onTap: () => openVideo(context),
+                onLongPress: (displayVideo?.isUpcoming ?? false) ||
+                        !allowModalSheet ||
+                        displayVideo == null ||
+                        displayVideo.filtered
+                    ? null
+                    : () => showVideoModalSheet != null
+                        ? showVideoModalSheet!(context, displayVideo)
+                        : VideoModalSheet.showVideoModalSheet(
+                            context, displayVideo),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    (state.video?.filtered ?? false)
+                        ? AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: colorScheme.secondaryContainer,
                                 borderRadius:
-                                    BorderRadius.circular(small ? 5 : 10)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: displayVideo.isUpcoming ?? false
-                                    ? []
-                                    : [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Expanded(
-                                              child: NavigationSwitcher(
-                                                child: state.progress > 0.05
-                                                    ? Align(
-                                                        alignment: Alignment
-                                                            .centerRight,
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      4.0,
-                                                                  vertical: 8),
-                                                          child:
-                                                              AnimatedContainer(
-                                                            curve: Curves
-                                                                .easeOutQuad,
-                                                            duration:
-                                                                animationDuration,
+                                    BorderRadius.circular(small ? 5 : 10),
+                              ),
+                              child: small
+                                  ? Icon(
+                                      Icons.visibility_off,
+                                      size: 10,
+                                      color: colorScheme.secondary,
+                                    )
+                                  : Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Text(
+                                            locals.videoFiltered,
+                                            style: filterStyle,
+                                          ),
+                                          ...video!.matchedFilters
+                                              .map((e) => Text(
+                                                    e.localizedLabel(
+                                                        locals, context),
+                                                    style: filterStyle,
+                                                  )),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 16.0),
+                                            child: Text(
+                                              locals.videoFilterTapToReveal,
+                                              style: filterStyle,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                            ),
+                          )
+                        : displayVideo != null
+                            ? VideoThumbnailView(
+                                videoId: displayVideo.videoId,
+                                thumbnails:
+                                    displayVideo.deArrowThumbnailUrl != null
+                                        ? [displayVideo.deArrowThumbnailUrl!]
+                                        : ImageObject
+                                            .getThumbnailUrlsByPreferredOrder(
+                                                displayVideo.videoThumbnails),
+                                decoration: BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.circular(small ? 5 : 10)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: displayVideo.isUpcoming ?? false
+                                        ? []
+                                        : [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Expanded(
+                                                  child: NavigationSwitcher(
+                                                    child: state.progress > 0.05
+                                                        ? Align(
                                                             alignment: Alignment
-                                                                .centerLeft,
-                                                            constraints: state
-                                                                        .progress ==
-                                                                    1
-                                                                ? const BoxConstraints(
-                                                                    maxWidth:
-                                                                        20)
-                                                                : const BoxConstraints(
-                                                                    maxWidth:
-                                                                        1200),
-                                                            width:
-                                                                double.infinity,
-                                                            height:
-                                                                state.progress ==
+                                                                .centerRight,
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          4.0,
+                                                                      vertical:
+                                                                          8),
+                                                              child:
+                                                                  AnimatedContainer(
+                                                                curve: Curves
+                                                                    .easeOutQuad,
+                                                                duration:
+                                                                    animationDuration,
+                                                                alignment: Alignment
+                                                                    .centerLeft,
+                                                                constraints: state
+                                                                            .progress ==
                                                                         1
-                                                                    ? 20
-                                                                    : small
-                                                                        ? 1
-                                                                        : 5,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: colorScheme
-                                                                  .secondaryContainer,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          20),
-                                                            ),
-                                                            child:
-                                                                AnimatedFractionallySizedBox(
-                                                                    widthFactor:
-                                                                        state.progress >
+                                                                    ? const BoxConstraints(
+                                                                        maxWidth:
+                                                                            20)
+                                                                    : const BoxConstraints(
+                                                                        maxWidth:
+                                                                            1200),
+                                                                width: double
+                                                                    .infinity,
+                                                                height:
+                                                                    state.progress ==
+                                                                            1
+                                                                        ? 20
+                                                                        : small
+                                                                            ? 1
+                                                                            : 5,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: colorScheme
+                                                                      .secondaryContainer,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              20),
+                                                                ),
+                                                                child:
+                                                                    AnimatedFractionallySizedBox(
+                                                                        widthFactor: state.progress >
                                                                                 0
                                                                             ? state
                                                                                 .progress
                                                                             : 0,
-                                                                    heightFactor:
-                                                                        1,
-                                                                    duration:
-                                                                        animationDuration,
-                                                                    curve: Curves
-                                                                        .easeInOutQuad,
-                                                                    child:
-                                                                        Container(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .center,
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        color: state.progress ==
-                                                                                1
-                                                                            ? colorScheme.primaryContainer
-                                                                            : colorScheme.primary,
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(20),
-                                                                      ),
-                                                                      child:
-                                                                          AnimatedCrossFade(
-                                                                        crossFadeState: state.progress ==
-                                                                                1
-                                                                            ? CrossFadeState.showFirst
-                                                                            : CrossFadeState.showSecond,
+                                                                        heightFactor:
+                                                                            1,
                                                                         duration:
                                                                             animationDuration,
-                                                                        secondChild:
-                                                                            const SizedBox.shrink(),
-                                                                        firstChild:
-                                                                            Icon(
-                                                                          Icons
-                                                                              .check,
-                                                                          size:
-                                                                              15,
-                                                                          color:
-                                                                              colorScheme.primary,
-                                                                        ),
-                                                                      ),
-                                                                    )),
-                                                          ),
-                                                        ),
-                                                      )
-                                                    : const SizedBox.shrink(),
-                                              ),
-                                            ),
-                                            if (!small)
-                                              Visibility(
-                                                visible: (video
-                                                            ?.lengthSeconds ??
-                                                        offlineVideo
-                                                            ?.lengthSeconds ??
-                                                        0) >
-                                                    0,
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Container(
-                                                    alignment: Alignment.center,
-                                                    height: 25,
-                                                    decoration: BoxDecoration(
-                                                        color: Colors.black
-                                                            .withValues(
-                                                                alpha: 0.75),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5)),
+                                                                        curve: Curves
+                                                                            .easeInOutQuad,
+                                                                        child:
+                                                                            Container(
+                                                                          alignment:
+                                                                              Alignment.center,
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            color: state.progress == 1
+                                                                                ? colorScheme.primaryContainer
+                                                                                : colorScheme.primary,
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(20),
+                                                                          ),
+                                                                          child:
+                                                                              AnimatedCrossFade(
+                                                                            crossFadeState: state.progress == 1
+                                                                                ? CrossFadeState.showFirst
+                                                                                : CrossFadeState.showSecond,
+                                                                            duration:
+                                                                                animationDuration,
+                                                                            secondChild:
+                                                                                const SizedBox.shrink(),
+                                                                            firstChild:
+                                                                                Icon(
+                                                                              Icons.check,
+                                                                              size: 15,
+                                                                              color: colorScheme.primary,
+                                                                            ),
+                                                                          ),
+                                                                        )),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : const SizedBox
+                                                            .shrink(),
+                                                  ),
+                                                ),
+                                                if (!small)
+                                                  Visibility(
+                                                    visible: (video
+                                                                ?.lengthSeconds ??
+                                                            offlineVideo
+                                                                ?.lengthSeconds ??
+                                                            0) >
+                                                        0,
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.all(
-                                                              4.0),
-                                                      child: Text(
-                                                        prettyDurationCustom(Duration(
-                                                            seconds: video
-                                                                    ?.lengthSeconds ??
-                                                                offlineVideo
-                                                                    ?.lengthSeconds ??
-                                                                0)),
-                                                        style: textTheme
-                                                            .bodySmall
-                                                            ?.copyWith(
-                                                                color: Colors
-                                                                    .white),
+                                                              8.0),
+                                                      child: Container(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        height: 25,
+                                                        decoration: BoxDecoration(
+                                                            color: Colors.black
+                                                                .withValues(
+                                                                    alpha:
+                                                                        0.75),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5)),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(4.0),
+                                                          child: Text(
+                                                            prettyDurationCustom(Duration(
+                                                                seconds: video
+                                                                        ?.lengthSeconds ??
+                                                                    offlineVideo
+                                                                        ?.lengthSeconds ??
+                                                                    0)),
+                                                            style: textTheme
+                                                                .bodySmall
+                                                                ?.copyWith(
+                                                                    color: Colors
+                                                                        .white),
+                                                          ),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                ),
-                                              )
+                                                  )
+                                              ],
+                                            ),
                                           ],
-                                        ),
-                                      ],
+                                  ),
+                                ),
+                              )
+                            : OfflineVideoThumbnail(video: offlineVideo!),
+                    const SizedBox(
+                      height: 4,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                (state.video?.filtered ?? false)
+                                    ? '**********'
+                                    : title,
+                                textAlign: TextAlign.left,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: small ? 1 : 2,
+                                style: (small
+                                        ? textTheme.labelSmall
+                                        : textTheme.bodyMedium)
+                                    ?.copyWith(
+                                        color: colorScheme.primary,
+                                        fontWeight: FontWeight.normal),
                               ),
+                              InkWell(
+                                onTap: () {
+                                  AutoRouter.of(context).push(ChannelRoute(
+                                      channelId: video?.authorId ??
+                                          offlineVideo?.authorUrl ??
+                                          ''));
+                                },
+                                child: Text(
+                                  author,
+                                  maxLines: 1,
+                                  textAlign: TextAlign.left,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: (small
+                                          ? textTheme.labelSmall
+                                          : textTheme.bodyMedium)
+                                      ?.copyWith(color: colorScheme.secondary),
+                                ),
+                              ),
+                              if (showMetrics && !small && video != null)
+                                VideoMetrics(
+                                  video: video,
+                                  style: textTheme.bodySmall,
+                                  showDuration: false,
+                                  iconSize: 13,
+                                )
+                            ],
+                          ),
+                        ),
+                        if (!(displayVideo?.isUpcoming ?? false) &&
+                            allowModalSheet &&
+                            !small &&
+                            displayVideo != null)
+                          InkWell(
+                            onTap: (state.video?.filtered ?? true)
+                                ? null
+                                : () => showVideoModalSheet != null
+                                    ? showVideoModalSheet!(
+                                        context, displayVideo)
+                                    : VideoModalSheet.showVideoModalSheet(
+                                        context, displayVideo),
+                            child: const Padding(
+                              padding: EdgeInsets.all(4),
+                              child: Icon(Icons.more_vert),
                             ),
                           )
-                        : OfflineVideoThumbnail(video: offlineVideo!),
-                const SizedBox(
-                  height: 4,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            (state.video?.filtered ?? false)
-                                ? '**********'
-                                : title,
-                            textAlign: TextAlign.left,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: small ? 1 : 2,
-                            style: (small
-                                    ? textTheme.labelSmall
-                                    : textTheme.bodyMedium)
-                                ?.copyWith(
-                                    color: colorScheme.primary,
-                                    fontWeight: FontWeight.normal),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              AutoRouter.of(context).push(ChannelRoute(
-                                  channelId: video?.authorId ??
-                                      offlineVideo?.authorUrl ??
-                                      ''));
-                            },
-                            child: Text(
-                              author,
-                              maxLines: 1,
-                              textAlign: TextAlign.left,
-                              overflow: TextOverflow.ellipsis,
-                              style: (small
-                                      ? textTheme.labelSmall
-                                      : textTheme.bodyMedium)
-                                  ?.copyWith(color: colorScheme.secondary),
-                            ),
-                          ),
-                          if (showMetrics && !small && video != null)
-                            VideoMetrics(
-                              video: video,
-                              style: textTheme.bodySmall,
-                              showDuration: false,
-                              iconSize: 13,
-                            )
-                        ],
-                      ),
+                      ],
                     ),
-                    if (!(displayVideo?.isUpcoming ?? false) &&
-                        allowModalSheet &&
-                        !small &&
-                        displayVideo != null)
-                      InkWell(
-                        onTap: (state.video?.filtered ?? true)
-                            ? null
-                            : () => showVideoModalSheet != null
-                                ? showVideoModalSheet!(
-                                    context, displayVideo)
-                                : VideoModalSheet.showVideoModalSheet(
-                                    context, displayVideo),
-                        child: const Padding(
-                          padding: EdgeInsets.all(4),
-                          child: Icon(Icons.more_vert),
-                        ),
-                      )
                   ],
                 ),
-              ],
-            ),
-          ));
+              ));
         },
       ),
     );

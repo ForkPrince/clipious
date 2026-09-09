@@ -98,8 +98,8 @@ class DeArrow {
       var validTitle =
           deArrow.titles.firstWhereOrNull((t) => t.votes >= 0 || t.locked);
       if (validTitle?.title != null && validTitle!.title!.isNotEmpty) {
-        vid =
-            vid.copyWith(title: validTitle.title ?? video.title, deArrowed: true);
+        vid = vid.copyWith(
+            title: validTitle.title ?? video.title, deArrowed: true);
       }
       if (doThumbnails) {
         var thumbnail = deArrow.thumbnailUrl;

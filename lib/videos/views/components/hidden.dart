@@ -62,55 +62,56 @@ class HiddenView extends StatelessWidget {
                       ),
                     )
                   : !state.loading && state.items.isEmpty
-                  ? const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('No hidden videos'),
-                      ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.only(top: 3),
-                      child: RefreshIndicator(
-                        onRefresh: () => listCubit.refreshItems(),
-                        child: ListView.builder(
-                          controller: listCubit.scrollController,
-                          scrollDirection: Axis.vertical,
-                          itemCount:
-                              state.items.length + (state.loading ? 5 : 0),
-                          itemBuilder: (context, index) => Padding(
-                            padding: EdgeInsets.only(
-                              bottom: index == state.items.length - 1
-                                  ? 70.0
-                                  : 0,
-                            ),
-                            child: index >= state.items.length
-                                ? const CompactVideoPlaceHolder()
-                                : SwipeActionCell(
-                                    key: ValueKey(state.items[index]),
-                                    trailingActions: [
-                                      SwipeAction(
-                                        performsFirstActionWithFullSwipe: true,
-                                        icon: const Icon(
-                                          Icons.visibility,
-                                          color: Colors.white,
+                      ? const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('No hidden videos'),
+                          ),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.only(top: 3),
+                          child: RefreshIndicator(
+                            onRefresh: () => listCubit.refreshItems(),
+                            child: ListView.builder(
+                              controller: listCubit.scrollController,
+                              scrollDirection: Axis.vertical,
+                              itemCount:
+                                  state.items.length + (state.loading ? 5 : 0),
+                              itemBuilder: (context, index) => Padding(
+                                padding: EdgeInsets.only(
+                                  bottom: index == state.items.length - 1
+                                      ? 70.0
+                                      : 0,
+                                ),
+                                child: index >= state.items.length
+                                    ? const CompactVideoPlaceHolder()
+                                    : SwipeActionCell(
+                                        key: ValueKey(state.items[index]),
+                                        trailingActions: [
+                                          SwipeAction(
+                                            performsFirstActionWithFullSwipe:
+                                                true,
+                                            icon: const Icon(
+                                              Icons.visibility,
+                                              color: Colors.white,
+                                            ),
+                                            onTap: (handler) async {
+                                              await handler(true);
+                                              hiddenCubit.unhideFromHidden(
+                                                state.items[index],
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                        child: HistoryVideoView(
+                                          key: ValueKey(state.items[index]),
+                                          videoId: state.items[index],
                                         ),
-                                        onTap: (handler) async {
-                                          await handler(true);
-                                          hiddenCubit.unhideFromHidden(
-                                            state.items[index],
-                                          );
-                                        },
                                       ),
-                                    ],
-                                    child: HistoryVideoView(
-                                      key: ValueKey(state.items[index]),
-                                      videoId: state.items[index],
-                                    ),
-                                  ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
               if (state.loading) const TopListLoading(),
             ],
           );
