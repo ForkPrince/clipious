@@ -1,6 +1,7 @@
 import 'package:clipious/videos/models/video.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:clipious/globals.dart';
 import 'package:clipious/l10n/generated/app_localizations.dart';
 import 'package:clipious/player/states/player.dart';
 import 'package:clipious/utils.dart';
@@ -64,9 +65,30 @@ class VideoModalSheet extends StatelessWidget {
     showSharingSheet(context, video);
   }
 
+  void hideVideo(BuildContext context) async {
+    Navigator.of(context).pop();
+    var ok = await service.hideVideo(video.videoId);
+    final ScaffoldMessengerState? scaffold = scaffoldKey.currentState;
+    scaffold?.showSnackBar(SnackBar(
+      content: Text(ok ? 'Video hidden' : 'Could not hide video'),
+      duration: const Duration(seconds: 1),
+    ));
+  }
+
+  void unhideVideo(BuildContext context) async {
+    Navigator.of(context).pop();
+    var ok = await service.unhideVideo(video.videoId);
+    final ScaffoldMessengerState? scaffold = scaffoldKey.currentState;
+    scaffold?.showSnackBar(SnackBar(
+      content: Text(ok ? 'Video unhidden' : 'Could not unhide video'),
+      duration: const Duration(seconds: 1),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
+    final hiddenFuture = service.supportsHidden();
     return FractionallySizedBox(
       widthFactor: 1,
       child: Padding(
@@ -118,6 +140,36 @@ class VideoModalSheet extends StatelessWidget {
                     icon: const Icon(Icons.share)),
                 Text(locals.share)
               ],
+            ),
+            FutureBuilder<bool>(
+              future: hiddenFuture,
+              builder: (context, snapshot) {
+                if (snapshot.data != true) return const SizedBox.shrink();
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton.filledTonal(
+                            onPressed: () => hideVideo(context),
+                            icon: const Icon(Icons.visibility_off)),
+                        const Text('Hide')
+                      ],
+                    ),
+                    const SizedBox(width: 16),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton.filledTonal(
+                            onPressed: () => unhideVideo(context),
+                            icon: const Icon(Icons.visibility)),
+                        const Text('Unhide')
+                      ],
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),

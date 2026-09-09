@@ -125,8 +125,10 @@ class TvVideoItem extends StatelessWidget {
                                         ),
                                       )
                                     : VideoThumbnailView(
-                                        videoId: video.videoId,
-                                        thumbnails: video.thumbnails,
+                                        videoId: state.video?.videoId ??
+                                            video.videoId,
+                                        thumbnails: state.video?.thumbnails ??
+                                            video.thumbnails,
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Container(
@@ -258,7 +260,9 @@ class TvVideoItem extends StatelessWidget {
                                   child: Text(
                                     (state.video?.filtered ?? false)
                                         ? '**********'
-                                        : video.title ?? '',
+                                        : state.video?.title ??
+                                            video.title ??
+                                            '',
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(color: colors.primary),

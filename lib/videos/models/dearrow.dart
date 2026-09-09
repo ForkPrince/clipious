@@ -24,18 +24,13 @@ class DeArrow {
 
   String? get thumbnailUrl {
     for (var thumb in thumbnails) {
-      if (thumb.votes >= 0 || thumb.locked) {
-        if (thumb.original) return thumbBaseUrl;
-        if (thumb.timestamp != null) {
-          return '$thumbBaseUrl&time=${thumb.timestamp}';
-        }
+      if (thumb.votes < 0 && !thumb.locked) continue;
+      if (thumb.original) return null;
+      if (thumb.timestamp != null) {
+        return '$thumbBaseUrl&time=${thumb.timestamp}';
       }
     }
-    if (videoDuration != null && randomTime != null) {
-      var time = videoDuration! * randomTime!;
-      return '$thumbBaseUrl&time=$time';
-    }
-    return thumbBaseUrl;
+    return null;
   }
 
   DeArrow({
@@ -52,16 +47,30 @@ class DeArrow {
 
   static Future<List<Video>> processVideos(List<Video>? videos) async {
     var process = db.getSettings(dearrowSettingName)?.value == "true";
-    if (videos != null && process) {
+    if (videos != null && process && videos.isNotEmpty) {
       bool doThumbnails =
           db.getSettings(dearrowThumbnailsSettingName)?.value == "true";
-      var futureTasks =
-          videos.map((e) => _deArrowVideo(e, doThumbnails)).toList();
-
-      return await Future.wait(futureTasks);
+      List<Video> out = [];
+      const chunkSize = 8;
+      for (var i = 0; i < videos.length; i += chunkSize) {
+        var chunk = videos.sublist(
+            i, i + chunkSize > videos.length ? videos.length : i + chunkSize);
+        var processed =
+            await Future.wait(chunk.map((e) => _deArrowVideo(e, doThumbnails)));
+        out.addAll(processed);
+      }
+      return out;
     } else {
       return videos ?? [];
     }
+  }
+
+  static Future<Video> processVideo(Video video) async {
+    var process = db.getSettings(dearrowSettingName)?.value == "true";
+    if (!process) return video;
+    bool doThumbnails =
+        db.getSettings(dearrowThumbnailsSettingName)?.value == "true";
+    return _deArrowVideo(video, doThumbnails);
   }
 
   static Future<Video> _deArrowVideo(Video video, bool doThumbnails) async {
@@ -78,37 +87,35 @@ class DeArrow {
         if (!doThumbnails) return vid;
 
         if (cache.url != null) {
-          bool cachedAvailable = await service.testDeArrowThumbnail(cache.url);
-          if (cachedAvailable) {
-            vid = vid.copyWith(deArrowThumbnailUrl: cache.url, deArrowed: true);
-            return vid;
-          }
+          vid = vid.copyWith(deArrowThumbnailUrl: cache.url, deArrowed: true);
+          return vid;
         }
+        if (cache.title != null) return vid;
       }
 
       var deArrow = await service.getDeArrow(video.videoId);
+      if (deArrow == null) return vid;
       var validTitle =
-          deArrow?.titles.firstWhereOrNull((t) => t.votes >= 0 || t.locked);
-      if (validTitle != null) {
-        vid = vid.copyWith(
-            title: validTitle.title ?? video.title, deArrowed: true);
+          deArrow.titles.firstWhereOrNull((t) => t.votes >= 0 || t.locked);
+      if (validTitle?.title != null && validTitle!.title!.isNotEmpty) {
+        vid =
+            vid.copyWith(title: validTitle.title ?? video.title, deArrowed: true);
       }
       if (doThumbnails) {
-        var thumbnail = deArrow?.thumbnailUrl;
+        var thumbnail = deArrow.thumbnailUrl;
         if (thumbnail != null) {
-          bool isThumbnailAvailable =
-              await service.testDeArrowThumbnail(thumbnail);
-          if (isThumbnailAvailable) {
-            vid = vid.copyWith(deArrowThumbnailUrl: thumbnail, deArrowed: true);
-          }
+          vid = vid.copyWith(deArrowThumbnailUrl: thumbnail, deArrowed: true);
         }
       }
 
       DeArrowCache newCache = DeArrowCache(video.videoId);
-      newCache.title = deArrow?.titles.firstOrNull?.title;
+      newCache.title = validTitle?.title;
       newCache.url = vid.deArrowThumbnailUrl;
       if (newCache.title != null || newCache.url != null) {
         await db.upsertDeArrowCache(newCache);
+      } else if (cache == null) {
+        DeArrowCache empty = DeArrowCache(video.videoId);
+        await db.upsertDeArrowCache(empty);
       }
 
       return vid;

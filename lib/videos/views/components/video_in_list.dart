@@ -71,30 +71,32 @@ class VideoListItem extends StatelessWidget {
     TextStyle filterStyle = (textTheme.bodySmall ?? const TextStyle())
         .copyWith(color: colorScheme.secondary.withValues(alpha: 0.7));
 
-    String title = video?.title ?? offlineVideo?.title ?? '';
-    String author = video?.author ?? offlineVideo?.author ?? '';
-
     return BlocProvider(
       create: (context) => VideoInListCubit(
           VideoInListState(video: video, offlineVideo: offlineVideo)),
       child: BlocBuilder<VideoInListCubit, VideoInListState>(
-        builder: (context, state) => BlocListener<PlayerCubit, PlayerState>(
+        builder: (context, state) {
+          var displayVideo = state.video ?? video;
+          String title = displayVideo?.title ?? offlineVideo?.title ?? '';
+          String author = displayVideo?.author ?? offlineVideo?.author ?? '';
+          return BlocListener<PlayerCubit, PlayerState>(
           listenWhen: (previous, current) =>
-              state.video != null &&
-              current.currentlyPlaying?.videoId == video!.videoId &&
+              displayVideo != null &&
+              current.currentlyPlaying?.videoId == displayVideo.videoId &&
               previous.position != current.position,
           listener: (context, state) =>
               context.read<VideoInListCubit>().updateProgress(),
           child: InkWell(
             onTap: () => openVideo(context),
-            onLongPress: (video?.isUpcoming ?? false) ||
+            onLongPress: (displayVideo?.isUpcoming ?? false) ||
                     !allowModalSheet ||
-                    state.video == null ||
-                    state.video!.filtered
+                    displayVideo == null ||
+                    displayVideo.filtered
                 ? null
                 : () => showVideoModalSheet != null
-                    ? showVideoModalSheet!(context, video!)
-                    : VideoModalSheet.showVideoModalSheet(context, video!),
+                    ? showVideoModalSheet!(context, displayVideo)
+                    : VideoModalSheet.showVideoModalSheet(
+                        context, displayVideo),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -141,13 +143,13 @@ class VideoListItem extends StatelessWidget {
                                 ),
                         ),
                       )
-                    : video != null
+                    : displayVideo != null
                         ? VideoThumbnailView(
-                            videoId: video!.videoId,
-                            thumbnails: video!.deArrowThumbnailUrl != null
-                                ? [video!.deArrowThumbnailUrl!]
+                            videoId: displayVideo.videoId,
+                            thumbnails: displayVideo.deArrowThumbnailUrl != null
+                                ? [displayVideo.deArrowThumbnailUrl!]
                                 : ImageObject.getThumbnailUrlsByPreferredOrder(
-                                    video!.videoThumbnails),
+                                    displayVideo.videoThumbnails),
                             decoration: BoxDecoration(
                                 borderRadius:
                                     BorderRadius.circular(small ? 5 : 10)),
@@ -155,7 +157,7 @@ class VideoListItem extends StatelessWidget {
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
-                                children: video!.isUpcoming ?? false
+                                children: displayVideo.isUpcoming ?? false
                                     ? []
                                     : [
                                         Row(
@@ -370,17 +372,18 @@ class VideoListItem extends StatelessWidget {
                         ],
                       ),
                     ),
-                    if (!(video?.isUpcoming ?? false) &&
+                    if (!(displayVideo?.isUpcoming ?? false) &&
                         allowModalSheet &&
                         !small &&
-                        video != null)
+                        displayVideo != null)
                       InkWell(
                         onTap: (state.video?.filtered ?? true)
                             ? null
                             : () => showVideoModalSheet != null
-                                ? showVideoModalSheet!(context, video!)
+                                ? showVideoModalSheet!(
+                                    context, displayVideo)
                                 : VideoModalSheet.showVideoModalSheet(
-                                    context, video!),
+                                    context, displayVideo),
                         child: const Padding(
                           padding: EdgeInsets.all(4),
                           child: Icon(Icons.more_vert),
@@ -390,8 +393,8 @@ class VideoListItem extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        ),
+          ));
+        },
       ),
     );
   }

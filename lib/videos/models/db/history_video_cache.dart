@@ -35,8 +35,11 @@ class HistoryVideoCache {
     var cachedVideo = db.getHistoryVideoByVideoId(e);
     if (cachedVideo == null) {
       var vid = await service.getVideo(e);
-      cachedVideo = HistoryVideoCache(vid.videoId, vid.title ?? '', vid.author,
-          ImageObject.getBestThumbnail(vid.videoThumbnails)?.url ?? '');
+      var thumb = vid.deArrowThumbnailUrl ??
+          ImageObject.getBestThumbnail(vid.videoThumbnails)?.url ??
+          '';
+      cachedVideo =
+          HistoryVideoCache(vid.videoId, vid.title ?? '', vid.author, thumb);
       await db.upsertHistoryVideo(cachedVideo);
     }
     return cachedVideo;

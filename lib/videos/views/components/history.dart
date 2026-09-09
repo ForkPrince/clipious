@@ -5,6 +5,7 @@ import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:clipious/globals.dart';
 import 'package:clipious/utils/states/item_list.dart';
 import 'package:clipious/utils/views/components/top_loading.dart';
+import 'package:clipious/videos/views/components/hidden.dart';
 import 'package:clipious/videos/views/components/history_video.dart';
 
 import '../../../utils.dart';
@@ -99,15 +100,41 @@ class HistoryView extends StatelessWidget {
             Positioned(
                 bottom: 15,
                 right: 15,
-                child: FloatingActionButton(
-                  onPressed: () {
-                    okCancelDialog(
-                        context,
-                        locals.clearHistoryQuestion,
-                        locals.clearHistoryQuestionExplanation,
-                        () => historyCubit.clearHistory());
-                  },
-                  child: const Icon(Icons.delete),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FutureBuilder<bool>(
+                      future: service.supportsHidden(),
+                      builder: (context, snapshot) {
+                        if (snapshot.data != true) {
+                          return const SizedBox.shrink();
+                        }
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            FloatingActionButton(
+                              heroTag: 'hidden',
+                              mini: true,
+                              onPressed: () => HiddenView.showHidden(context),
+                              child: const Icon(Icons.visibility_off),
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                        );
+                      },
+                    ),
+                    FloatingActionButton(
+                      heroTag: 'clear',
+                      onPressed: () {
+                        okCancelDialog(
+                            context,
+                            locals.clearHistoryQuestion,
+                            locals.clearHistoryQuestionExplanation,
+                            () => historyCubit.clearHistory());
+                      },
+                      child: const Icon(Icons.delete),
+                    ),
+                  ],
                 ))
           ],
         );

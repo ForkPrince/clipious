@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:clipious/globals.dart';
 import 'package:clipious/utils/states/item_list.dart';
+import 'package:clipious/videos/models/dearrow.dart';
 
 import '../models/db/history_video_cache.dart';
 
@@ -40,6 +41,23 @@ class HistoryItemCubit extends Cubit<HistoryItemState> {
     if (!isClosed) {
       emit(state.copyWith(cachedVid: cachedVid, loading: false));
     }
+
+    try {
+      var deArrowed = await DeArrow.processVideo(cachedVid.toVideo());
+      if (!isClosed &&
+          (deArrowed.title != cachedVid.title ||
+              (deArrowed.deArrowThumbnailUrl != null &&
+                  deArrowed.deArrowThumbnailUrl != cachedVid.thumbnail))) {
+        var updated = HistoryVideoCache(
+            cachedVid.videoId,
+            deArrowed.title ?? cachedVid.title,
+            cachedVid.author,
+            deArrowed.deArrowThumbnailUrl ?? cachedVid.thumbnail)
+          ..created = cachedVid.created;
+        await db.upsertHistoryVideo(updated);
+        if (!isClosed) emit(state.copyWith(cachedVid: updated));
+      }
+    } catch (_) {}
   }
 }
 

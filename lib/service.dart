@@ -68,6 +68,8 @@ const urlGetPublicPlaylist = '/api/v1/playlists/:id';
 const urlGetDislikes = 'https://returnyoutubedislikeapi.com/votes?videoId=';
 const urlGetClearHistory = '/api/v1/auth/history';
 const urlAddDeleteHistory = '/api/v1/auth/history/:id';
+const urlGetHidden = '/api/v1/auth/hidden';
+const urlHideUnhideVideo = '/api/v1/auth/hidden/:id';
 const urlImgurScreenshotUpload = 'https://api.imgur.com/3/image';
 
 const imgurClientId = 'Client-ID 2cfbc27ce77879d';
@@ -219,7 +221,7 @@ class Service {
 
   Future<String?> logIn(String serverUrl) async {
     String url =
-        '$serverUrl/authorize_token?scopes=:feed,:subscriptions*,:playlists*,:history*&callback_url=clipious-auth://';
+        '$serverUrl/authorize_token?scopes=:feed,:subscriptions*,:playlists*,:history*,:hidden*&callback_url=clipious-auth://';
     final result = await FlutterWebAuth2.authenticate(
         url: url, callbackUrlScheme: 'clipious-auth');
 
@@ -380,8 +382,12 @@ class Service {
 
       log.fine("calling $url");
       final response = await httpClient.get((Uri.parse(url)));
+      if (response.statusCode == 404) return null;
       var body = utf8.decode(response.bodyBytes);
-      var deArrow = DeArrow.fromJson(jsonDecode(body));
+      var json = jsonDecode(body) as Map<String, dynamic>;
+      json.putIfAbsent('titles', () => []);
+      json.putIfAbsent('thumbnails', () => []);
+      var deArrow = DeArrow.fromJson(json);
       deArrow.videoId = videoId;
       return deArrow;
     } catch (err) {
@@ -723,6 +729,69 @@ class Service {
 
     final response = await httpClient.post(req.uri, headers: req.headers);
     handleResponse(response);
+  }
+
+  final Map<String, bool> _hiddenSupportCache = {};
+
+  void clearHiddenSupportCache() => _hiddenSupportCache.clear();
+
+  Future<bool> supportsHidden() async {
+    try {
+      if (!await isLoggedIn()) return false;
+      final server = await db.getCurrentlySelectedServer();
+      final key = server.url;
+      if (_hiddenSupportCache.containsKey(key)) {
+        return _hiddenSupportCache[key]!;
+      }
+      final req = await buildRequest(urlGetHidden,
+          query: {'page': '1', 'max_results': '1'},
+          authenticated: true,
+          forceJson: true);
+      final response = await httpClient.get(req.uri, headers: req.headers);
+      if (response.statusCode == 404) {
+        return false;
+      }
+      _hiddenSupportCache[key] = true;
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<List<String>> getHiddenVideos(int page, int maxResults) async {
+    final req = await buildRequest(urlGetHidden,
+        query: {'page': page.toString(), 'max_results': maxResults.toString()},
+        authenticated: true,
+        forceJson: true);
+
+    final response = await httpClient.get(req.uri, headers: req.headers);
+    Iterable i = handleResponse(response);
+
+    return List<String>.from(i.map((e) => e as String));
+  }
+
+  Future<bool> hideVideo(String videoId) async {
+    if (!await isLoggedIn()) return false;
+    try {
+      var req = await buildRequest(urlHideUnhideVideo,
+          pathParams: {':id': videoId}, authenticated: true, forceJson: true);
+      final response = await httpClient.post(req.uri, headers: req.headers);
+      return response.statusCode >= 200 && response.statusCode < 300;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> unhideVideo(String videoId) async {
+    if (!await isLoggedIn()) return false;
+    try {
+      var req = await buildRequest(urlHideUnhideVideo,
+          pathParams: {':id': videoId}, authenticated: true, forceJson: true);
+      final response = await httpClient.delete(req.uri, headers: req.headers);
+      return response.statusCode >= 200 && response.statusCode < 300;
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<Duration?> pingServer(String url) async {
