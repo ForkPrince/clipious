@@ -68,22 +68,23 @@ class DeArrow {
   @JsonKey(includeFromJson: false, includeToJson: false)
   late final String videoId;
 
-  String get thumbBaseUrl =>
-      'https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=:id'
-          .replaceAll(':id', videoId);
+  static const _thumbnailBaseUrl =
+      'https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=';
+
+  String get thumbBaseUrl => '$_thumbnailBaseUrl$videoId';
 
   String? get thumbnailUrl {
-    for (var thumb in thumbnails) {
-      if (thumb.votes < 0 && !thumb.locked) continue;
-      if (thumb.original) return null;
-      if (thumb.timestamp != null) {
-        return '$thumbBaseUrl&time=${thumb.timestamp}';
+    var thumb = thumbnails.isNotEmpty ? thumbnails.first : null;
+    var valid = thumb != null && (thumb.votes >= 0 || thumb.locked);
+    if (valid && thumb.original) return null;
+    if (valid || videoDuration != null) {
+      var time = thumb?.timestamp;
+      if (time == null && videoDuration != null) {
+        time = videoDuration! * (randomTime ?? 0);
       }
+      if (time != null) return '$thumbBaseUrl&time=$time';
     }
-    if (videoDuration != null && randomTime != null) {
-      return '$thumbBaseUrl&time=${videoDuration! * randomTime!}';
-    }
-    return null;
+    return thumbBaseUrl;
   }
 
   String resolveTitle(String? originalTitle, {bool normalize = false}) {
@@ -163,7 +164,6 @@ class DeArrow {
           vid = vid.copyWith(deArrowThumbnailUrl: cache.url);
           return vid;
         }
-        if (cache.title != null) return vid;
       }
 
       var deArrow = await service.getDeArrow(video.videoId);
@@ -184,11 +184,17 @@ class DeArrow {
         newCache.cachedAt = DateTime.now().millisecondsSinceEpoch;
         newCache.normalized = normalizeTitles;
         await db.upsertDeArrowCache(newCache);
-      } else if (cache == null) {
-        DeArrowCache newCache = DeArrowCache(video.videoId);
-        newCache.cachedAt = DateTime.now().millisecondsSinceEpoch;
-        newCache.normalized = normalizeTitles;
-        await db.upsertDeArrowCache(newCache);
+      } else {
+        if (doThumbnails) {
+          vid = vid.copyWith(
+              deArrowThumbnailUrl: '$_thumbnailBaseUrl${video.videoId}');
+        }
+        if (cache == null) {
+          DeArrowCache newCache = DeArrowCache(video.videoId);
+          newCache.cachedAt = DateTime.now().millisecondsSinceEpoch;
+          newCache.normalized = normalizeTitles;
+          await db.upsertDeArrowCache(newCache);
+        }
       }
 
       return vid;
