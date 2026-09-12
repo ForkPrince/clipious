@@ -1079,6 +1079,13 @@ class AppLocalizationsOr extends AppLocalizations {
       'ଟାଇଟଲ୍ ସହିତ ଭିଡିଓ ଥମ୍ବନେଲଗୁଡିକ ବଦଳାନ୍ତୁ';
 
   @override
+  String get deArrowNormalizeTitles => 'Normalize titles';
+
+  @override
+  String get deArrowNormalizeTitlesDescription =>
+      'Apply proper casing to all video titles';
+
+  @override
   String get deArrowWarning =>
       'DeArrowକୁ ସକ୍ରିୟ କରନ୍ତୁ ଆପର ବ୍ରାଉଜିଙ୍ଗ ଗତିକୁ ଉଲ୍ଲେଖନୀୟ ଭାବରେ ହ୍ରାସ କରିପାରିବେ କାରଣ ପ୍ରତ୍ୟେକ ଭିଡିଓ ପାଇଁ ଅତିରିକ୍ତ HTTP ଅନୁରୋଧ ଆବଶ୍ୟକ';
 

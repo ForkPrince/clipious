@@ -11,7 +11,8 @@ DeArrowCache _$DeArrowCacheFromJson(Map<String, dynamic> json) => DeArrowCache(
     )
       ..title = json['title'] as String?
       ..url = json['url'] as String?
-      ..cachedAt = (json['cachedAt'] as num?)?.toInt();
+      ..cachedAt = (json['cachedAt'] as num?)?.toInt()
+      ..normalized = json['normalized'] as bool?;
 
 Map<String, dynamic> _$DeArrowCacheToJson(DeArrowCache instance) =>
     <String, dynamic>{
@@ -19,4 +20,5 @@ Map<String, dynamic> _$DeArrowCacheToJson(DeArrowCache instance) =>
       'title': instance.title,
       'url': instance.url,
       'cachedAt': instance.cachedAt,
+      'normalized': instance.normalized,
     };

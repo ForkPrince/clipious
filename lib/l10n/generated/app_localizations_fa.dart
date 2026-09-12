@@ -1079,6 +1079,13 @@ class AppLocalizationsFa extends AppLocalizations {
       'جایگزین کردن تصویر بندانگشتی علاوه بر عنوان';
 
   @override
+  String get deArrowNormalizeTitles => 'Normalize titles';
+
+  @override
+  String get deArrowNormalizeTitlesDescription =>
+      'Apply proper casing to all video titles';
+
+  @override
   String get deArrowWarning =>
       'فعال کردن DeArrow به دلیل افزودن درخواست‌های http موردنیاز هر ویدیو، می‌تواند به شکل چشمگیری سرعت استفاده از اپلیکیشن را کاهش دهد';
 

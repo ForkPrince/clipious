@@ -1097,6 +1097,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Remplacer les vignettes des vidéos, ainsi que les titres';
 
   @override
+  String get deArrowNormalizeTitles => 'Normalize titles';
+
+  @override
+  String get deArrowNormalizeTitlesDescription =>
+      'Apply proper casing to all video titles';
+
+  @override
   String get deArrowWarning =>
       'Activer DeArrow peut réduire significativement la vitesse de navigation de l\'application car des requêtes http supplémentaires sont nécessaires pour chaque vidéo';
 

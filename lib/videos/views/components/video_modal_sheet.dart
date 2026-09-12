@@ -12,7 +12,7 @@ import 'package:clipious/videos/views/components/download_modal_sheet.dart';
 import '../../../main.dart';
 import 'add_to_queue_button.dart';
 
-const _sheetActionWidth = 84.0;
+const _sheetActionWidth = 80.0;
 
 class VideoModalSheet extends StatelessWidget {
   final Video video;
@@ -113,74 +113,63 @@ class VideoModalSheet extends StatelessWidget {
       widthFactor: 1,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: _sheetActionWidth,
-                  child: AddToPlayListButton(
-                    videoId: video.videoId,
-                    type: AddToPlayListButtonType.modalSheet,
-                    afterAdd: () => Navigator.pop(context),
-                  ),
-                ),
-                _action(
-                    IconButton.filledTonal(
-                        onPressed:
-                            AddToQueueButton.canAddToQueue(context, [video])
-                                ? () => addToQueue(context)
-                                : null,
-                        icon: const Icon(Icons.playlist_play)),
-                    locals.addToQueueList),
-                _action(
-                    IconButton.filledTonal(
-                        onPressed: () => playNext(context),
-                        icon: const Icon(Icons.play_arrow)),
-                    locals.playNext),
-                _action(
-                    IconButton.filledTonal(
-                        onPressed: () => downloadVideo(context),
-                        icon: const Icon(Icons.download)),
-                    locals.download),
-              ],
+            SizedBox(
+              width: _sheetActionWidth,
+              child: AddToPlayListButton(
+                videoId: video.videoId,
+                type: AddToPlayListButtonType.modalSheet,
+                afterAdd: () => Navigator.pop(context),
+              ),
             ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _action(
-                    IconButton.filledTonal(
-                        onPressed: () => _showSharingSheet(context),
-                        icon: const Icon(Icons.share)),
-                    locals.share),
-                FutureBuilder<bool>(
-                  future: hiddenFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.data != true) {
-                      return const SizedBox.shrink();
-                    }
-                    return BlocBuilder<HiddenVideosCubit, HiddenVideosState>(
-                      bloc: HiddenVideosCubit.instance,
-                      builder: (context, hiddenState) {
-                        var hidden =
-                            hiddenState.hiddenIds.contains(video.videoId);
-                        return _action(
-                            IconButton.filledTonal(
-                                onPressed: () => hidden
-                                    ? unhideVideo(context)
-                                    : hideVideo(context),
-                                icon: Icon(hidden
-                                    ? Icons.visibility
-                                    : Icons.visibility_off)),
-                            hidden ? 'Unhide' : 'Hide');
-                      },
-                    );
+            _action(
+                IconButton.filledTonal(
+                    onPressed: AddToQueueButton.canAddToQueue(context, [video])
+                        ? () => addToQueue(context)
+                        : null,
+                    icon: const Icon(Icons.playlist_play)),
+                locals.addToQueueList),
+            _action(
+                IconButton.filledTonal(
+                    onPressed: () => playNext(context),
+                    icon: const Icon(Icons.play_arrow)),
+                locals.playNext),
+            _action(
+                IconButton.filledTonal(
+                    onPressed: () => downloadVideo(context),
+                    icon: const Icon(Icons.download)),
+                locals.download),
+            _action(
+                IconButton.filledTonal(
+                    onPressed: () => _showSharingSheet(context),
+                    icon: const Icon(Icons.share)),
+                locals.share),
+            FutureBuilder<bool>(
+              future: hiddenFuture,
+              builder: (context, snapshot) {
+                if (snapshot.data != true) {
+                  return const SizedBox.shrink();
+                }
+                return BlocBuilder<HiddenVideosCubit, HiddenVideosState>(
+                  bloc: HiddenVideosCubit.instance,
+                  builder: (context, hiddenState) {
+                    var hidden = hiddenState.hiddenIds.contains(video.videoId);
+                    return _action(
+                        IconButton.filledTonal(
+                            onPressed: () => hidden
+                                ? unhideVideo(context)
+                                : hideVideo(context),
+                            icon: Icon(hidden
+                                ? Icons.visibility
+                                : Icons.visibility_off)),
+                        hidden ? 'Unhide' : 'Hide');
                   },
-                ),
-              ],
+                );
+              },
             ),
           ],
         ),

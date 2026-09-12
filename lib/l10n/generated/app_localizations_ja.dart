@@ -1037,6 +1037,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deArrowReplaceThumbnailsDescription => '動画の題名に加えサムネイルも置換する';
 
   @override
+  String get deArrowNormalizeTitles => 'Normalize titles';
+
+  @override
+  String get deArrowNormalizeTitlesDescription =>
+      'Apply proper casing to all video titles';
+
+  @override
   String get deArrowWarning =>
       'DeArrow が有効であれば、個々の動画に追加の HTTP リクエストを行うためアプリの閲覧速度は大きく低下します';
 

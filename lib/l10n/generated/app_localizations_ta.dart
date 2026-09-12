@@ -1094,6 +1094,13 @@ class AppLocalizationsTa extends AppLocalizations {
       'தலைப்புகள் கூடுதலாக வீடியோ சிறு உருவங்களை மாற்றவும்';
 
   @override
+  String get deArrowNormalizeTitles => 'Normalize titles';
+
+  @override
+  String get deArrowNormalizeTitlesDescription =>
+      'Apply proper casing to all video titles';
+
+  @override
   String get deArrowWarning =>
       'ஒவ்வொரு வீடியோவிற்கும் கூடுதல் HTTP கோரிக்கைகள் தேவைப்படுவதால், அன்பை இயக்குவது பயன்பாட்டின் உலாவல் வேகத்தை கணிசமாகக் குறைக்கும்';
 

@@ -39,6 +39,7 @@ const backgroundCheckFrequency = "background-check-frequency";
 const subtitleBackground = 'subtitle-background';
 const dearrowSettingName = 'dearrow';
 const dearrowThumbnailsSettingName = "dearrow-thumbnails";
+const dearrowNormalizeTitlesSettingName = "dearrow-normalize-titles";
 const fullScreenOnLandscapeSettingName = "fullscreen-on-landscape";
 const screenControlsSettingName = "screen-controls";
 const forceTvUiSettingName = "force-tv-ui";

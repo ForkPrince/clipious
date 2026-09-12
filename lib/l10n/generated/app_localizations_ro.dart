@@ -1092,6 +1092,13 @@ class AppLocalizationsRo extends AppLocalizations {
       'Înlocuiește miniaturile videoclipurilor în plus față de titluri';
 
   @override
+  String get deArrowNormalizeTitles => 'Normalize titles';
+
+  @override
+  String get deArrowNormalizeTitlesDescription =>
+      'Apply proper casing to all video titles';
+
+  @override
   String get deArrowWarning =>
       'Activarea DeArrow poate reduce semnificativ viteza de navigare a aplicației, întrucât sunt necesare cereri http suplimentare pentru fiecare videoclip în parte';
 

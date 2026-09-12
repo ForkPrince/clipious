@@ -1074,6 +1074,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'استبدال الصور المصغرة للفيديو بالإضافة إلى العناوين';
 
   @override
+  String get deArrowNormalizeTitles => 'Normalize titles';
+
+  @override
+  String get deArrowNormalizeTitlesDescription =>
+      'Apply proper casing to all video titles';
+
+  @override
   String get deArrowWarning =>
       'يمكن أن يؤدي تمكين DeArrow إلى تقليل سرعة تصفح التطبيق بشكل كبير حيث يلزم وجود طلبات http إضافية لكل مقطع فيديو واحد';
 

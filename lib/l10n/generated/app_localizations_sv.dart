@@ -1091,6 +1091,13 @@ class AppLocalizationsSv extends AppLocalizations {
       'Byt ut miniatyrbilden utöver namnet';
 
   @override
+  String get deArrowNormalizeTitles => 'Normalize titles';
+
+  @override
+  String get deArrowNormalizeTitlesDescription =>
+      'Apply proper casing to all video titles';
+
+  @override
   String get deArrowWarning =>
       'Att aktivera DeArrow kan markant minska bläddringshastigheten i applikationen då extra internetförfrågningar krävs för varje enskild film';
 

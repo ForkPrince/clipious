@@ -1914,6 +1914,18 @@ abstract class AppLocalizations {
   /// **'Replace video thumbnails in addition of the titles'**
   String get deArrowReplaceThumbnailsDescription;
 
+  /// Settings title for checkbox on whether to normalize title casing
+  ///
+  /// In en, this message translates to:
+  /// **'Normalize titles'**
+  String get deArrowNormalizeTitles;
+
+  /// Description for DeArrow normalize titles setting switch
+  ///
+  /// In en, this message translates to:
+  /// **'Apply proper casing to all video titles'**
+  String get deArrowNormalizeTitlesDescription;
+
   /// Warning message when the user enables DeArrow
   ///
   /// In en, this message translates to:

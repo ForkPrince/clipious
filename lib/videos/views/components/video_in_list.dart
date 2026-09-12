@@ -126,7 +126,7 @@ class VideoListItem extends StatelessWidget {
                                             locals.videoFiltered,
                                             style: filterStyle,
                                           ),
-                                          ...video!.matchedFilters
+                                          ...displayVideo!.matchedFilters
                                               .map((e) => Text(
                                                     e.localizedLabel(
                                                         locals, context),
@@ -265,8 +265,8 @@ class VideoListItem extends StatelessWidget {
                                                 ),
                                                 if (!small)
                                                   Visibility(
-                                                    visible: (video
-                                                                ?.lengthSeconds ??
+                                                    visible: (displayVideo
+                                                                .lengthSeconds ??
                                                             offlineVideo
                                                                 ?.lengthSeconds ??
                                                             0) >
@@ -294,8 +294,8 @@ class VideoListItem extends StatelessWidget {
                                                                   .all(4.0),
                                                           child: Text(
                                                             prettyDurationCustom(Duration(
-                                                                seconds: video
-                                                                        ?.lengthSeconds ??
+                                                                seconds: displayVideo
+                                                                        .lengthSeconds ??
                                                                     offlineVideo
                                                                         ?.lengthSeconds ??
                                                                     0)),

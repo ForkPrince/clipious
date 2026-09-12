@@ -10,6 +10,7 @@ class DeArrowCache {
   String? title;
   String? url;
   int? cachedAt;
+  bool? normalized;
 
   bool get isStale =>
       cachedAt == null ||

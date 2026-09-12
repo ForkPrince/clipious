@@ -1056,6 +1056,13 @@ class AppLocalizationsZh extends AppLocalizations {
       'Replace video thumbnails in addition of the titles';
 
   @override
+  String get deArrowNormalizeTitles => 'Normalize titles';
+
+  @override
+  String get deArrowNormalizeTitlesDescription =>
+      'Apply proper casing to all video titles';
+
+  @override
   String get deArrowWarning =>
       'Enabling DeArrow can significantly reduce the browsing speed of the app as extra http requests are needed for every single video';
 

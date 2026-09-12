@@ -404,6 +404,9 @@ class SettingsCubit extends Cubit<SettingsState> {
   setDearrowThumbnails(bool b) async =>
       await _set(dearrowThumbnailsSettingName, b);
 
+  setDearrowNormalizeTitles(bool b) async =>
+      await _set(dearrowNormalizeTitlesSettingName, b);
+
   setSkipStep(int s) async => await _set(skipStepSettingName, s);
 
   setSkipExponentially(bool b) async =>
@@ -601,6 +604,9 @@ sealed class SettingsState with _$SettingsState {
 
   bool get dearrowThumbnails =>
       _get(dearrowThumbnailsSettingName)?.value == 'true';
+
+  bool get dearrowNormalizeTitles =>
+      _get(dearrowNormalizeTitlesSettingName)?.value == 'true';
 
   bool get fullscreenOnRotate =>
       (_get(fullScreenOnLandscapeSettingName)?.value ?? "true") == "true";

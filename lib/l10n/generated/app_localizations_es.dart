@@ -1096,6 +1096,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Reemplazar las miniaturas del vídeo además de los títulos';
 
   @override
+  String get deArrowNormalizeTitles => 'Normalize titles';
+
+  @override
+  String get deArrowNormalizeTitlesDescription =>
+      'Apply proper casing to all video titles';
+
+  @override
   String get deArrowWarning =>
       'Habilitar DeArrow puede reducir significativamente la velocidad de navegación de la aplicación, ya que se necesitan solicitudes http adicionales para cada video';
 

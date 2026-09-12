@@ -56,6 +56,13 @@ class DeArrowSettingsScreen extends StatelessWidget {
                     onToggle: cubit.setDearrowThumbnails,
                     enabled: state.dearrow,
                   ),
+                  SettingsTile.switchTile(
+                    title: Text(locals.deArrowNormalizeTitles),
+                    description: Text(locals.deArrowNormalizeTitlesDescription),
+                    initialValue: state.dearrowNormalizeTitles,
+                    onToggle: cubit.setDearrowNormalizeTitles,
+                    enabled: state.dearrow,
+                  ),
                 ],
               ),
             ],

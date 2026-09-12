@@ -1,4 +1,3 @@
-import 'package:clipious/extensions.dart';
 import 'package:clipious/globals.dart';
 import 'package:clipious/videos/models/db/dearrow_cache.dart';
 import 'package:clipious/videos/models/video.dart';
@@ -74,29 +73,28 @@ class DeArrow {
           .replaceAll(':id', videoId);
 
   String? get thumbnailUrl {
-    var thumb = thumbnails.firstOrNull;
-    var valid = thumb != null && (thumb.votes >= 0 || thumb.locked);
-    if (valid && thumb.original) return null;
-    if (valid || videoDuration != null) {
-      if (valid && thumb.timestamp != null) {
+    for (var thumb in thumbnails) {
+      if (thumb.votes < 0 && !thumb.locked) continue;
+      if (thumb.original) return null;
+      if (thumb.timestamp != null) {
         return '$thumbBaseUrl&time=${thumb.timestamp}';
       }
-      if (videoDuration != null) {
-        return '$thumbBaseUrl&time=${videoDuration! * (randomTime ?? 0)}';
-      }
-      return thumbBaseUrl;
     }
-    return thumbBaseUrl;
+    if (videoDuration != null && randomTime != null) {
+      return '$thumbBaseUrl&time=${videoDuration! * randomTime!}';
+    }
+    return null;
   }
 
-  String resolveTitle(String? originalTitle) {
-    var first = titles.firstOrNull;
-    if (first != null &&
-        (first.votes >= 0 || first.locked) &&
-        (first.title?.isNotEmpty ?? false)) {
-      return formatTitle(first.title);
+  String resolveTitle(String? originalTitle, {bool normalize = false}) {
+    for (var title in titles) {
+      if ((title.votes >= 0 || title.locked) &&
+          (title.title?.isNotEmpty ?? false)) {
+        return normalize ? formatTitle(title.title) : title.title!;
+      }
     }
-    return formatTitle(originalTitle);
+    if (normalize) return formatTitle(originalTitle);
+    return originalTitle ?? '';
   }
 
   DeArrow({
@@ -116,13 +114,15 @@ class DeArrow {
     if (videos != null && process && videos.isNotEmpty) {
       bool doThumbnails =
           db.getSettings(dearrowThumbnailsSettingName)?.value == "true";
+      bool normalizeTitles =
+          db.getSettings(dearrowNormalizeTitlesSettingName)?.value == "true";
       List<Video> out = [];
       const chunkSize = 8;
       for (var i = 0; i < videos.length; i += chunkSize) {
         var chunk = videos.sublist(
             i, i + chunkSize > videos.length ? videos.length : i + chunkSize);
-        var processed =
-            await Future.wait(chunk.map((e) => _deArrowVideo(e, doThumbnails)));
+        var processed = await Future.wait(
+            chunk.map((e) => _deArrowVideo(e, doThumbnails, normalizeTitles)));
         out.addAll(processed);
       }
       return out;
@@ -136,16 +136,21 @@ class DeArrow {
     if (!process) return video;
     bool doThumbnails =
         db.getSettings(dearrowThumbnailsSettingName)?.value == "true";
-    return _deArrowVideo(video, doThumbnails);
+    bool normalizeTitles =
+        db.getSettings(dearrowNormalizeTitlesSettingName)?.value == "true";
+    return _deArrowVideo(video, doThumbnails, normalizeTitles);
   }
 
-  static Future<Video> _deArrowVideo(Video video, bool doThumbnails) async {
+  static Future<Video> _deArrowVideo(
+      Video video, bool doThumbnails, bool normalizeTitles) async {
     try {
       var cache = db.getDeArrowCache(video.videoId);
       if (cache != null && cache.isStale) cache = null;
+      if (cache != null && cache.normalized != normalizeTitles) cache = null;
 
-      var vid =
-          video.copyWith(title: formatTitle(video.title), deArrowed: true);
+      var vid = video.copyWith(
+          title: normalizeTitles ? formatTitle(video.title) : video.title,
+          deArrowed: true);
 
       if (cache != null) {
         if (cache.title != null) {
@@ -163,20 +168,28 @@ class DeArrow {
 
       var deArrow = await service.getDeArrow(video.videoId);
       if (deArrow != null) {
-        vid = vid.copyWith(title: deArrow.resolveTitle(video.title));
+        vid = vid.copyWith(
+            title:
+                deArrow.resolveTitle(video.title, normalize: normalizeTitles));
         if (doThumbnails) {
           var thumbnail = deArrow.thumbnailUrl;
           if (thumbnail != null) {
             vid = vid.copyWith(deArrowThumbnailUrl: thumbnail);
           }
         }
-      }
 
-      DeArrowCache newCache = DeArrowCache(video.videoId);
-      newCache.title = vid.title;
-      newCache.url = vid.deArrowThumbnailUrl;
-      newCache.cachedAt = DateTime.now().millisecondsSinceEpoch;
-      await db.upsertDeArrowCache(newCache);
+        DeArrowCache newCache = DeArrowCache(video.videoId);
+        newCache.title = vid.deArrowed ? vid.title : null;
+        newCache.url = vid.deArrowThumbnailUrl;
+        newCache.cachedAt = DateTime.now().millisecondsSinceEpoch;
+        newCache.normalized = normalizeTitles;
+        await db.upsertDeArrowCache(newCache);
+      } else if (cache == null) {
+        DeArrowCache newCache = DeArrowCache(video.videoId);
+        newCache.cachedAt = DateTime.now().millisecondsSinceEpoch;
+        newCache.normalized = normalizeTitles;
+        await db.upsertDeArrowCache(newCache);
+      }
 
       return vid;
     } catch (err) {

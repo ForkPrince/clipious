@@ -1277,6 +1277,14 @@
   "@deArrowReplaceThumbnailsDescription": {
     "description": "Description for DeArrow setting switch"
   },
+  "deArrowNormalizeTitles": "Normalize titles",
+  "@deArrowNormalizeTitles": {
+    "description": "Settings title for checkbox on whether to normalize title casing"
+  },
+  "deArrowNormalizeTitlesDescription": "Apply proper casing to all video titles",
+  "@deArrowNormalizeTitlesDescription": {
+    "description": "Description for DeArrow normalize titles setting switch"
+  },
   "deArrowWarning": "Enabling DeArrow can significantly reduce the browsing speed of the app as extra http requests are needed for every single video",
   "@deArrowWarning": {
     "description": "Warning message when the user enables DeArrow"

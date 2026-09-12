@@ -1087,6 +1087,13 @@ class AppLocalizationsTr extends AppLocalizations {
       'Başlıklara ek olarak video küçük resimlerini değiştirin';
 
   @override
+  String get deArrowNormalizeTitles => 'Normalize titles';
+
+  @override
+  String get deArrowNormalizeTitlesDescription =>
+      'Apply proper casing to all video titles';
+
+  @override
   String get deArrowWarning =>
       'DeArrow\'u etkinleştirmek, her video için fazladan http istekleri gerekli olduğu için, uygulamanın gezinme hızını önemli bir miktarda azaltabilir';
 

@@ -1085,6 +1085,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Vervang zowel videominiaturen als de titels';
 
   @override
+  String get deArrowNormalizeTitles => 'Normalize titles';
+
+  @override
+  String get deArrowNormalizeTitlesDescription =>
+      'Apply proper casing to all video titles';
+
+  @override
   String get deArrowWarning =>
       'Het inschakelen van DeArrow kan de snelheid van bladeren door de app aanzienlijk verminderen, omdat voor elke afzonderlijke video extra HTTP-verzoeken nodig zijn';
 

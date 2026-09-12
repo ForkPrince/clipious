@@ -1078,6 +1078,13 @@ class AppLocalizationsVi extends AppLocalizations {
       'Thay thế hình thu nhỏ của video ngoài tiêu đề';
 
   @override
+  String get deArrowNormalizeTitles => 'Normalize titles';
+
+  @override
+  String get deArrowNormalizeTitlesDescription =>
+      'Apply proper casing to all video titles';
+
+  @override
   String get deArrowWarning =>
       'Bật DeArrow có thể giảm đáng kể tốc độ duyệt web của ứng dụng vì cần thêm yêu cầu http cho mỗi video';
 

@@ -1086,6 +1086,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Замените превью видео в дополнение к заголовкам';
 
   @override
+  String get deArrowNormalizeTitles => 'Normalize titles';
+
+  @override
+  String get deArrowNormalizeTitlesDescription =>
+      'Apply proper casing to all video titles';
+
+  @override
   String get deArrowWarning =>
       'Включение DeArrow может значительно снизить быстродействие приложения, так как для каждого видео потребуются дополнительные http-запросы';
 
