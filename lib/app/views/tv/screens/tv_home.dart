@@ -10,6 +10,7 @@ import 'package:clipious/settings/states/settings.dart';
 import 'package:clipious/utils/models/paginated_list.dart';
 import 'package:clipious/utils/views/tv/components/tv_button.dart';
 import 'package:clipious/utils/views/tv/components/tv_overscan.dart';
+import 'package:clipious/videos/models/paginated_history_video_list.dart';
 import 'package:clipious/videos/views/components/subscriptions.dart';
 import 'package:clipious/videos/views/components/trending.dart';
 
@@ -61,6 +62,13 @@ class TvHomeScreen extends StatelessWidget {
   openPlaylists(BuildContext context) {
     AutoRouter.of(context).push(TvPlaylistGridRoute(
         playlistList: SingleEndpointList(service.getUserPlaylists)));
+  }
+
+  openHistory(BuildContext context) {
+    var locals = AppLocalizations.of(context)!;
+    AutoRouter.of(context).push(TvGridRoute(
+        paginatedVideoList: PaginatedHistoryVideoList(),
+        title: locals.history));
   }
 
   @override
@@ -153,6 +161,8 @@ class TvHomeScreen extends StatelessWidget {
                                                   openSubscriptions(context),
                                                 (HomeDataSource.playlist) =>
                                                   openPlaylists(context),
+                                                (HomeDataSource.history) =>
+                                                  openHistory(context),
                                                 (HomeDataSource.trending) =>
                                                   openTrending(context),
                                                 (HomeDataSource.popular) =>

@@ -49,6 +49,7 @@ This fork adds the following custom features:
 - **Hide videos**: Hide videos from subscriptions (requires an invidious fork)
 - **Video Chapters**: Chapter markers in the player (requires an invidious fork)
 - **Show channel icons on search**: Display channel thumbnails in search results
+- **Add video history on TV**: Browse watched videos from the TV home menu
 
 ## Installation
 The best way to install is to get it directly from the release page. Using [Obtainium](https://github.com/ImranR98/Obtainium) can help keeping the app up to date.
