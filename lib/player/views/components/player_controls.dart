@@ -4,6 +4,7 @@ import 'package:clipious/globals.dart';
 import 'package:clipious/main.dart';
 import 'package:clipious/player/states/interfaces/media_player.dart';
 import 'package:clipious/player/states/player.dart';
+import 'package:clipious/player/views/components/chapter_slider.dart';
 import 'package:clipious/player/views/components/sleep_timer.dart';
 import 'package:clipious/player/views/components/system_setting_slider.dart';
 import 'package:clipious/settings/states/settings.dart';
@@ -568,8 +569,10 @@ class PlayerControls extends StatelessWidget {
                                         Expanded(
                                           child: SizedBox(
                                               height: 25,
-                                              child: Slider(
-                                                min: 0,
+                                              child: ChapterSlider(
+                                                chapters:
+                                                    currentlyPlaying?.chapters,
+                                                duration: playerState.duration,
                                                 value: min(
                                                     playerState
                                                         .position.inMilliseconds

@@ -4,6 +4,7 @@ import 'package:clipious/utils/views/components/thumbnail.dart';
 import 'package:clipious/utils/views/tv/components/tv_button.dart';
 import 'package:clipious/utils/views/tv/components/tv_horizontal_item_list.dart';
 import 'package:clipious/utils/views/tv/components/tv_overscan.dart';
+import 'package:clipious/videos/models/chapter.dart';
 import 'package:clipious/videos/models/video.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -319,30 +320,11 @@ class TvPlayerControls extends StatelessWidget {
                                         ),
                                       )
                                     : Expanded(
-                                        child: player.progress >= 0
-                                            ? Container(
-                                                decoration: BoxDecoration(
-                                                    color: Colors.black
-                                                        .withValues(alpha: 0.5),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5)),
-                                                child:
-                                                    AnimatedFractionallySizedBox(
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  duration: animationDuration,
-                                                  widthFactor: player.progress,
-                                                  child: Container(
-                                                    height: 8,
-                                                    decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5)),
-                                                  ),
-                                                ))
-                                            : const SizedBox.shrink()),
+                                        child: TvChapterProgressBar(
+                                        progress: player.progress,
+                                        chapters: currentlyPlaying?.chapters,
+                                        duration: player.duration,
+                                      )),
                                 if (!(currentlyPlaying?.liveNow ?? false))
                                   Padding(
                                     padding: const EdgeInsets.only(left: 16.0),
@@ -393,6 +375,81 @@ class TvPlayerControls extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+/// Horizontal progress bar used by the TV player which additionally renders a
+/// small tick for each video chapter.
+class TvChapterProgressBar extends StatelessWidget {
+  final double progress;
+  final List<Chapter>? chapters;
+  final Duration duration;
+
+  const TvChapterProgressBar({
+    super.key,
+    required this.progress,
+    required this.chapters,
+    required this.duration,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (progress < 0) {
+      return const SizedBox.shrink();
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final int durationMs = duration.inMilliseconds;
+        final bool showMarkers =
+            chapters != null && chapters!.length > 1 && durationMs > 0;
+
+        return SizedBox(
+          height: 8,
+          width: constraints.maxWidth,
+          child: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              if (showMarkers)
+                ...chapters!.map((chapter) {
+                  final double fraction =
+                      (chapter.startTime * 1000) / durationMs;
+                  if (fraction <= 0 || fraction >= 1) {
+                    return const SizedBox.shrink();
+                  }
+                  return Positioned(
+                    left: (fraction * constraints.maxWidth - 1)
+                        .clamp(0.0, constraints.maxWidth - 2),
+                    top: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 2,
+                      color: Colors.white.withValues(alpha: 0.6),
+                    ),
+                  );
+                }),
+              AnimatedFractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                duration: animationDuration,
+                widthFactor: progress,
+                child: Container(
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

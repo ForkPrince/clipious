@@ -7,6 +7,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../utils/models/image_object.dart';
 import 'adaptive_format.dart';
 import 'caption.dart';
+import 'chapter.dart';
 import 'format_stream.dart';
 
 part 'video.freezed.dart';
@@ -71,6 +72,9 @@ sealed class Video with _$Video implements ShareLinks, IdedVideo {
       List<AdaptiveFormat>? adaptiveFormats,
       List<FormatStream>? formatStreams,
       @Default([]) List<Caption> captions,
+      // Null when the server doesn't support chapters (fork-only feature),
+      // an empty list when supported but the video has no chapters.
+      List<Chapter>? chapters,
       @Default([]) List<Video> recommendedVideos,
       String? title,
       int? lengthSeconds,
@@ -124,6 +128,9 @@ sealed class Video with _$Video implements ShareLinks, IdedVideo {
 
     return Uri.parse(link);
   }
+
+  /// Whether the server supports chapters and this video has more than one.
+  bool get hasChapters => (chapters?.length ?? 0) > 1;
 
   List<String> get thumbnails {
     var originals =
