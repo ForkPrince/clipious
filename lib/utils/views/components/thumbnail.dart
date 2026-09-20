@@ -44,9 +44,12 @@ class Thumbnail extends StatelessWidget {
                     } else {
                       final cubit = context.read<ThumbnailCubit>();
 
-                      final url = state.selected!.startsWith('/')
-                          ? server.data!.url + state.selected!
-                          : state.selected!;
+                      final selected = state.selected!;
+                      final url = selected.startsWith('//')
+                          ? '${Uri.parse(server.data!.url).scheme}:$selected'
+                          : selected.startsWith('/')
+                              ? server.data!.url + selected
+                              : selected;
 
                       return CachedNetworkImage(
                         key: ValueKey(url),

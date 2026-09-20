@@ -41,6 +41,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 - Video filtering
 - Return YouTube dislikes
 
+## Custom Features
+
+This fork adds the following custom features:
+
+- **DeArrow improvements**: Normalize video titles and replace more thumbnails
+- **Hide videos**: Hide videos from subscriptions (requires an invidious fork)
+- **Video Chapters**: Chapter markers in the player (requires an invidious fork)
+- **Show channel icons on search**: Display channel thumbnails in search results
+
 ## Installation
 The best way to install is to get it directly from the release page. Using [Obtainium](https://github.com/ImranR98/Obtainium) can help keeping the app up to date.
 
