@@ -1,4 +1,4 @@
-package com.github.lamarios.clipious
+package com.github.forkprince.clipious
 
 import io.flutter.embedding.android.FlutterActivity
 import cl.puntito.simple_pip_mode.PipCallbackHelper

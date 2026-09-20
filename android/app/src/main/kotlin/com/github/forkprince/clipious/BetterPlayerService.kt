@@ -1,4 +1,4 @@
-package com.github.lamarios.clipious;
+package com.github.forkprince.clipious;
 
 import android.app.NotificationManager
 import android.app.Service
