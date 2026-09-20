@@ -406,12 +406,27 @@ class TvChannelPlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     var colors = Theme.of(context).colorScheme;
     return AnimatedPlaceHolder(
-        child: Container(
-      decoration: BoxDecoration(
-        color: colors.secondaryContainer,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: const Text('               '),
+        child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            color: colors.secondaryContainer,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Container(
+          width: 60,
+          height: 20,
+          decoration: BoxDecoration(
+            color: colors.secondaryContainer,
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+      ],
     ));
   }
 }

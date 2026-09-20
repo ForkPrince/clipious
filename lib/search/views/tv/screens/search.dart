@@ -205,7 +205,7 @@ class TvSearchScreen extends StatelessWidget {
                                                             .titleLarge,
                                                       )),
                                                   SizedBox(
-                                                    height: 60,
+                                                    height: 120,
                                                     child:
                                                         TvHorizontalPaginatedListView<
                                                             Channel>(
