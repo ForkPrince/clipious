@@ -422,24 +422,6 @@ class TvChapterProgressBar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5),
                 ),
               ),
-              if (showMarkers)
-                ...chapters!.map((chapter) {
-                  final double fraction =
-                      (chapter.startTime * 1000) / durationMs;
-                  if (fraction <= 0 || fraction >= 1) {
-                    return const SizedBox.shrink();
-                  }
-                  return Positioned(
-                    left: (fraction * constraints.maxWidth - 1)
-                        .clamp(0.0, constraints.maxWidth - 2),
-                    top: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 2,
-                      color: Colors.black54,
-                    ),
-                  );
-                }),
               AnimatedFractionallySizedBox(
                 alignment: Alignment.centerLeft,
                 duration: animationDuration,
@@ -452,6 +434,29 @@ class TvChapterProgressBar extends StatelessWidget {
                   ),
                 ),
               ),
+              // Markers are painted last so the played portion never hides
+              // them, and each marker contrasts with the track beneath it.
+              if (showMarkers)
+                ...chapters!.map((chapter) {
+                  final double fraction =
+                      (chapter.startTime * 1000) / durationMs;
+                  if (fraction <= 0 || fraction >= 1) {
+                    return const SizedBox.shrink();
+                  }
+                  final bool isPlayed = fraction <= progress;
+                  return Positioned(
+                    left: (fraction * constraints.maxWidth - 1)
+                        .clamp(0.0, constraints.maxWidth - 2),
+                    top: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 2,
+                      color: isPlayed
+                          ? Colors.black.withValues(alpha: 0.55)
+                          : Colors.white.withValues(alpha: 0.85),
+                    ),
+                  );
+                }),
             ],
           ),
         );

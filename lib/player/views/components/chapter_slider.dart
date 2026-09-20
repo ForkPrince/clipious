@@ -183,8 +183,6 @@ class _ChapterSliderState extends State<ChapterSlider> {
               data: theme.sliderTheme.copyWith(
                 trackShape: _ChapterTrackShape(
                   chapterFractions: fractions,
-                  markerColor:
-                      theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   highlightRange: _currentChapterRange(),
                 ),
               ),
@@ -249,14 +247,20 @@ class _ChapterPopup extends StatelessWidget {
   }
 }
 
+/// Returns a color that contrasts with [background], so markers and highlights
+/// stay visible regardless of the slider's active/inactive track colors.
+Color _contrastingColor(Color background, {double alpha = 0.85}) {
+  return ThemeData.estimateBrightnessForColor(background) == Brightness.dark
+      ? Colors.white.withValues(alpha: alpha)
+      : Colors.black.withValues(alpha: alpha);
+}
+
 class _ChapterTrackShape extends RoundedRectSliderTrackShape {
   final List<double> chapterFractions;
-  final Color markerColor;
   final (double, double)? highlightRange;
 
   const _ChapterTrackShape({
     required this.chapterFractions,
-    required this.markerColor,
     this.highlightRange,
   });
 
@@ -301,8 +305,10 @@ class _ChapterTrackShape extends RoundedRectSliderTrackShape {
       final double left = trackRect.left + trackRect.width * highlight.$1;
       final double right = trackRect.left + trackRect.width * highlight.$2;
       if (right > left) {
+        final Color inactiveTrackColor =
+            sliderTheme.inactiveTrackColor ?? Colors.black;
         final Paint highlightPaint = Paint()
-          ..color = Colors.white.withValues(alpha: 0.35);
+          ..color = _contrastingColor(inactiveTrackColor, alpha: 0.35);
         context.canvas.drawRRect(
           RRect.fromRectAndRadius(
             Rect.fromLTRB(left, trackRect.top, right, trackRect.bottom),
@@ -313,13 +319,20 @@ class _ChapterTrackShape extends RoundedRectSliderTrackShape {
       }
     }
 
-    final Paint paint = Paint()
-      ..color = markerColor
-      ..strokeWidth = 2
-      ..strokeCap = StrokeCap.round;
+    final Color activeTrackColor = sliderTheme.activeTrackColor ?? Colors.white;
+    final Color inactiveTrackColor =
+        sliderTheme.inactiveTrackColor ?? Colors.black;
 
     for (final fraction in chapterFractions) {
       final double dx = trackRect.left + trackRect.width * fraction;
+      final bool isPlayed = textDirection == TextDirection.rtl
+          ? dx >= thumbCenter.dx
+          : dx <= thumbCenter.dx;
+      final Paint paint = Paint()
+        ..color =
+            _contrastingColor(isPlayed ? activeTrackColor : inactiveTrackColor)
+        ..strokeWidth = 2
+        ..strokeCap = StrokeCap.round;
       context.canvas.drawLine(
         Offset(dx, trackRect.top - 1.5),
         Offset(dx, trackRect.bottom + 1.5),

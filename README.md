@@ -50,7 +50,7 @@ This fork adds the following custom features:
 - **Video Chapters**: Chapter markers with title popup and highlight track in the player (requires an [invidious fork](https://git.serversmp.xyz/TwintStudio/invidious))
 - **Show channel icons on search**: Display channel thumbnails in search results
 - **Add video history on TV**: Browse watched videos from the TV home menu
-- **TV recommendations**: Press Down while watching to shrink the player and browse recommended videos below, like YouTube TV (press Up to return to the video)
+- **TV recommendations**: Show recommended videos right in the player
 
 ## Installation
 The best way to install is to get it directly from the release page. Using [Obtainium](https://github.com/ImranR98/Obtainium) can help keeping the app up to date.
