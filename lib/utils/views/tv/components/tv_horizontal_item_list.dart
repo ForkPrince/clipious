@@ -12,11 +12,13 @@ class TvHorizontalItemList<T> extends StatelessWidget {
   final PaginatedList<T> paginatedList;
   final Widget Function() getPlaceholder;
   final String? tags;
+  final double height;
   final Widget Function(BuildContext context, int index, T item) buildItem;
 
   const TvHorizontalItemList(
       {super.key,
       this.tags,
+      this.height = 250,
       required this.paginatedList,
       required this.buildItem,
       required this.getPlaceholder});
@@ -44,7 +46,7 @@ class TvHorizontalItemList<T> extends StatelessWidget {
               !state.loading && items.isEmpty
                   ? const SizedBox.shrink()
                   : SizedBox(
-                      height: 250,
+                      height: height,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         controller: cubit.scrollController,
@@ -70,12 +72,14 @@ class TvHorizontalVideoList extends StatelessWidget {
   final PaginatedList<Video> paginatedVideoList;
   final Function(BuildContext context, Video video)? onSelect;
   final String? tags;
+  final double height;
   final int autoFocusedIndex;
   final void Function(Video video, int index, bool focus)? onItemFocus;
 
   const TvHorizontalVideoList(
       {super.key,
       this.tags,
+      this.height = 250,
       required this.paginatedVideoList,
       this.onSelect,
       this.autoFocusedIndex = 0,
@@ -86,6 +90,7 @@ class TvHorizontalVideoList extends StatelessWidget {
     return TvHorizontalItemList<Video>(
       getPlaceholder: () => const TvVideoItemPlaceHolder(),
       paginatedList: paginatedVideoList,
+      height: height,
       buildItem: (context, index, e) => TvVideoItem(
         key: ValueKey('video-item-${e.videoId}'),
         video: e,
