@@ -573,6 +573,8 @@ class PlayerControls extends StatelessWidget {
                                                 chapters:
                                                     currentlyPlaying?.chapters,
                                                 duration: playerState.duration,
+                                                isDragging: playerState
+                                                    .draggingPositionSlider,
                                                 value: min(
                                                     playerState
                                                         .position.inMilliseconds
