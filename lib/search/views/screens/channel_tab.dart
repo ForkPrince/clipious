@@ -8,8 +8,10 @@ import 'package:clipious/search/models/search_type.dart';
 import 'package:clipious/search/states/search.dart';
 import 'package:clipious/search/views/screens/search.dart';
 import 'package:clipious/utils.dart';
+import 'package:clipious/utils/models/image_object.dart';
 import 'package:clipious/utils/models/paginated_list.dart';
 import 'package:clipious/utils/views/components/paginated_list_view.dart';
+import 'package:clipious/utils/views/components/thumbnail.dart';
 
 @RoutePage()
 class SearchChannelTab extends StatelessWidget {
@@ -46,21 +48,32 @@ class SearchChannelTab extends StatelessWidget {
                 },
                 child: Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
+                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
                   child: Row(
                     children: [
+                      Thumbnail(
+                        width: 40,
+                        height: 40,
+                        thumbnails:
+                            ImageObject.getThumbnailUrlsByPreferredOrder(
+                                e.authorThumbnails),
+                        decoration: BoxDecoration(
+                          color: colors.secondaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
                       Expanded(
                           child: Text(
                         e.author,
                         style: TextStyle(color: colors.primary),
                       )),
-                      const Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: Icon(
-                          Icons.people,
-                          size: 15,
-                        ),
+                      Icon(
+                        Icons.people,
+                        size: 15,
+                        color: colors.secondary,
                       ),
+                      const SizedBox(width: 4),
                       Text(compactCurrency.format(e.subCount)),
                     ],
                   ),

@@ -7,8 +7,10 @@ import 'package:clipious/playlists/models/playlist.dart';
 import 'package:clipious/playlists/views/components/playlist_in_list.dart';
 import 'package:clipious/router.dart';
 import 'package:clipious/search/models/search_type.dart';
+import 'package:clipious/utils/models/image_object.dart';
 import 'package:clipious/utils/models/paginated_list.dart';
 import 'package:clipious/utils/views/components/placeholders.dart';
+import 'package:clipious/utils/views/components/thumbnail.dart';
 import 'package:clipious/utils/views/tv/components/tv_button.dart';
 import 'package:clipious/utils/views/tv/components/tv_horizontal_item_list.dart';
 import 'package:clipious/utils/views/tv/components/tv_horizontal_paginated_list.dart';
@@ -261,6 +263,22 @@ class TvSearchScreen extends StatelessWidget {
                                                                   MainAxisSize
                                                                       .min,
                                                               children: [
+                                                                Thumbnail(
+                                                                  width: 50,
+                                                                  height: 50,
+                                                                  thumbnails: ImageObject
+                                                                      .getThumbnailUrlsByPreferredOrder(
+                                                                          e.authorThumbnails),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: colors
+                                                                        .secondaryContainer,
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                    height: 4),
                                                                 Text(e.author),
                                                               ],
                                                             ),
