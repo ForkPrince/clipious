@@ -1,1 +1,1 @@
-const localInvidiousServer= 'http://localhost:3000';
+const localInvidiousServer = 'http://localhost:3000';

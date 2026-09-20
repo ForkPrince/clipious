@@ -16,9 +16,11 @@ void main() {
     const channelId = 'UCHDxYLv8iovIbhrfl16CNyg';
     await service.subscribe(channelId);
     await manager.refreshSubs();
-    expect(manager.state.subs.any((element) => element.authorId == channelId), true);
+    expect(manager.state.subs.any((element) => element.authorId == channelId),
+        true);
     await manager.unsubscribe(channelId);
     await manager.refreshSubs();
-    expect(manager.state.subs.any((element) => element.authorId == channelId), false);
+    expect(manager.state.subs.any((element) => element.authorId == channelId),
+        false);
   });
 }

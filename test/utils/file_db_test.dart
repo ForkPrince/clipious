@@ -15,7 +15,8 @@ main() {
     var n = await db.getLastSubscriptionNotification();
     expect(n == null, true);
 
-    await db.setLastSubscriptionNotification(SubscriptionNotification("abc", 123));
+    await db
+        .setLastSubscriptionNotification(SubscriptionNotification("abc", 123));
     n = await db.getLastSubscriptionNotification();
     expect(n != null, true);
     expect(n!.lastSeenVideoId, "abc");
@@ -28,7 +29,8 @@ main() {
     var notifs = await db.getAllPlaylistNotifications();
     expect(notifs.isEmpty, true);
 
-    await db.upsertPlaylistNotification(PlaylistNotification("abc", 5, 1234, "My playlist"));
+    await db.upsertPlaylistNotification(
+        PlaylistNotification("abc", 5, 1234, "My playlist"));
     notifs = await db.getAllPlaylistNotifications();
     expect(notifs.length, 1);
 
@@ -49,8 +51,6 @@ main() {
     // making sure we're not creating new entries on edit
     notifs = await db.getAllPlaylistNotifications();
     expect(notifs.length, 1);
-
-
 
     n = await db.getPlaylistNotification("abc");
     expect(n != null, true);
@@ -92,7 +92,8 @@ main() {
     expect(notifs.length, 0);
 
     // i should be able to try to delete something that doesn't exist without problem
-    await db.deletePlaylistNotification(PlaylistNotification("anotherid", 123, 123, "oops"));
+    await db.deletePlaylistNotification(
+        PlaylistNotification("anotherid", 123, 123, "oops"));
   });
 
   test('Channel notifications', () async {
@@ -101,7 +102,8 @@ main() {
     var notifs = await db.getAllChannelNotifications();
     expect(notifs.isEmpty, true);
 
-    await db.upsertChannelNotification(ChannelNotification("abc", "channel1", "abc", 123));
+    await db.upsertChannelNotification(
+        ChannelNotification("abc", "channel1", "abc", 123));
     notifs = await db.getAllChannelNotifications();
     expect(notifs.length, 1);
 
@@ -129,7 +131,6 @@ main() {
     expect(n.lastSeenVideoId, "def");
     expect(n.timestamp, 1235);
     expect(n.channelName, "new channel1");
-
 
     // testing the method to directly set video count
     await db.setChannelNotificationLastViewedVideo("abc", "aaa");
@@ -164,6 +165,7 @@ main() {
     expect(notifs.length, 0);
 
     // i should be able to try to delete something that doesn't exist without problem
-    await db.deleteChannelNotification(ChannelNotification("fdafa", "channelNamefdsfas", "fsdfsdf", 1313));
+    await db.deleteChannelNotification(
+        ChannelNotification("fdafa", "channelNamefdsfas", "fsdfsdf", 1313));
   });
 }

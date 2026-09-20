@@ -4,9 +4,7 @@ import 'package:clipious/settings/models/db/app_logs.dart';
 import 'package:clipious/settings/states/app_logs.dart';
 import 'package:clipious/utils/sembast_sqflite_database.dart';
 
-
 Future<void> main() async {
-
   setUp(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
     db = await SembastSqfDb.createInMemory();
@@ -16,7 +14,11 @@ Future<void> main() async {
   test('test logs', () async {
     // inserting more than expected ot make sure old stuff is culled
     for (int i = 0; i < 200; i++) {
-      await db.insertLogs(AppLog(message: i.toString(), level: "info", logger: 'test_log', time: DateTime.now()));
+      await db.insertLogs(AppLog(
+          message: i.toString(),
+          level: "info",
+          logger: 'test_log',
+          time: DateTime.now()));
     }
 
     // we should be cutting old stuff

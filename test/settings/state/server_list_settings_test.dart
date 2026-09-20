@@ -19,7 +19,8 @@ void main() {
   tearDown(() async => await db.close());
 
   test('save public servers', () async {
-    final servers = ServerListSettingsCubit(const ServerListSettingsState(dbServers: [], publicServers: []), app);
+    final servers = ServerListSettingsCubit(
+        const ServerListSettingsState(dbServers: [], publicServers: []), app);
     // await servers.getPublicServers();
     await servers.refreshServers();
     expect(servers.state.publicServers.isEmpty, false);
@@ -40,7 +41,8 @@ void main() {
   });
 
   test('switching server', () async {
-    final servers = ServerListSettingsCubit(const ServerListSettingsState(dbServers: [], publicServers: []), app);
+    final servers = ServerListSettingsCubit(
+        const ServerListSettingsState(dbServers: [], publicServers: []), app);
     // await servers.getPublicServers();
     await servers.refreshServers();
     expect(servers.state.publicServers.isEmpty, false);
@@ -56,14 +58,18 @@ void main() {
     await servers.switchServer(s1);
     var inUse = await db.getCurrentlySelectedServer();
     expect(inUse.url, s1.url);
-    var inUseCount = servers.state.dbServers.where((element) => element.inUse == true).length;
+    var inUseCount = servers.state.dbServers
+        .where((element) => element.inUse == true)
+        .length;
     expect(inUseCount, 1);
     expect(app.state.server?.url, s1.url);
 
     await servers.switchServer(s2);
     inUse = await db.getCurrentlySelectedServer();
     expect(inUse.url, s2.url);
-    inUseCount = servers.state.dbServers.where((element) => element.inUse == true).length;
+    inUseCount = servers.state.dbServers
+        .where((element) => element.inUse == true)
+        .length;
     expect(inUseCount, 1);
     expect(app.state.server?.url, s2.url);
   });

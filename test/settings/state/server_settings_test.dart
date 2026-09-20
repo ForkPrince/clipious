@@ -21,7 +21,8 @@ main() {
   tearDown(() async => await db.close());
 
   test('test server setting', () async {
-    var server = ServerSettingsCubit(ServerSettingsState(server:Server(url: localInvidiousServer)), app);
+    var server = ServerSettingsCubit(
+        ServerSettingsState(server: Server(url: localInvidiousServer)), app);
     await server.useServer(true);
 
     await server.logInWithCookie("test", "test");

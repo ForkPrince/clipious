@@ -6,11 +6,13 @@ import '../globals.dart';
 
 Future<Server> getLoggedInTestServer() async {
   var server = Server(url: localInvidiousServer);
-  server = server.copyWith(sidCookie: await service.loginWithCookies(localInvidiousServer, "test", "test"));
+  server = server.copyWith(
+      sidCookie:
+          await service.loginWithCookies(localInvidiousServer, "test", "test"));
   return server;
 }
 
-Future<void> setUpTestsForTestServer() async{
+Future<void> setUpTestsForTestServer() async {
   db = await SembastSqfDb.createInMemory();
   var server = await getLoggedInTestServer();
   await db.upsertServer(server);

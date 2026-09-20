@@ -32,7 +32,20 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
   }
 
   displaySettings() {
-    emit(state.copyWith(showSettings: true, displayControls: false));
+    emit(state.copyWith(
+        showSettings: true,
+        showQueue: false,
+        showRecommended: false,
+        displayControls: false));
+  }
+
+  displayRecommended() {
+    EasyDebounce.cancel('tv-controls');
+    emit(state.copyWith(
+        showRecommended: true,
+        showQueue: false,
+        showSettings: false,
+        displayControls: false));
   }
 
   showUi() {
@@ -41,10 +54,24 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
   }
 
   KeyEventResult handleRemoteEvents(FocusNode node, KeyEvent event) {
-    bool timeLineControl =
-        !state.showQueue && !state.showSettings && !state.displayControls;
+    bool panelsClosed =
+        !state.showQueue && !state.showSettings && !state.showRecommended;
+    bool timeLineControl = panelsClosed && !state.displayControls;
+    bool hasRecommendations =
+        filteredVideos(player.state.currentlyPlaying?.recommendedVideos ?? [])
+            .isNotEmpty;
+
+    // pressing down while no panel is open reveals the recommended videos
+    if (event is KeyUpEvent &&
+        panelsClosed &&
+        hasRecommendations &&
+        event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      displayRecommended();
+      return KeyEventResult.handled;
+    }
+
     log.fine(
-        'Key: ${event.logicalKey}, Timeline control: $timeLineControl, showQueue: ${state.showQueue}, showSettings: ${state.showSettings}, showControls: ${state.displayControls}');
+        'Key: ${event.logicalKey}, Timeline control: $timeLineControl, showQueue: ${state.showQueue}, showSettings: ${state.showSettings}, showRecommended: ${state.showRecommended}, showControls: ${state.displayControls}');
     showUi();
 
     // looks like back is activate on pressdown and not press up
@@ -54,7 +81,9 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
       emit(state.copyWith(
           showQueue: false,
           showSettings: false,
-          displayControls: state.showQueue || state.showSettings));
+          showRecommended: false,
+          displayControls:
+              state.showQueue || state.showSettings || state.showRecommended));
       return KeyEventResult.handled;
     } else if (event is KeyUpEvent) {
       switch (event.logicalKey) {
@@ -116,6 +145,7 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
         controlsOpacity: 0,
         showSettings: false,
         showQueue: false,
+        showRecommended: false,
         displayControls: false));
   }
 
@@ -126,17 +156,25 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
             controlsOpacity: 0,
             showSettings: false,
             showQueue: false,
+            showRecommended: false,
             displayControls: false));
       }
     });
   }
 
   displayQueue() {
-    emit(state.copyWith(showQueue: true, displayControls: false));
+    emit(state.copyWith(
+        showQueue: true, showRecommended: false, displayControls: false));
   }
 
   Future<void> playFromQueue(Video video) async {
     emit(state.copyWith(showQueue: false, loading: true));
+    player.switchToVideo(video);
+    emit(state.copyWith(loading: false));
+  }
+
+  Future<void> playFromRecommended(Video video) async {
+    emit(state.copyWith(showRecommended: false, loading: true));
     player.switchToVideo(video);
     emit(state.copyWith(loading: false));
   }
@@ -163,6 +201,7 @@ sealed class TvPlayerControlsState with _$TvPlayerControlsState {
     @Default(0) double controlsOpacity,
     @Default(false) bool showSettings,
     @Default(false) bool showQueue,
+    @Default(false) bool showRecommended,
     @Default(false) bool loading,
     @Default(false) bool displayControls,
   }) = _TvPlayerControlsState;

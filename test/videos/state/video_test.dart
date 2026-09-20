@@ -34,19 +34,26 @@ void main() {
   });
 
   group('Youtube dislike', () {
-    test('If youtube dislike is down, it should not break the video loading', () async {
+    test('If youtube dislike is down, it should not break the video loading',
+        () async {
       try {
         // using service that will fail on dislikes
         service = FakeService();
 
         bool loggedIn = await service.isLoggedIn();
-        var settingsCubit = TestSettingsCubit(SettingsState.init(), TestAppCubit(AppState(0, null, HomeLayout())));
+        var settingsCubit = TestSettingsCubit(SettingsState.init(),
+            TestAppCubit(AppState(0, null, HomeLayout())));
 
         // using youtube dislikes
         await settingsCubit.setUseReturnYoutubeDislike(true);
 
-        PlayerCubit player = TestPlayerCubit(PlayerState(playQueue: ListQueue()), settingsCubit);
-        var video = VideoCubit(VideoState(videoId: 'dQw4w9WgXcQ', isLoggedIn: loggedIn), DownloadManagerCubit(const DownloadManagerState(), player), player, settingsCubit);
+        PlayerCubit player =
+            TestPlayerCubit(PlayerState(playQueue: ListQueue()), settingsCubit);
+        var video = VideoCubit(
+            VideoState(videoId: 'dQw4w9WgXcQ', isLoggedIn: loggedIn),
+            DownloadManagerCubit(const DownloadManagerState(), player),
+            player,
+            settingsCubit);
         await video.onReady();
 
         // we shouldn't have any errors that would override displaying video info properly

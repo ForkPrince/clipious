@@ -1,4 +1,3 @@
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clipious/channels/states/channel.dart';
 import 'package:clipious/globals.dart';
@@ -24,7 +23,7 @@ void main() {
     expect(newSub, !subbed);
     await channel.toggleSubscription();
     expect(channel.state.isSubscribed, subbed);
-    newSub = await  service.isSubscribedToChannel(channelId);
+    newSub = await service.isSubscribedToChannel(channelId);
     expect(newSub, subbed);
   });
 }

@@ -21,11 +21,11 @@ Future<void> main() async {
 
   test('setting and reading settings', () async {
     // testing boolean setting
-    await settingsCubit.setUseSearchHistory (true);
+    await settingsCubit.setUseSearchHistory(true);
     expect(settingsCubit.state.useSearchHistory, true);
 
     // testing numbers
-await    settingsCubit.setSubtitleSize (10);
+    await settingsCubit.setSubtitleSize(10);
     expect(settingsCubit.state.subtitleSize, 10);
 
     //testing strings
@@ -33,11 +33,11 @@ await    settingsCubit.setSubtitleSize (10);
     expect(settingsCubit.state.lastSubtitles, "en_US");
 
     // testing skip steps
- await   settingsCubit.setSkipStep(skipSteps.first);
+    await settingsCubit.setSkipStep(skipSteps.first);
     expect(settingsCubit.state.skipStep, skipSteps.first);
 
     for (int i = 1; i < skipSteps.length; i++) {
-     await settingsCubit.changeSkipStep(increase: true);
+      await settingsCubit.changeSkipStep(increase: true);
       expect(settingsCubit.state.skipStep, skipSteps[i]);
     }
 
@@ -45,10 +45,10 @@ await    settingsCubit.setSubtitleSize (10);
     // should remain to the max
     expect(settingsCubit.state.skipStep, skipSteps.last);
 
-    await settingsCubit.setSkipStep ( skipSteps.last);
+    await settingsCubit.setSkipStep(skipSteps.last);
     expect(settingsCubit.state.skipStep, skipSteps.last);
     for (int i = skipSteps.length - 2; i > 0; i--) {
-     await settingsCubit.changeSkipStep(increase: false);
+      await settingsCubit.changeSkipStep(increase: false);
       expect(settingsCubit.state.skipStep, skipSteps[i]);
     }
   });
@@ -60,6 +60,5 @@ await    settingsCubit.setSubtitleSize (10);
     SettingsValue s = SettingsValue('test', 'yo');
     await settingsCubit.saveSetting(s);
     expect(db.getSettings('test')?.value, 'yo');
-
   });
 }
