@@ -47,7 +47,7 @@ This fork adds the following custom features:
 
 - **DeArrow improvements**: Normalize video titles and replace more thumbnails
 - **Hide videos**: Hide videos from subscriptions (requires an [invidious fork](https://git.serversmp.xyz/TwintStudio/invidious))
-- **Video Chapters**: Chapter markers in the player (requires an [invidious fork](https://git.serversmp.xyz/TwintStudio/invidious))
+- **Video Chapters**: Chapter markers with title popup and highlight track in the player (requires an [invidious fork](https://git.serversmp.xyz/TwintStudio/invidious))
 - **Show channel icons on search**: Display channel thumbnails in search results
 - **Add video history on TV**: Browse watched videos from the TV home menu
 

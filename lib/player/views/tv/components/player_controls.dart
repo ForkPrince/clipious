@@ -430,7 +430,7 @@ class TvChapterProgressBar extends StatelessWidget {
                     bottom: 0,
                     child: Container(
                       width: 2,
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: Colors.black54,
                     ),
                   );
                 }),
