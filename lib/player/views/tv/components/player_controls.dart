@@ -17,16 +17,15 @@ import '../../../../utils/models/paginated_list.dart';
 import '../../../states/player.dart';
 
 class TvPlayerControls extends StatelessWidget {
-  const TvPlayerControls({super.key});
+  final FocusNode? focusNode;
+  final VoidCallback? onEnterRecommendations;
+
+  const TvPlayerControls(
+      {super.key, this.focusNode, this.onEnterRecommendations});
 
   onVideoQueueSelected(
       BuildContext context, TvPlayerControlsCubit cubit, Video video) {
     cubit.playFromQueue(video);
-  }
-
-  onVideoRecommendedSelected(
-      BuildContext context, TvPlayerControlsCubit cubit, Video video) {
-    cubit.playFromRecommended(video);
   }
 
   @override
@@ -35,8 +34,9 @@ class TvPlayerControls extends StatelessWidget {
     var locals = AppLocalizations.of(context)!;
     var player = context.read<PlayerCubit>();
     return BlocProvider(
-      create: (context) =>
-          TvPlayerControlsCubit(const TvPlayerControlsState(), player),
+      create: (context) => TvPlayerControlsCubit(
+          const TvPlayerControlsState(), player,
+          onEnterRecommendations: onEnterRecommendations),
       child: BlocBuilder<TvPlayerControlsCubit, TvPlayerControlsState>(
         builder: (context, playerState) {
           var cubit = context.read<TvPlayerControlsCubit>();
@@ -56,6 +56,7 @@ class TvPlayerControls extends StatelessWidget {
               cubit.onStreamEvent(state.mediaEvent);
             },
             child: Focus(
+              focusNode: focusNode,
               autofocus: true,
               onKeyEvent: (node, event) =>
                   cubit.handleRemoteEvents(node, event),
@@ -250,29 +251,6 @@ class TvPlayerControls extends StatelessWidget {
                                             ),
                                           ),
                                           Expanded(child: Container()),
-                                          Visibility(
-                                            visible: (currentlyPlaying
-                                                        ?.recommendedVideos ??
-                                                    const <Video>[])
-                                                .isNotEmpty,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 16.0),
-                                              child: TvButton(
-                                                onPressed: (context) =>
-                                                    cubit.displayRecommended(),
-                                                unfocusedColor:
-                                                    Colors.transparent,
-                                                child: const Padding(
-                                                  padding: EdgeInsets.all(8.0),
-                                                  child: Icon(
-                                                    Icons.recommend,
-                                                    size: 30,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
                                           Padding(
                                             padding: const EdgeInsets.only(
                                                 right: 16.0),
@@ -393,37 +371,6 @@ class TvPlayerControls extends StatelessWidget {
                                                   ctx, cubit, video),
                                           paginatedVideoList:
                                               FixedItemList(videos)),
-                                    ],
-                                  ),
-                                ))
-                              : const SizedBox.shrink())),
-                  Positioned(
-                      left: 0,
-                      bottom: 50,
-                      right: 0,
-                      child: AnimatedSwitcher(
-                          duration: animationDuration,
-                          child: playerState.showRecommended
-                              ? TvOverscan(
-                                  child: FocusScope(
-                                  autofocus: true,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        locals.recommended,
-                                        style: textTheme.titleLarge,
-                                      ),
-                                      TvHorizontalVideoList(
-                                          onSelect: (ctx, video) =>
-                                              onVideoRecommendedSelected(
-                                                  ctx, cubit, video),
-                                          paginatedVideoList:
-                                              FixedItemList<Video>(
-                                                  currentlyPlaying
-                                                          ?.recommendedVideos ??
-                                                      [])),
                                     ],
                                   ),
                                 ))

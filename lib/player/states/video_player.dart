@@ -334,7 +334,9 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
         videoController = BetterPlayerController(
             BetterPlayerConfiguration(
                 overlay: isTv
-                    ? const TvPlayerControls()
+                    ? TvPlayerControls(
+                        focusNode: state.controlsFocusNode,
+                        onEnterRecommendations: state.onEnterRecommendations)
                     : PlayerControls(mediaPlayerCubit: this),
                 deviceOrientationsOnFullScreen: [
                   DeviceOrientation.landscapeLeft,
@@ -629,7 +631,9 @@ sealed class VideoPlayerState extends MediaPlayerState with _$VideoPlayerState {
       Video? video,
       DownloadedVideo? offlineVideo,
       bool? playNow,
-      bool? disableControls}) = _VideoPlayerState;
+      bool? disableControls,
+      FocusNode? controlsFocusNode,
+      VoidCallback? onEnterRecommendations}) = _VideoPlayerState;
 
   const VideoPlayerState._();
 }

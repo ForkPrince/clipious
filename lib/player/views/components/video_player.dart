@@ -15,6 +15,8 @@ class VideoPlayer extends StatefulWidget {
   final bool? playNow;
   final bool? disableControls;
   final Duration? startAt;
+  final FocusNode? controlsFocusNode;
+  final VoidCallback? onEnterRecommendations;
 
   const VideoPlayer(
       {super.key,
@@ -23,7 +25,9 @@ class VideoPlayer extends StatefulWidget {
       this.playNow,
       this.disableControls,
       this.offlineVideo,
-      this.startAt})
+      this.startAt,
+      this.controlsFocusNode,
+      this.onEnterRecommendations})
       : assert(video == null || offlineVideo == null,
             'cannot provide both video and offline video\n');
 
@@ -52,7 +56,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
               key: _betterPlayerKey,
               video: widget.video,
               offlineVideo: widget.offlineVideo,
-              disableControls: widget.disableControls),
+              disableControls: widget.disableControls,
+              controlsFocusNode: widget.controlsFocusNode,
+              onEnterRecommendations: widget.onEnterRecommendations),
           player,
           settings),
       child: BlocBuilder<VideoPlayerCubit, VideoPlayerState>(

@@ -21,7 +21,12 @@ final log = Logger('TvPlayerController');
 class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
   final PlayerCubit player;
 
-  TvPlayerControlsCubit(super.initialState, this.player);
+  /// Called when the user navigates down and no overlay panel is open. The
+  /// screen uses it to shrink the video and reveal the recommended videos.
+  final VoidCallback? onEnterRecommendations;
+
+  TvPlayerControlsCubit(super.initialState, this.player,
+      {this.onEnterRecommendations});
 
   fastForward() {
     player.fastForward();
@@ -32,20 +37,7 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
   }
 
   displaySettings() {
-    emit(state.copyWith(
-        showSettings: true,
-        showQueue: false,
-        showRecommended: false,
-        displayControls: false));
-  }
-
-  displayRecommended() {
-    EasyDebounce.cancel('tv-controls');
-    emit(state.copyWith(
-        showRecommended: true,
-        showQueue: false,
-        showSettings: false,
-        displayControls: false));
+    emit(state.copyWith(showSettings: true, displayControls: false));
   }
 
   showUi() {
@@ -54,24 +46,22 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
   }
 
   KeyEventResult handleRemoteEvents(FocusNode node, KeyEvent event) {
-    bool panelsClosed =
-        !state.showQueue && !state.showSettings && !state.showRecommended;
+    bool panelsClosed = !state.showQueue && !state.showSettings;
     bool timeLineControl = panelsClosed && !state.displayControls;
-    bool hasRecommendations =
-        filteredVideos(player.state.currentlyPlaying?.recommendedVideos ?? [])
-            .isNotEmpty;
 
-    // pressing down while no panel is open reveals the recommended videos
+    // navigating down reveals the recommended videos, like YouTube TV
     if (event is KeyUpEvent &&
         panelsClosed &&
-        hasRecommendations &&
-        event.logicalKey == LogicalKeyboardKey.arrowDown) {
-      displayRecommended();
+        event.logicalKey == LogicalKeyboardKey.arrowDown &&
+        onEnterRecommendations != null &&
+        filteredVideos(player.state.currentlyPlaying?.recommendedVideos ?? [])
+            .isNotEmpty) {
+      onEnterRecommendations!();
       return KeyEventResult.handled;
     }
 
     log.fine(
-        'Key: ${event.logicalKey}, Timeline control: $timeLineControl, showQueue: ${state.showQueue}, showSettings: ${state.showSettings}, showRecommended: ${state.showRecommended}, showControls: ${state.displayControls}');
+        'Key: ${event.logicalKey}, Timeline control: $timeLineControl, showQueue: ${state.showQueue}, showSettings: ${state.showSettings}, showControls: ${state.displayControls}');
     showUi();
 
     // looks like back is activate on pressdown and not press up
@@ -81,9 +71,7 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
       emit(state.copyWith(
           showQueue: false,
           showSettings: false,
-          showRecommended: false,
-          displayControls:
-              state.showQueue || state.showSettings || state.showRecommended));
+          displayControls: state.showQueue || state.showSettings));
       return KeyEventResult.handled;
     } else if (event is KeyUpEvent) {
       switch (event.logicalKey) {
@@ -145,7 +133,6 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
         controlsOpacity: 0,
         showSettings: false,
         showQueue: false,
-        showRecommended: false,
         displayControls: false));
   }
 
@@ -156,25 +143,17 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
             controlsOpacity: 0,
             showSettings: false,
             showQueue: false,
-            showRecommended: false,
             displayControls: false));
       }
     });
   }
 
   displayQueue() {
-    emit(state.copyWith(
-        showQueue: true, showRecommended: false, displayControls: false));
+    emit(state.copyWith(showQueue: true, displayControls: false));
   }
 
   Future<void> playFromQueue(Video video) async {
     emit(state.copyWith(showQueue: false, loading: true));
-    player.switchToVideo(video);
-    emit(state.copyWith(loading: false));
-  }
-
-  Future<void> playFromRecommended(Video video) async {
-    emit(state.copyWith(showRecommended: false, loading: true));
     player.switchToVideo(video);
     emit(state.copyWith(loading: false));
   }
@@ -201,7 +180,6 @@ sealed class TvPlayerControlsState with _$TvPlayerControlsState {
     @Default(0) double controlsOpacity,
     @Default(false) bool showSettings,
     @Default(false) bool showQueue,
-    @Default(false) bool showRecommended,
     @Default(false) bool loading,
     @Default(false) bool displayControls,
   }) = _TvPlayerControlsState;

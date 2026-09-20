@@ -17,7 +17,6 @@ mixin _$TvPlayerControlsState {
   double get controlsOpacity;
   bool get showSettings;
   bool get showQueue;
-  bool get showRecommended;
   bool get loading;
   bool get displayControls;
 
@@ -40,8 +39,6 @@ mixin _$TvPlayerControlsState {
                 other.showSettings == showSettings) &&
             (identical(other.showQueue, showQueue) ||
                 other.showQueue == showQueue) &&
-            (identical(other.showRecommended, showRecommended) ||
-                other.showRecommended == showRecommended) &&
             (identical(other.loading, loading) || other.loading == loading) &&
             (identical(other.displayControls, displayControls) ||
                 other.displayControls == displayControls));
@@ -49,11 +46,11 @@ mixin _$TvPlayerControlsState {
 
   @override
   int get hashCode => Object.hash(runtimeType, controlsOpacity, showSettings,
-      showQueue, showRecommended, loading, displayControls);
+      showQueue, loading, displayControls);
 
   @override
   String toString() {
-    return 'TvPlayerControlsState(controlsOpacity: $controlsOpacity, showSettings: $showSettings, showQueue: $showQueue, showRecommended: $showRecommended, loading: $loading, displayControls: $displayControls)';
+    return 'TvPlayerControlsState(controlsOpacity: $controlsOpacity, showSettings: $showSettings, showQueue: $showQueue, loading: $loading, displayControls: $displayControls)';
   }
 }
 
@@ -67,7 +64,6 @@ abstract mixin class $TvPlayerControlsStateCopyWith<$Res> {
       {double controlsOpacity,
       bool showSettings,
       bool showQueue,
-      bool showRecommended,
       bool loading,
       bool displayControls});
 }
@@ -88,7 +84,6 @@ class _$TvPlayerControlsStateCopyWithImpl<$Res>
     Object? controlsOpacity = null,
     Object? showSettings = null,
     Object? showQueue = null,
-    Object? showRecommended = null,
     Object? loading = null,
     Object? displayControls = null,
   }) {
@@ -104,10 +99,6 @@ class _$TvPlayerControlsStateCopyWithImpl<$Res>
       showQueue: null == showQueue
           ? _self.showQueue
           : showQueue // ignore: cast_nullable_to_non_nullable
-              as bool,
-      showRecommended: null == showRecommended
-          ? _self.showRecommended
-          : showRecommended // ignore: cast_nullable_to_non_nullable
               as bool,
       loading: null == loading
           ? _self.loading
@@ -213,20 +204,15 @@ extension TvPlayerControlsStatePatterns on TvPlayerControlsState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(double controlsOpacity, bool showSettings, bool showQueue,
-            bool showRecommended, bool loading, bool displayControls)?
+            bool loading, bool displayControls)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _TvPlayerControlsState() when $default != null:
-        return $default(
-            _that.controlsOpacity,
-            _that.showSettings,
-            _that.showQueue,
-            _that.showRecommended,
-            _that.loading,
-            _that.displayControls);
+        return $default(_that.controlsOpacity, _that.showSettings,
+            _that.showQueue, _that.loading, _that.displayControls);
       case _:
         return orElse();
     }
@@ -248,19 +234,14 @@ extension TvPlayerControlsStatePatterns on TvPlayerControlsState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(double controlsOpacity, bool showSettings, bool showQueue,
-            bool showRecommended, bool loading, bool displayControls)
+            bool loading, bool displayControls)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _TvPlayerControlsState():
-        return $default(
-            _that.controlsOpacity,
-            _that.showSettings,
-            _that.showQueue,
-            _that.showRecommended,
-            _that.loading,
-            _that.displayControls);
+        return $default(_that.controlsOpacity, _that.showSettings,
+            _that.showQueue, _that.loading, _that.displayControls);
     }
   }
 
@@ -279,19 +260,14 @@ extension TvPlayerControlsStatePatterns on TvPlayerControlsState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(double controlsOpacity, bool showSettings, bool showQueue,
-            bool showRecommended, bool loading, bool displayControls)?
+            bool loading, bool displayControls)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _TvPlayerControlsState() when $default != null:
-        return $default(
-            _that.controlsOpacity,
-            _that.showSettings,
-            _that.showQueue,
-            _that.showRecommended,
-            _that.loading,
-            _that.displayControls);
+        return $default(_that.controlsOpacity, _that.showSettings,
+            _that.showQueue, _that.loading, _that.displayControls);
       case _:
         return null;
     }
@@ -305,7 +281,6 @@ class _TvPlayerControlsState extends TvPlayerControlsState {
       {this.controlsOpacity = 0,
       this.showSettings = false,
       this.showQueue = false,
-      this.showRecommended = false,
       this.loading = false,
       this.displayControls = false})
       : super._();
@@ -319,9 +294,6 @@ class _TvPlayerControlsState extends TvPlayerControlsState {
   @override
   @JsonKey()
   final bool showQueue;
-  @override
-  @JsonKey()
-  final bool showRecommended;
   @override
   @JsonKey()
   final bool loading;
@@ -349,8 +321,6 @@ class _TvPlayerControlsState extends TvPlayerControlsState {
                 other.showSettings == showSettings) &&
             (identical(other.showQueue, showQueue) ||
                 other.showQueue == showQueue) &&
-            (identical(other.showRecommended, showRecommended) ||
-                other.showRecommended == showRecommended) &&
             (identical(other.loading, loading) || other.loading == loading) &&
             (identical(other.displayControls, displayControls) ||
                 other.displayControls == displayControls));
@@ -358,11 +328,11 @@ class _TvPlayerControlsState extends TvPlayerControlsState {
 
   @override
   int get hashCode => Object.hash(runtimeType, controlsOpacity, showSettings,
-      showQueue, showRecommended, loading, displayControls);
+      showQueue, loading, displayControls);
 
   @override
   String toString() {
-    return 'TvPlayerControlsState(controlsOpacity: $controlsOpacity, showSettings: $showSettings, showQueue: $showQueue, showRecommended: $showRecommended, loading: $loading, displayControls: $displayControls)';
+    return 'TvPlayerControlsState(controlsOpacity: $controlsOpacity, showSettings: $showSettings, showQueue: $showQueue, loading: $loading, displayControls: $displayControls)';
   }
 }
 
@@ -378,7 +348,6 @@ abstract mixin class _$TvPlayerControlsStateCopyWith<$Res>
       {double controlsOpacity,
       bool showSettings,
       bool showQueue,
-      bool showRecommended,
       bool loading,
       bool displayControls});
 }
@@ -399,7 +368,6 @@ class __$TvPlayerControlsStateCopyWithImpl<$Res>
     Object? controlsOpacity = null,
     Object? showSettings = null,
     Object? showQueue = null,
-    Object? showRecommended = null,
     Object? loading = null,
     Object? displayControls = null,
   }) {
@@ -415,10 +383,6 @@ class __$TvPlayerControlsStateCopyWithImpl<$Res>
       showQueue: null == showQueue
           ? _self.showQueue
           : showQueue // ignore: cast_nullable_to_non_nullable
-              as bool,
-      showRecommended: null == showRecommended
-          ? _self.showRecommended
-          : showRecommended // ignore: cast_nullable_to_non_nullable
               as bool,
       loading: null == loading
           ? _self.loading

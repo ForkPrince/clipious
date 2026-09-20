@@ -24,6 +24,8 @@ mixin _$VideoPlayerState {
   DownloadedVideo? get offlineVideo;
   bool? get playNow;
   bool? get disableControls;
+  FocusNode? get controlsFocusNode;
+  VoidCallback? get onEnterRecommendations;
 
   /// Create a copy of VideoPlayerState
   /// with the given fields replaced by the non-null parameter values.
@@ -52,7 +54,11 @@ mixin _$VideoPlayerState {
                 other.offlineVideo == offlineVideo) &&
             (identical(other.playNow, playNow) || other.playNow == playNow) &&
             (identical(other.disableControls, disableControls) ||
-                other.disableControls == disableControls));
+                other.disableControls == disableControls) &&
+            (identical(other.controlsFocusNode, controlsFocusNode) ||
+                other.controlsFocusNode == controlsFocusNode) &&
+            (identical(other.onEnterRecommendations, onEnterRecommendations) ||
+                other.onEnterRecommendations == onEnterRecommendations));
   }
 
   @override
@@ -67,11 +73,13 @@ mixin _$VideoPlayerState {
       video,
       offlineVideo,
       playNow,
-      disableControls);
+      disableControls,
+      controlsFocusNode,
+      onEnterRecommendations);
 
   @override
   String toString() {
-    return 'VideoPlayerState(colors: $colors, overFlowTextColor: $overFlowTextColor, key: $key, startAt: $startAt, selectedNonDashTrack: $selectedNonDashTrack, bufferPosition: $bufferPosition, video: $video, offlineVideo: $offlineVideo, playNow: $playNow, disableControls: $disableControls)';
+    return 'VideoPlayerState(colors: $colors, overFlowTextColor: $overFlowTextColor, key: $key, startAt: $startAt, selectedNonDashTrack: $selectedNonDashTrack, bufferPosition: $bufferPosition, video: $video, offlineVideo: $offlineVideo, playNow: $playNow, disableControls: $disableControls, controlsFocusNode: $controlsFocusNode, onEnterRecommendations: $onEnterRecommendations)';
   }
 }
 
@@ -91,7 +99,9 @@ abstract mixin class $VideoPlayerStateCopyWith<$Res> {
       Video? video,
       DownloadedVideo? offlineVideo,
       bool? playNow,
-      bool? disableControls});
+      bool? disableControls,
+      FocusNode? controlsFocusNode,
+      VoidCallback? onEnterRecommendations});
 
   $VideoCopyWith<$Res>? get video;
   $DownloadedVideoCopyWith<$Res>? get offlineVideo;
@@ -120,6 +130,8 @@ class _$VideoPlayerStateCopyWithImpl<$Res>
     Object? offlineVideo = freezed,
     Object? playNow = freezed,
     Object? disableControls = freezed,
+    Object? controlsFocusNode = freezed,
+    Object? onEnterRecommendations = freezed,
   }) {
     return _then(_self.copyWith(
       colors: null == colors
@@ -162,6 +174,14 @@ class _$VideoPlayerStateCopyWithImpl<$Res>
           ? _self.disableControls
           : disableControls // ignore: cast_nullable_to_non_nullable
               as bool?,
+      controlsFocusNode: freezed == controlsFocusNode
+          ? _self.controlsFocusNode
+          : controlsFocusNode // ignore: cast_nullable_to_non_nullable
+              as FocusNode?,
+      onEnterRecommendations: freezed == onEnterRecommendations
+          ? _self.onEnterRecommendations
+          : onEnterRecommendations // ignore: cast_nullable_to_non_nullable
+              as VoidCallback?,
     ));
   }
 
@@ -295,7 +315,9 @@ extension VideoPlayerStatePatterns on VideoPlayerState {
             Video? video,
             DownloadedVideo? offlineVideo,
             bool? playNow,
-            bool? disableControls)?
+            bool? disableControls,
+            FocusNode? controlsFocusNode,
+            VoidCallback? onEnterRecommendations)?
         $default, {
     required TResult orElse(),
   }) {
@@ -312,7 +334,9 @@ extension VideoPlayerStatePatterns on VideoPlayerState {
             _that.video,
             _that.offlineVideo,
             _that.playNow,
-            _that.disableControls);
+            _that.disableControls,
+            _that.controlsFocusNode,
+            _that.onEnterRecommendations);
       case _:
         return orElse();
     }
@@ -343,7 +367,9 @@ extension VideoPlayerStatePatterns on VideoPlayerState {
             Video? video,
             DownloadedVideo? offlineVideo,
             bool? playNow,
-            bool? disableControls)
+            bool? disableControls,
+            FocusNode? controlsFocusNode,
+            VoidCallback? onEnterRecommendations)
         $default,
   ) {
     final _that = this;
@@ -359,7 +385,9 @@ extension VideoPlayerStatePatterns on VideoPlayerState {
             _that.video,
             _that.offlineVideo,
             _that.playNow,
-            _that.disableControls);
+            _that.disableControls,
+            _that.controlsFocusNode,
+            _that.onEnterRecommendations);
     }
   }
 
@@ -387,7 +415,9 @@ extension VideoPlayerStatePatterns on VideoPlayerState {
             Video? video,
             DownloadedVideo? offlineVideo,
             bool? playNow,
-            bool? disableControls)?
+            bool? disableControls,
+            FocusNode? controlsFocusNode,
+            VoidCallback? onEnterRecommendations)?
         $default,
   ) {
     final _that = this;
@@ -403,7 +433,9 @@ extension VideoPlayerStatePatterns on VideoPlayerState {
             _that.video,
             _that.offlineVideo,
             _that.playNow,
-            _that.disableControls);
+            _that.disableControls,
+            _that.controlsFocusNode,
+            _that.onEnterRecommendations);
       case _:
         return null;
     }
@@ -423,7 +455,9 @@ class _VideoPlayerState extends VideoPlayerState {
       this.video,
       this.offlineVideo,
       this.playNow,
-      this.disableControls})
+      this.disableControls,
+      this.controlsFocusNode,
+      this.onEnterRecommendations})
       : super._();
 
   @override
@@ -448,6 +482,10 @@ class _VideoPlayerState extends VideoPlayerState {
   final bool? playNow;
   @override
   final bool? disableControls;
+  @override
+  final FocusNode? controlsFocusNode;
+  @override
+  final VoidCallback? onEnterRecommendations;
 
   /// Create a copy of VideoPlayerState
   /// with the given fields replaced by the non-null parameter values.
@@ -476,7 +514,11 @@ class _VideoPlayerState extends VideoPlayerState {
                 other.offlineVideo == offlineVideo) &&
             (identical(other.playNow, playNow) || other.playNow == playNow) &&
             (identical(other.disableControls, disableControls) ||
-                other.disableControls == disableControls));
+                other.disableControls == disableControls) &&
+            (identical(other.controlsFocusNode, controlsFocusNode) ||
+                other.controlsFocusNode == controlsFocusNode) &&
+            (identical(other.onEnterRecommendations, onEnterRecommendations) ||
+                other.onEnterRecommendations == onEnterRecommendations));
   }
 
   @override
@@ -491,11 +533,13 @@ class _VideoPlayerState extends VideoPlayerState {
       video,
       offlineVideo,
       playNow,
-      disableControls);
+      disableControls,
+      controlsFocusNode,
+      onEnterRecommendations);
 
   @override
   String toString() {
-    return 'VideoPlayerState(colors: $colors, overFlowTextColor: $overFlowTextColor, key: $key, startAt: $startAt, selectedNonDashTrack: $selectedNonDashTrack, bufferPosition: $bufferPosition, video: $video, offlineVideo: $offlineVideo, playNow: $playNow, disableControls: $disableControls)';
+    return 'VideoPlayerState(colors: $colors, overFlowTextColor: $overFlowTextColor, key: $key, startAt: $startAt, selectedNonDashTrack: $selectedNonDashTrack, bufferPosition: $bufferPosition, video: $video, offlineVideo: $offlineVideo, playNow: $playNow, disableControls: $disableControls, controlsFocusNode: $controlsFocusNode, onEnterRecommendations: $onEnterRecommendations)';
   }
 }
 
@@ -517,7 +561,9 @@ abstract mixin class _$VideoPlayerStateCopyWith<$Res>
       Video? video,
       DownloadedVideo? offlineVideo,
       bool? playNow,
-      bool? disableControls});
+      bool? disableControls,
+      FocusNode? controlsFocusNode,
+      VoidCallback? onEnterRecommendations});
 
   @override
   $VideoCopyWith<$Res>? get video;
@@ -548,6 +594,8 @@ class __$VideoPlayerStateCopyWithImpl<$Res>
     Object? offlineVideo = freezed,
     Object? playNow = freezed,
     Object? disableControls = freezed,
+    Object? controlsFocusNode = freezed,
+    Object? onEnterRecommendations = freezed,
   }) {
     return _then(_VideoPlayerState(
       colors: null == colors
@@ -590,6 +638,14 @@ class __$VideoPlayerStateCopyWithImpl<$Res>
           ? _self.disableControls
           : disableControls // ignore: cast_nullable_to_non_nullable
               as bool?,
+      controlsFocusNode: freezed == controlsFocusNode
+          ? _self.controlsFocusNode
+          : controlsFocusNode // ignore: cast_nullable_to_non_nullable
+              as FocusNode?,
+      onEnterRecommendations: freezed == onEnterRecommendations
+          ? _self.onEnterRecommendations
+          : onEnterRecommendations // ignore: cast_nullable_to_non_nullable
+              as VoidCallback?,
     ));
   }
 
