@@ -83,200 +83,223 @@ class TvVideoItem extends StatelessWidget {
                           duration: animationDuration,
                           child: AspectRatio(
                             aspectRatio: 16 / 13,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                (state.video?.filtered ?? false)
-                                    ? AspectRatio(
-                                        aspectRatio: 16 / 9,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: colors.secondaryContainer,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          padding: const EdgeInsets.all(5),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              Text(
-                                                locals.videoFiltered,
-                                                style: filterStyle,
+                            // The card has a fixed aspect ratio, but the two
+                            // title lines plus the author need a minimum amount
+                            // of room. Reserve that space and let the thumbnail
+                            // take whatever height is left (cropped by the
+                            // thumbnail's BoxFit.cover) instead of letting the
+                            // text overflow the tile on short/small screens.
+                            child: LayoutBuilder(
+                              builder: (context, cardConstraints) {
+                                final double textReserve = 72.0 *
+                                    MediaQuery.textScalerOf(context).scale(1.0);
+                                final double thumbnailHeight =
+                                    (cardConstraints.maxHeight - textReserve)
+                                        .clamp(0.0,
+                                            cardConstraints.maxWidth * 9 / 16);
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: thumbnailHeight,
+                                      child: (state.video?.filtered ?? false)
+                                          ? Container(
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    colors.secondaryContainer,
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
                                               ),
-                                              ...video.matchedFilters
-                                                  .map((e) => Text(
-                                                        e.localizedLabel(
-                                                            locals, context),
-                                                        style: filterStyle,
-                                                      )),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 16.0),
-                                                child: Text(
-                                                  locals.videoFilterTapToReveal,
-                                                  style: filterStyle,
+                                              padding: const EdgeInsets.all(5),
+                                              alignment: Alignment.center,
+                                              child: FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Text(locals.videoFiltered,
+                                                        style: filterStyle),
+                                                    ...video.matchedFilters.map(
+                                                        (e) => Text(
+                                                            e.localizedLabel(
+                                                                locals,
+                                                                context),
+                                                            style:
+                                                                filterStyle)),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 16.0),
+                                                      child: Text(
+                                                          locals
+                                                              .videoFilterTapToReveal,
+                                                          style: filterStyle),
+                                                    )
+                                                  ],
                                                 ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                    : VideoThumbnailView(
-                                        videoId: state.video?.videoId ??
-                                            video.videoId,
-                                        thumbnails: state.video?.thumbnails ??
-                                            video.thumbnails,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Container(
-                                            alignment: Alignment.bottomRight,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: ((video.isUpcoming ??
-                                                          false) &&
-                                                      (video.premiereTimestamp !=
-                                                          null))
-                                                  ? [
-                                                      Text(locals.premieresIn(prettyDuration(
-                                                          DateTimeRange(
-                                                                  end: DateTime
-                                                                      .fromMillisecondsSinceEpoch(
-                                                                          video.premiereTimestamp! *
-                                                                              1000),
-                                                                  start: DateTime
-                                                                      .now())
-                                                              .duration,
-                                                          maxUnits: 1))),
-                                                    ]
-                                                  : [
-                                                      if (state.progress >
-                                                              0.05 &&
-                                                          state.progress < 1)
-                                                        Expanded(
-                                                          child: Container(
-                                                            margin:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    right: 8),
-                                                            alignment: Alignment
-                                                                .centerLeft,
-                                                            height: 5,
-                                                            width:
-                                                                double.infinity,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: colors
-                                                                  .secondaryContainer,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          20),
-                                                            ),
-                                                            child:
-                                                                FractionallySizedBox(
-                                                              widthFactor: state
-                                                                  .progress,
-                                                              heightFactor: 1,
-                                                              child: Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: state.progress ==
-                                                                          1
-                                                                      ? colors
-                                                                          .primaryContainer
-                                                                      : colors
-                                                                          .primary,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              20),
+                                              ),
+                                            )
+                                          : VideoThumbnailView(
+                                              videoId: state.video?.videoId ??
+                                                  video.videoId,
+                                              thumbnails:
+                                                  state.video?.thumbnails ??
+                                                      video.thumbnails,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Container(
+                                                  alignment:
+                                                      Alignment.bottomRight,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: ((video
+                                                                    .isUpcoming ??
+                                                                false) &&
+                                                            (video.premiereTimestamp !=
+                                                                null))
+                                                        ? [
+                                                            Text(locals.premieresIn(prettyDuration(
+                                                                DateTimeRange(
+                                                                        end: DateTime.fromMillisecondsSinceEpoch(video.premiereTimestamp! *
+                                                                            1000),
+                                                                        start: DateTime
+                                                                            .now())
+                                                                    .duration,
+                                                                maxUnits: 1))),
+                                                          ]
+                                                        : [
+                                                            if (state.progress >
+                                                                    0.05 &&
+                                                                state.progress <
+                                                                    1)
+                                                              Expanded(
+                                                                child:
+                                                                    Container(
+                                                                        margin: const EdgeInsets
+                                                                            .only(
+                                                                            right:
+                                                                                8),
+                                                                        alignment:
+                                                                            Alignment
+                                                                                .centerLeft,
+                                                                        height:
+                                                                            5,
+                                                                        width: double
+                                                                            .infinity,
+                                                                        decoration: BoxDecoration(
+                                                                            color: colors
+                                                                                .secondaryContainer,
+                                                                            borderRadius: BorderRadius.circular(
+                                                                                20)),
+                                                                        child:
+                                                                            FractionallySizedBox(
+                                                                          widthFactor:
+                                                                              state.progress,
+                                                                          heightFactor:
+                                                                              1,
+                                                                          child:
+                                                                              Container(
+                                                                            decoration:
+                                                                                BoxDecoration(color: state.progress == 1 ? colors.primaryContainer : colors.primary, borderRadius: BorderRadius.circular(20)),
+                                                                          ),
+                                                                        )),
+                                                              ),
+                                                            if (state
+                                                                    .progress ==
+                                                                1)
+                                                              Container(
+                                                                margin:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        right:
+                                                                            8),
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(5),
+                                                                decoration: BoxDecoration(
+                                                                    color: colors
+                                                                        .primaryContainer,
+                                                                    shape: BoxShape
+                                                                        .circle),
+                                                                child: Icon(
+                                                                  Icons.check,
+                                                                  size: 15,
+                                                                  color: colors
+                                                                      .primary,
                                                                 ),
                                                               ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      if (state.progress == 1)
-                                                        Container(
-                                                          margin:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                                  right: 8),
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(5),
-                                                          decoration: BoxDecoration(
-                                                              color: colors
-                                                                  .primaryContainer,
-                                                              shape: BoxShape
-                                                                  .circle),
-                                                          child: Icon(
-                                                            Icons.check,
-                                                            size: 15,
-                                                            color:
-                                                                colors.primary,
-                                                          ),
-                                                        ),
-                                                      if (video.lengthSeconds !=
-                                                          null)
-                                                        Container(
-                                                          decoration: BoxDecoration(
-                                                              color: Colors
-                                                                  .black
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.5),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          5)),
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(3.0),
-                                                            child: Text(
-                                                              prettyDurationCustom(
-                                                                  Duration(
-                                                                      seconds:
-                                                                          video.lengthSeconds ??
-                                                                              0)),
-                                                              style: textTheme
-                                                                  .bodySmall
-                                                                  ?.copyWith(
-                                                                      color: Colors
-                                                                          .white),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                    ],
+                                                            if (video
+                                                                    .lengthSeconds !=
+                                                                null)
+                                                              Container(
+                                                                decoration: BoxDecoration(
+                                                                    color: Colors
+                                                                        .black
+                                                                        .withValues(
+                                                                            alpha:
+                                                                                0.5),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            5)),
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          3.0),
+                                                                  child: Text(
+                                                                    prettyDurationCustom(Duration(
+                                                                        seconds:
+                                                                            video.lengthSeconds ??
+                                                                                0)),
+                                                                    style: textTheme
+                                                                        .bodySmall
+                                                                        ?.copyWith(
+                                                                            color:
+                                                                                Colors.white),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                          ],
+                                                  ),
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        )),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: Text(
-                                    (state.video?.filtered ?? false)
-                                        ? '**********'
-                                        : state.video?.title ??
-                                            video.title ??
-                                            '',
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(color: colors.primary),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: Text(
-                                    video.author ?? '',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(color: colors.secondary),
-                                  ),
-                                ),
-                              ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          8.0, 4.0, 8.0, 0.0),
+                                      child: Text(
+                                        (state.video?.filtered ?? false)
+                                            ? '**********'
+                                            : state.video?.title ??
+                                                video.title ??
+                                                '',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: textTheme.bodyMedium
+                                            ?.copyWith(color: colors.primary),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          8.0, 0.0, 8.0, 4.0),
+                                      child: Text(
+                                        video.author ?? '',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: textTheme.bodySmall
+                                            ?.copyWith(color: colors.secondary),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
                           )),
                     ),
