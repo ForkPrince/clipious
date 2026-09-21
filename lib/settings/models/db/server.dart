@@ -22,7 +22,17 @@ sealed class Server with _$Server {
   const Server._();
 
   Map<String, String>? headersForUrl(String url) {
-    var useHeaders = url.startsWith(this.url);
+    bool useHeaders = false;
+    try {
+      final uri = Uri.parse(url);
+      final serverUri = Uri.parse(this.url);
+      useHeaders =
+          uri.scheme == serverUri.scheme &&
+          uri.host == serverUri.host &&
+          uri.port == serverUri.port;
+    } catch (_) {
+      useHeaders = false;
+    }
     _log.fine('need header for $url ? $useHeaders');
     return useHeaders ? customHeaders : null;
   }

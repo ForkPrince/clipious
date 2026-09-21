@@ -207,7 +207,7 @@ class FileDB extends IDbClient {
 
   Future<void> _writeMapToFile(File f, Map<String, dynamic> map) async {
     var string = jsonEncode(map);
-    _log.fine("Writing json to ${f.path}: $string");
+    _log.fine("Writing json to ${f.path}");
     await f.writeAsString(string, mode: FileMode.write);
   }
 
@@ -225,29 +225,29 @@ class FileDB extends IDbClient {
     var f = await _openAppFile(_channelNotifFile);
     try {
       await f.delete();
-    } catch (e) {
-      log.fine('file doesn\'t exist');
+    } on FileSystemException catch (e) {
+      if (e.osError?.errorCode != 2) rethrow;
     }
 
     f = await _openAppFile(_playlistNotifsFile);
     try {
       await f.delete();
-    } catch (e) {
-      log.fine('file doesn\'t exist');
+    } on FileSystemException catch (e) {
+      if (e.osError?.errorCode != 2) rethrow;
     }
 
     f = await _openAppFile(_subNotifsFile);
     try {
       await f.delete();
-    } catch (e) {
-      log.fine('file doesn\'t exist');
+    } on FileSystemException catch (e) {
+      if (e.osError?.errorCode != 2) rethrow;
     }
 
     f = await _openAppFile(_genericSettings);
     try {
       await f.delete();
-    } catch (e) {
-      log.fine('file doesn\'t exist');
+    } on FileSystemException catch (e) {
+      if (e.osError?.errorCode != 2) rethrow;
     }
   }
 

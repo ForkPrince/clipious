@@ -52,6 +52,15 @@ This fork adds the following custom features:
 - **Add video history on TV**: Browse watched videos from the TV home menu
 - **TV recommendations**: Show recommended videos right in the player
 
+### Patches from [Videre](https://github.com/DVBeckwitt/Videre)
+
+- Credential leak fix in thumbnail loading
+- HTML response crash protection
+- Nullable FormatStream fields for compatibility with non-standard instances
+- Credential logging removal
+- Non-DASH quality selection fix
+- Disable Impeller on Android to fix black video on TV
+
 ## Installation
 The best way to install is to get it directly from the release page. Using [Obtainium](https://github.com/ImranR98/Obtainium) can help keeping the app up to date.
 

@@ -91,27 +91,31 @@ class Service {
     log.info(
         "Response from ${response.request?.method} ${urlFormatForLog(response.request?.url)}, status: ${response.statusCode}");
 
-    if (body.isNotEmpty) {
-      var decoded = jsonDecode(body);
-      String? error;
-      try {
-        Map<String, dynamic> errorFinder = decoded as Map<String, dynamic>;
-        error = errorFinder.containsKey('error') ? decoded['error'] : null;
-      } catch (err) {
-        // no error we keep going
+    if (response.statusCode < 200 || response.statusCode >= 400) {
+      if (body.isNotEmpty) {
+        try {
+          Map<String, dynamic> errorFinder = jsonDecode(body);
+          if (errorFinder.containsKey('error')) {
+            log.severe('Error while calling service: ${errorFinder['error']}');
+            throw InvidiousServiceError(errorFinder['error']);
+          }
+        } on FormatException {
+          // Response is HTML (Cloudflare, proxy error, etc.)
+        }
       }
-
-      if (error != null) {
-        log.severe('Error while calling service: $error');
-        throw InvidiousServiceError(error);
-      }
-
-      return decoded;
-    } else if (response.statusCode < 200 || response.statusCode >= 400) {
       log.severe(
-          'Error making request to ${response.request?.url}, \n status: ${response.statusCode}, \n Body: ${response.body}');
+          'Error making request to ${response.request?.url}, \n status: ${response.statusCode}');
       throw InvidiousServiceError(
           'Couldn\'t make request, response code: ${response.statusCode}');
+    }
+
+    if (body.isNotEmpty) {
+      try {
+        var decoded = jsonDecode(body);
+        return decoded;
+      } on FormatException {
+        throw InvidiousServiceError('Invalid JSON response from server');
+      }
     }
   }
 

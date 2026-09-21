@@ -280,7 +280,7 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
                 : formatStream?.url ?? '';
         if (!isUsingDash() && formatStream != null) {
           newState =
-              newState.copyWith(selectedNonDashTrack: formatStream.resolution);
+              newState.copyWith(selectedNonDashTrack: formatStream.qualityLabel);
         }
 
         // somehow invidious is sending google url even when using local proxy when not using dash
@@ -547,6 +547,9 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
   @override
   selectVideoTrack(int index) {
+    var tracks = getVideoTracks();
+    if (index < 0 || index >= tracks.length) return;
+
     if (isUsingDash()) {
       var betterPlayerAsmsTrack =
           videoController?.betterPlayerAsmsTracks[index];
@@ -554,7 +557,7 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
         videoController?.setTrack(betterPlayerAsmsTrack);
       }
     } else {
-      var track = getVideoTracks()[index];
+      var track = tracks[index];
       var url = videoController?.betterPlayerDataSource?.resolutions?[track];
       if (url != null) {
         videoController?.setResolution(url);
