@@ -279,8 +279,8 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
                 ? '${newState.video!.dashUrl}${useProxy ? '?local=true' : ''}'
                 : formatStream?.url ?? '';
         if (!isUsingDash() && formatStream != null) {
-          newState =
-              newState.copyWith(selectedNonDashTrack: formatStream.qualityLabel);
+          newState = newState.copyWith(
+              selectedNonDashTrack: formatStream.qualityLabel);
         }
 
         // somehow invidious is sending google url even when using local proxy when not using dash
