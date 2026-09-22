@@ -34,6 +34,7 @@ class DeArrow {
       '[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}\u{231A}-\u{231B}\u{23E9}-\u{23FA}\u{25AA}-\u{25FE}\u{2934}-\u{2935}\u{2B05}-\u{2B55}\u{3030}\u{303D}\u{3297}\u{3299}]',
       unicode: true);
   static final _firstLetter = RegExp(r'^[^a-z]*[a-z]');
+  static final _ampersandLetter = RegExp(r'&([a-z])');
 
   static String formatTitle(String? text) {
     if (text == null || text.isEmpty) return text ?? '';
@@ -52,9 +53,11 @@ class DeArrow {
           _smallWords.contains(word.toLowerCase())) {
         out.add(word.toLowerCase());
       } else {
-        var lower = word.toLowerCase();
-        out.add(
-            lower.replaceFirstMapped(_firstLetter, (m) => m[0]!.toUpperCase()));
+        var lower = word
+            .toLowerCase()
+            .replaceFirstMapped(_firstLetter, (m) => m[0]!.toUpperCase());
+        out.add(lower.replaceAllMapped(
+            _ampersandLetter, (m) => '&${m[1]!.toUpperCase()}'));
       }
     }
     return out.join(' ');
