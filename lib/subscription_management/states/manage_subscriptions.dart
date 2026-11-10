@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:clipious/extensions.dart';
 import 'package:clipious/offline_subscriptions/models/offline_subscription.dart';
+import 'package:clipious/settings/models/errors/invidious_service_error.dart';
 import 'package:logging/logging.dart';
 
 import '../../globals.dart';
@@ -20,17 +21,24 @@ class ManageSubscriptionCubit extends Cubit<ManageSubscriptionsState> {
     refreshSubs();
   }
 
-  Future unsubscribe(String authorId) async {
-    bool success = await service.unSubscribe(authorId);
-    bool isSubscribed = await service.isSubscribedToChannel(authorId);
+  Future<void> unsubscribe(String authorId) async {
+    emit(state.copyWith(loading: true));
+    try {
+      await service.unSubscribe(authorId);
+      final isSubscribed = await service.isSubscribedToChannel(authorId);
 
-    if (!success || isSubscribed) {
-      logger.fine(
-          'Issue setting subscription unsub request: $success  isSubscribed: $isSubscribed');
-      return unsubscribe(authorId);
+      if (isSubscribed) {
+        throw InvidiousServiceError(
+          'The subscription state was not updated',
+        );
+      }
+
+      await refreshSubs();
+    } catch (error) {
+      logger.warning('Unable to unsubscribe from $authorId', error);
+      emit(state.copyWith(loading: false));
+      rethrow;
     }
-
-    refreshSubs();
   }
 
   Future<void> refreshSubs() async {

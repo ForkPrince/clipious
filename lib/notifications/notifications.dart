@@ -139,7 +139,7 @@ Future<void> sendNotification(String title, String message,
     {required NotificationTypes type,
     Map<String, String>? payload,
     int id = 0}) async {
-  AwesomeNotifications().createNotification(
+  await AwesomeNotifications().createNotification(
       content: NotificationContent(
           id: type.idSpace + id,
           payload: payload,

@@ -240,6 +240,8 @@ class PlayerControls extends StatelessWidget {
 
             bool isMini =
                 context.select((PlayerCubit cubit) => cubit.state.isMini);
+            final isDragging =
+                context.select((PlayerCubit cubit) => cubit.state.isDragging);
             bool isPlaying =
                 context.select((PlayerCubit cubit) => cubit.state.isPlaying);
             Video? currentlyPlaying = context
@@ -275,6 +277,9 @@ class PlayerControls extends StatelessWidget {
             var canDragToAdjustDeviceSettings = screenControlsEnabled &&
                 playerState.fullScreenState == FullScreenState.fullScreen &&
                 !playerState.displayControls;
+            final canDragPlayer =
+                playerState.fullScreenState != FullScreenState.fullScreen &&
+                    !playerState.displayControls;
 
             return BlocListener<PlayerCubit, PlayerState>(
               listenWhen: (previous, current) =>
@@ -284,21 +289,20 @@ class PlayerControls extends StatelessWidget {
               },
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
-                onVerticalDragEnd:
-                    playerState.fullScreenState == FullScreenState.fullScreen ||
-                            playerState.displayControls
-                        ? null
-                        : player.videoDraggedEnd,
+                // Keep the active recognizer until it settles even if controls
+                // appear mid-drag. Disposing it would skip end/cancel entirely.
+                onVerticalDragEnd: canDragPlayer
+                    ? player.videoDraggedEnd
+                    : isDragging
+                        ? (_) => player.videoDragCancelled()
+                        : null,
                 onVerticalDragUpdate:
-                    playerState.fullScreenState == FullScreenState.fullScreen ||
-                            playerState.displayControls
-                        ? null
-                        : player.videoDragged,
+                    canDragPlayer ? player.videoDragged : null,
                 onVerticalDragStart:
-                    playerState.fullScreenState == FullScreenState.fullScreen ||
-                            playerState.displayControls
-                        ? null
-                        : player.videoDragStarted,
+                    canDragPlayer ? player.videoDragStarted : null,
+                onVerticalDragCancel: canDragPlayer || isDragging
+                    ? player.videoDragCancelled
+                    : null,
                 child: AspectRatio(
                   aspectRatio: 16 / 9,
                   child: Stack(

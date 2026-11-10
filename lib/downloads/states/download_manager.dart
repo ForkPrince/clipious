@@ -275,11 +275,15 @@ class DownloadManagerCubit extends Cubit<DownloadManagerState> {
 
     progresses.remove(vid.videoId);
 
-    try {
-      String path = await vid.effectivePath;
-      await File(path).delete();
-    } catch (e) {
-      log.fine('Video file might not be available, that\'s ok');
+    // The active job may have finished since this UI snapshot was taken.
+    vid = db.getDownloadByVideoId(vid.videoId) ?? vid;
+
+    for (final path in [await vid.downloadPath, await vid.effectivePath]) {
+      try {
+        await File(path).delete();
+      } catch (e) {
+        log.fine('Video file might not be available, that\'s ok');
+      }
     }
 
     try {

@@ -68,6 +68,11 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
         break;
       case ProcessingState.ready:
         player.setEvent(const MediaEvent(state: MediaState.ready));
+        // Audio focus changes can pause/resume the native decoder without a
+        // UI command. Keep transport controls and notifications in sync.
+        player.setEvent(MediaEvent(
+            state: MediaState.playing,
+            type: playing ? MediaEventType.play : MediaEventType.pause));
         break;
       case ProcessingState.completed:
         player.setEvent(const MediaEvent(state: MediaState.completed));
@@ -130,12 +135,11 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
                 .first;
             if (audio != null) {
               if (startAt == null) {
-                double progress = db.getVideoProgress(state.video!.videoId);
-                if (progress > 0 && progress < 0.90) {
-                  startAt = Duration(
-                      seconds: ((state.video!.lengthSeconds ?? 0) * progress)
-                          .floor());
-                }
+                final resumed = db
+                    .getVideoPlaybackProgress(state.video!.videoId)
+                    .resumePosition(
+                        durationSeconds: state.video!.lengthSeconds);
+                if (resumed != Duration.zero) startAt = resumed;
               }
               emit(state);
 
@@ -153,6 +157,16 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
         }
 
         await audioPlayer?.setAudioSource(source, initialPosition: startAt);
+
+        // Source initialization may briefly report zero before its initial
+        // seek. Publish the admitted position before any play/rate event:
+        // MediaSession extrapolates progress from those events.
+        final position = audioPlayer?.position ?? Duration.zero;
+        emit(state.copyWith(audioPosition: position));
+        player.setEvent(MediaEvent<Duration>(
+            state: MediaState.ready,
+            type: MediaEventType.progress,
+            value: position));
 
         play();
         // TODO: make this less duplicated between videos and audio
@@ -182,7 +196,7 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
   @override
   void switchToOfflineVideo(DownloadedVideo v) {
     emit(state.copyWith(video: null, offlineVideo: v));
-    playVideo(true);
+    playVideo(true, startAt: player.state.startAt);
   }
 
   @override

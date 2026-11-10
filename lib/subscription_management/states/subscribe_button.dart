@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:clipious/offline_subscriptions/models/offline_subscription.dart';
+import 'package:clipious/settings/models/errors/invidious_service_error.dart';
 import 'package:logging/logging.dart';
 
 import '../../globals.dart';
@@ -12,23 +13,33 @@ class SubscribeButtonCubit extends Cubit<SubscribeButtonState> {
     onReady();
   }
 
-  Future setAccountSubscription(bool subscribed) async {
+  Future<void> setAccountSubscription(bool subscribed) async {
     if (isClosed) return;
     emit(state.copyWith(loading: true));
 
-    bool wasSubscribed = state.isAccountSubscribed;
-    bool success = false;
-    if (!subscribed) {
-      success = await service.unSubscribe(state.channelId);
-    } else {
-      success = await service.subscribe(state.channelId);
-    }
-    bool isSubscribed = await service.isSubscribedToChannel(state.channelId);
-    if (!success || isSubscribed == wasSubscribed) {
-      return setAccountSubscription(subscribed);
-    }
-    if (!isClosed) {
-      emit(state.copyWith(loading: false, isAccountSubscribed: isSubscribed));
+    try {
+      if (subscribed) {
+        await service.subscribe(state.channelId);
+      } else {
+        await service.unSubscribe(state.channelId);
+      }
+
+      final actual = await service.isSubscribedToChannel(state.channelId);
+      if (actual != subscribed) {
+        throw InvidiousServiceError(
+          'The subscription state was not updated',
+        );
+      }
+
+      if (!isClosed) {
+        emit(state.copyWith(
+          loading: false,
+          isAccountSubscribed: actual,
+        ));
+      }
+    } catch (_) {
+      if (!isClosed) emit(state.copyWith(loading: false));
+      rethrow;
     }
   }
 

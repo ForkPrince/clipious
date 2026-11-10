@@ -237,9 +237,15 @@ class SembastSqfDb extends IDbClient {
   }
 
   @override
+  @override
   double getVideoProgress(String videoId) {
-    var v = progressStore.record(videoId).getSync(db);
-    return v != null ? Progress.fromJson(v).progress : 0;
+    return getVideoPlaybackProgress(videoId).progress;
+  }
+
+  @override
+  Progress getVideoPlaybackProgress(String videoId) {
+    final value = progressStore.record(videoId).getSync(db);
+    return value == null ? Progress(0, videoId) : Progress.fromJson(value);
   }
 
   @override
@@ -260,7 +266,19 @@ class SembastSqfDb extends IDbClient {
 
   @override
   saveProgress(Progress progress) async {
-    await progressStore.record(progress.videoId).put(db, progress.toJson());
+    // Compare and write together: overlapping playback/seek updates must not
+    // miss a watched-status transition by reading the same previous value.
+    final watchedChanged = await db.transaction((txn) async {
+      final record = progressStore.record(progress.videoId);
+      final previous = await record.get(txn);
+      final wasWatched = previous != null &&
+          Progress.fromJson(previous).progress >= watchedProgressThreshold;
+      await record.put(txn, progress.toJson());
+      return wasWatched != (progress.progress >= watchedProgressThreshold);
+    });
+    if (watchedChanged) {
+      playbackHistoryRevision.value++;
+    }
   }
 
   @override

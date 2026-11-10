@@ -56,9 +56,15 @@ class ContinuationList<T> extends PaginatedList<T> {
   }
 
   @override
-  Future<List<T>> refresh() {
+  Future<List<T>> refresh() async {
+    final previous = continuation;
     continuation = null;
-    return getItems();
+    try {
+      return await getItems();
+    } catch (_) {
+      continuation = previous;
+      rethrow;
+    }
   }
 }
 
@@ -137,15 +143,16 @@ class SubscriptionVideoList extends PaginatedVideoList {
   @override
   Future<List<Video>> getItems() async {
     final isLoggedIn = await service.isLoggedIn();
+    var nextHasMoreOnline = isLoggedIn && hasMoreOnline;
 
     List<Video> videos = [];
 
-    if (isLoggedIn) {
+    if (nextHasMoreOnline) {
       UserFeed feed =
           await service.getUserFeed(page: page, maxResults: maxResults);
       videos.addAll(feed.notifications ?? []);
       videos.addAll(feed.videos ?? []);
-      hasMoreOnline = videos.length >= maxResults;
+      nextHasMoreOnline = videos.length >= maxResults;
     }
 
     final offlineSubs = await db.getOfflineSubscriptions();
@@ -170,11 +177,13 @@ class SubscriptionVideoList extends PaginatedVideoList {
       }
     }
 
+    final nextContinuations = Map<String, String>.from(continuations);
     if (futures.isNotEmpty) {
       final offlineSubVideos = await Future.wait(futures);
       for (final result in offlineSubVideos) {
         videos.addAll(result.response.videos);
-        continuations[result.channelId] = result.response.continuation ?? _done;
+        nextContinuations[result.channelId] =
+            result.response.continuation ?? _done;
       }
     }
 
@@ -183,22 +192,43 @@ class SubscriptionVideoList extends PaginatedVideoList {
     );
     videos.sort((a, b) => (b.published ?? 0).compareTo(a.published ?? 0));
 
+    // Commit cursors only once all sources succeed so retry cannot skip a page.
+    hasMoreOnline = nextHasMoreOnline;
+    continuations = nextContinuations;
     return videos;
   }
 
   @override
   Future<List<Video>> getMoreItems() async {
+    if (!getHasMore()) return [];
+    final previousPage = page;
     if (hasMoreOnline) {
       page = page + 1;
     }
-    return getItems();
+    try {
+      return await getItems();
+    } catch (_) {
+      page = previousPage;
+      rethrow;
+    }
   }
 
   @override
   Future<List<Video>> refresh() async {
+    final previousPage = page;
+    final previousHasMoreOnline = hasMoreOnline;
+    final previousContinuations = continuations;
     page = 1;
+    hasMoreOnline = true;
     continuations = {};
-    return getItems();
+    try {
+      return await getItems();
+    } catch (_) {
+      page = previousPage;
+      hasMoreOnline = previousHasMoreOnline;
+      continuations = previousContinuations;
+      rethrow;
+    }
   }
 
   @override
@@ -321,6 +351,21 @@ class PageBasedPaginatedList<T> extends PaginatedList<T> {
 
   @override
   Future<List<T>> refresh() async {
-    return await getItemsFunc(1, maxResults * page);
+    final items = <T>[];
+    var refreshedPage = 1;
+    var refreshedHasMore = true;
+    // Some endpoints (including search) have a fixed page size. Reload each
+    // visible page rather than assuming they honor a larger result limit.
+    while (true) {
+      final next = await getItemsFunc(refreshedPage, maxResults);
+      items.addAll(next);
+      refreshedHasMore = next.length == maxResults;
+      if (!refreshedHasMore || refreshedPage >= page) break;
+      refreshedPage++;
+    }
+    // Preserve the old cursor if any of the requests fail.
+    page = refreshedPage;
+    hasMore = refreshedHasMore;
+    return items;
   }
 }

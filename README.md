@@ -53,6 +53,19 @@ Android client application for [invidious](https://invidious.io), the privacy fo
 - Stop background playback promptly, owned player-control timers, subscribe-button closed guards
 - Comment load guard, keep comments on error, retry button
 - Tolerant per-format parsing and channelId-keyed subscription continuations
+- Hardened playback fallback (source cap, media-URL validation, no instance credentials to the native player, stale-setup cancellation)
+- Bounded quality selection (resolutions from budget-accepted streams, tracks from built sources)
+- Per-source media headers and resolution fallback chain in the player
+- Invidious DASH 400 "No check ID" fix (manifest resolver, one retry, route-health cache)
+- Hardened Invidious sessions (status code + HTML diagnostics, session validation, no infinite subscribe retry)
+- 429 handling with Retry-After, duplicate video-request coalescing, 15 s browse cache, Accept: application/json
+- Dropped playback commands fix (play/pause intent survives source setup)
+- Keep playback position when switching to audio; ignore zero-progress until the initial seek finishes
+- Queue, pagination, FileDB and redirect fixes (queue correctness, Timer lifecycle, cursor restore on failure, serialised atomic FileDB writes, origin-scoped redirects, sequential history sync, serialised server edits)
+- Exact resume position (saved position/duration, resume to the exact second, transactional watched-status updates)
+- Mini-player drag fixes (cancel settles to mini/big, drag state resets, top clamped to the viewport with keyboard inset)
+- Audio-focus and MediaSession sync (play/pause re-emit on ready, admitted position published before play/rate events)
+- Relaxed server-setup thumbnail validation (one usable resolved thumbnail is enough)
 
 ## Installation
 

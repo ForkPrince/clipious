@@ -76,6 +76,9 @@ abstract class IDbClient {
 
   double getVideoProgress(String videoId);
 
+  Progress getVideoPlaybackProgress(String videoId) =>
+      Progress(getVideoProgress(videoId), videoId);
+
   Future<void> saveProgress(Progress progress);
 
   Future<void> useServer(Server server);

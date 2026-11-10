@@ -53,13 +53,18 @@ class AddServerCubit extends Cubit<AddServerState> {
         final video =
             await service.getVideo('dQw4w9WgXcQ', serverOverride: server);
 
-        final invalidThumbnailUrls = video.videoThumbnails
-            .map(
-              (e) => e.url,
-            )
-            .any((u) => u.startsWith("/"));
-
-        if (invalidThumbnailUrls) {
+        final thumbnails = video.videoThumbnails;
+        // Validate the resolved URLs that the image loader uses. One usable
+        // candidate is enough because the loader tries the available sizes.
+        if (thumbnails.isNotEmpty &&
+            !thumbnails.any((thumbnail) {
+              if (thumbnail.url.trim().isEmpty) return false;
+              final url =
+                  Uri.tryParse(_resolveThumbnailUrl(thumbnail.url, server));
+              return url != null &&
+                  const {'http', 'https'}.contains(url.scheme) &&
+                  url.host.isNotEmpty;
+            })) {
           throw WrongThumbnailUrl();
         }
       }
@@ -104,6 +109,21 @@ class AddServerCubit extends Cubit<AddServerState> {
   void setAdvancedTest(bool advancedTest) {
     emit(state.copyWith(advancedTest: advancedTest));
   }
+}
+
+/// Resolve a thumbnail URL the way the image loader would: absolute http(s)
+/// URLs pass through, instance-relative paths resolve against the server.
+/// (Videre's invidiousImageUrl() does the same plus instance-proxy routing,
+/// which Clipious does not have.)
+String _resolveThumbnailUrl(String url, Server server) {
+  final trimmed = url.trim();
+  if (trimmed.isEmpty) return '';
+  final parsed = Uri.tryParse(trimmed);
+  if (parsed == null) return '';
+  if (parsed.hasScheme) return trimmed;
+  final base = Uri.tryParse(server.url);
+  if (base == null) return '';
+  return base.resolve(trimmed).toString();
 }
 
 @freezed

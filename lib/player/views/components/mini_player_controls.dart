@@ -67,7 +67,7 @@ class MiniPlayerControls extends StatelessWidget {
                                 player.seek(Duration.zero);
                                 player.play();
                               }
-                            : player.togglePlay,
+                            : player.togglePlaying,
                         style: buttonStyle,
                         icon: Icon(
                           isPlaying

@@ -1,13 +1,11 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:clipious/settings/models/errors/invidious_service_error.dart';
 import 'package:clipious/videos/models/video.dart';
 import 'package:clipious/videos/states/hidden_videos.dart';
-import 'package:logging/logging.dart';
 
 import '../models/paginated_list.dart';
 
@@ -15,11 +13,13 @@ part 'item_list.freezed.dart';
 
 enum ItemListErrors { none, couldNotFetchItems, invalidScope }
 
-var log = Logger('ItemListCubit');
-
 class ItemListCubit<T> extends Cubit<ItemListState<T>> {
-  ScrollController scrollController = ScrollController();
+  final ScrollController scrollController = ScrollController();
   StreamSubscription? _hiddenSub;
+  Timer? _loadMoreTimer;
+  bool _loading = false;
+  Completer<void>? _loadComplete;
+  Future<List<T>> Function()? _failedLoad;
 
   ItemListCubit(super.initialState) {
     onReady();
@@ -33,6 +33,8 @@ class ItemListCubit<T> extends Cubit<ItemListState<T>> {
 
   @override
   close() async {
+    _loadMoreTimer?.cancel();
+    _failedLoad = null;
     await _hiddenSub?.cancel();
     scrollController.dispose();
     super.close();
@@ -44,18 +46,19 @@ class ItemListCubit<T> extends Cubit<ItemListState<T>> {
   }
 
   void onScrollEvent() {
-    if (scrollController.hasClients) {
+    if (!isClosed && !_loading && state.itemList.getHasMore()) {
+      if (!scrollController.hasClients) return;
       if (scrollController.position.maxScrollExtent * 0.9 <
           scrollController.offset) {
-        EasyDebounce.debounce('loading-more-videos',
-            const Duration(milliseconds: 500), getMoreItems);
+        _loadMoreTimer?.cancel();
+        _loadMoreTimer = Timer(const Duration(milliseconds: 500), getMoreItems);
       }
     }
   }
 
   Future<void> getMoreItems() async {
-    if (!state.loading && state.itemList.getHasMore()) {
-      loadItems(() async {
+    if (!isClosed && !_loading && state.itemList.getHasMore()) {
+      await loadItems(() async {
         List<T> items = await state.itemList.getMoreItems();
         List<T> currentItems = List.from(state.items)..addAll(items);
         return currentItems;
@@ -64,7 +67,8 @@ class ItemListCubit<T> extends Cubit<ItemListState<T>> {
   }
 
   Future<void> refreshItems() async {
-    loadItems(state.itemList.refresh);
+    await _loadComplete?.future;
+    await loadItems(state.itemList.refresh);
   }
 
   void removeWhere(bool Function(T) test) {
@@ -76,10 +80,21 @@ class ItemListCubit<T> extends Cubit<ItemListState<T>> {
   }
 
   Future<void> getItems() async {
-    loadItems(state.itemList.getItems);
+    await loadItems(state.itemList.getItems);
+  }
+
+  /// Retry the failed request without resetting its page or continuation.
+  Future<void> retryItems() async {
+    final request = _failedLoad;
+    if (request != null) await loadItems(request);
   }
 
   Future<void> loadItems(Future<List<T>> Function() refreshFunction) async {
+    if (isClosed || _loading) return;
+    _loadMoreTimer?.cancel();
+    _loading = true;
+    _failedLoad = null;
+    final completion = _loadComplete = Completer<void>();
     emit(state.copyWith(error: ItemListErrors.none, loading: true));
     try {
       var items = await refreshFunction();
@@ -94,9 +109,13 @@ class ItemListCubit<T> extends Cubit<ItemListState<T>> {
         error = ItemListErrors.couldNotFetchItems;
       }
       if (!isClosed) {
-        emit(state.copyWith(error: error, items: [], loading: false));
+        _failedLoad = refreshFunction;
+        emit(state.copyWith(error: error, loading: false));
       }
-      rethrow;
+    } finally {
+      _loading = false;
+      _loadComplete = null;
+      completion.complete();
     }
   }
 

@@ -108,9 +108,19 @@ class ServerListSettingsCubit extends Cubit<ServerListSettingsState> {
 
   Future<void> switchServer(Server s) async {
     await db.useServer(s);
-    await fileDb.useServer(s);
+    try {
+      await service.validateCurrentSession();
+    } catch (error, stackTrace) {
+      log.warning(
+        'Unable to validate the stored Invidious session',
+        error,
+        stackTrace,
+      );
+    }
+    final selectedServer = await db.getCurrentlySelectedServer();
+    await fileDb.useServer(selectedServer);
     await refreshServers();
-    appCubit.setServer(s);
+    appCubit.setServer(selectedServer);
   }
 }
 

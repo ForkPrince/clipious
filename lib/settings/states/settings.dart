@@ -171,13 +171,12 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   Future<void> setHistoryLimit(int value) async {
-    if (value < 1) {
-      await setSearchHistoryLimit(1);
-    } else if (value <= 30) {
-      await setSearchHistoryLimit(value);
-    }
+    if (value > 30) return;
+    final limit = value < 1 ? 1 : value;
+    final previousLimit = state.searchHistoryLimit;
+    await setSearchHistoryLimit(limit);
 
-    if (value < state.searchHistoryLimit) {
+    if (limit < previousLimit) {
       await db.clearExcessSearchHistory();
     }
   }
