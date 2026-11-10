@@ -14,8 +14,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:clipious/globals.dart';
 import 'package:clipious/player/models/media_command.dart';
 import 'package:clipious/player/models/media_event.dart';
+import 'package:clipious/player/models/playback_queue.dart';
 import 'package:clipious/player/states/interfaces/media_player.dart';
 import 'package:clipious/utils.dart';
+import 'package:clipious/utils/invidious_image.dart';
 import 'package:clipious/utils/models/image_object.dart';
 import 'package:logging/logging.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
@@ -114,10 +116,9 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   }
 
   int get currentIndex {
-    String? currentVideoId = state.currentlyPlaying?.videoId ??
-        state.offlineCurrentlyPlaying?.videoId;
     return (state.videos.isNotEmpty ? state.videos : state.offlineVideos)
-        .indexWhere((element) => element.videoId == currentVideoId);
+        .indexWhere(
+            (element) => playbackQueueId(element) == state.currentQueueId);
   }
 
   Future<void> onReady() async {
@@ -314,13 +315,20 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   }
 
   void queueVideos(List<Video> videos) {
-    final ids = state.videos.map((video) => video.videoId).toSet();
-    final additions = videos
-        .where((video) => !video.filtered && ids.add(video.videoId))
+    // Assign occurrence ids first so the same upload twice in the added
+    // list becomes two distinct queue occurrences instead of one.
+    final additions = assignPlaybackQueueIds(
+        videos.where((video) => !video.filtered).toList());
+    // Only skip an addition whose occurrence is already in the queue.
+    final existingIds = state.videos.map(playbackQueueId).toSet();
+    final fresh = additions
+        .where((video) => !existingIds.contains(playbackQueueId(video)))
         .toList();
-    if (additions.isEmpty) return;
-    emit(state
-        .copyWith(offlineVideos: [], videos: [...state.videos, ...additions]));
+    if (fresh.isEmpty) return;
+    // Re-assign against the combined queue so a fresh occurrence of an
+    // upload already queued gets a distinct id instead of colliding.
+    final combined = assignPlaybackQueueIds([...state.videos, ...fresh]);
+    emit(state.copyWith(offlineVideos: [], videos: combined));
     generatePlayQueue();
   }
 
@@ -406,8 +414,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
       play();
     } else if (state.videos.isNotEmpty || state.offlineVideos.isNotEmpty) {
       //moving current video to played list
-      String? currentVideoId = state.currentlyPlaying?.videoId ??
-          state.offlineCurrentlyPlaying?.videoId;
+      String? currentVideoId = state.currentQueueId;
       if (currentVideoId != null) {
         // state.playedVideos.remove(currentVideoId);
         var newPlayedVideos = List<String>.from(state.playedVideos)
@@ -418,11 +425,11 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
       if (state.playQueue.isNotEmpty) {
         String toPlay = state.playQueue.removeFirst();
         if (state.videos.isNotEmpty) {
-          await switchToVideo(
-              state.videos.firstWhere((element) => element.videoId == toPlay));
+          await switchToVideo(state.videos
+              .firstWhere((element) => playbackQueueId(element) == toPlay));
         } else {
           await switchToOfflineVideo(state.offlineVideos
-              .firstWhere((element) => element.videoId == toPlay));
+              .firstWhere((element) => playbackQueueId(element) == toPlay));
         }
       } else if (settings.state.playerRepeatMode == PlayerRepeat.repeatAll) {
         emit(state.copyWith(playedVideos: [], playQueue: ListQueue.from([])));
@@ -446,8 +453,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         () async {
       if (state.playedVideos.isNotEmpty) {
         // putting back current video in play queue
-        String? currentVideoId = state.currentlyPlaying?.videoId ??
-            state.offlineCurrentlyPlaying?.videoId;
+        String? currentVideoId = state.currentQueueId;
         var playQueue = ListQueue<String>.from(state.playQueue);
         if (currentVideoId != null) {
           // state.playQueue.remove(currentVideoId);
@@ -457,11 +463,11 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         var playedVideos = List<String>.from(state.playedVideos);
         String toPlay = playedVideos.removeLast();
         if (state.videos.isNotEmpty) {
-          await switchToVideo(
-              state.videos.firstWhere((element) => element.videoId == toPlay));
+          await switchToVideo(state.videos
+              .firstWhere((element) => playbackQueueId(element) == toPlay));
         } else {
           await switchToOfflineVideo(state.offlineVideos
-              .firstWhere((element) => element.videoId == toPlay));
+              .firstWhere((element) => playbackQueueId(element) == toPlay));
         }
         emit(state.copyWith(playQueue: playQueue, playedVideos: playedVideos));
       } else {
@@ -489,7 +495,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         offlineVideos = List<DownloadedVideo>.from(vids, growable: true).cast();
       } else {
         offlineVideos = [];
-        videos = List<Video>.from(vids, growable: true).cast();
+        videos = assignPlaybackQueueIds(vids.cast<Video>());
       }
 
       var selectedFullScreenIndex = 0;
@@ -527,9 +533,8 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
     }
 
     if (settings.state.playerShuffleMode) {
-      final selectedId = listToCheckAgainst[index].videoId;
-      final currentId = state.currentlyPlaying?.videoId ??
-          state.offlineCurrentlyPlaying?.videoId;
+      final selectedId = playbackQueueId(listToCheckAgainst[index]);
+      final currentId = state.currentQueueId;
       if (selectedId == currentId) return;
       emit(state.copyWith(
           playedVideos: [
@@ -544,9 +549,9 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
       for (int i = 0; i < listToCheckAgainst.length; i++) {
         var v = listToCheckAgainst[i];
         if (i < index) {
-          played.add(v.videoId);
+          played.add(playbackQueueId(v));
         } else if (i > index) {
-          playNext.add(v.videoId);
+          playNext.add(playbackQueueId(v));
         }
       }
       emit(state.copyWith(
@@ -604,6 +609,9 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         } else {
           v = await service.getVideo(video.videoId);
         }
+        // Playback responses describe the upload; keep the queue occurrence
+        // of the video that was requested.
+        if (video is Video) v = v.preservingQueueEntryIdFrom(video);
         currentlyPlaying = v;
         mediaCommand = MediaCommand(MediaCommandType.switchVideo,
             value: SwitchVideoValue(video: v, startAt: startAt));
@@ -643,7 +651,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         log.severe(
             "Couldn't play video  '${video.videoId}', removing it from the queue");
 
-        removeVideoFromQueue(video.videoId);
+        removeVideoFromQueue(playbackQueueId(video));
         _playNextNow();
       }
     }
@@ -693,18 +701,20 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         mediaCommand: const MediaCommand(MediaCommandType.pause)));
   }
 
-  void removeVideoFromQueue(String videoId) {
+  void removeVideoFromQueue(String queueId) {
     var videos = List<Video>.from(state.videos);
     var offlineVideos = List<DownloadedVideo>.from(state.offlineVideos);
     var listToUpdate = videos.isNotEmpty ? videos : offlineVideos;
+    if (!listToUpdate.any((video) => playbackQueueId(video) == queueId)) return;
     if (listToUpdate.length == 1) {
       hide();
     } else {
       var playQueue = ListQueue<String>.from(state.playQueue)
-        ..removeWhere((element) => element == videoId);
+        ..removeWhere((element) => element == queueId);
       var playedVideos = List<String>.from(state.playedVideos)
-        ..removeWhere((element) => element == videoId);
-      listToUpdate.removeWhere((element) => element.videoId == videoId);
+        ..removeWhere((element) => element == queueId);
+      listToUpdate
+          .removeWhere((element) => playbackQueueId(element) == queueId);
       emit(state.copyWith(
           videos: videos,
           offlineVideos: offlineVideos,
@@ -786,14 +796,12 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
     var movedItem = listToUpdate.removeAt(oldItemIndex);
     listToUpdate.insert(newItemIndex, movedItem);
     var playedVideos = state.playedVideos;
-    final currentId = state.currentlyPlaying?.videoId ??
-        state.offlineCurrentlyPlaying?.videoId;
+    final currentId = state.currentQueueId;
     final current =
-        listToUpdate.indexWhere((video) => video.videoId == currentId);
+        listToUpdate.indexWhere((video) => playbackQueueId(video) == currentId);
     if (!settings.state.playerShuffleMode && current >= 0) {
       // Queue order determines previous/next playback outside shuffle mode.
-      playedVideos =
-          listToUpdate.take(current).map((video) => video.videoId).toList();
+      playedVideos = listToUpdate.take(current).map(playbackQueueId).toList();
     }
     emit(state.copyWith(
         playedVideos: playedVideos,
@@ -806,12 +814,19 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
     if (state.videos.isEmpty) {
       playVideo([video]);
     } else {
-      final videos = state.videos.any((item) => item.videoId == video.videoId)
-          ? state.videos
-          : [...state.videos, video];
+      final existing = state.videos
+              .where((item) => playbackQueueId(item) == playbackQueueId(video))
+              .firstOrNull ??
+          state.videos
+              .where((item) => item.videoId == video.videoId)
+              .firstOrNull;
+      final target = existing ?? video.copyWith(queueEntryId: null);
+      final videos =
+          existing == null ? [...state.videos, target] : state.videos;
+      final queueId = playbackQueueId(target);
       var playQueue = ListQueue<String>.from(state.playQueue)
-        ..removeWhere((id) => id == video.videoId)
-        ..addFirst(video.videoId);
+        ..removeWhere((id) => id == queueId)
+        ..addFirst(queueId);
       emit(state.copyWith(videos: videos, playQueue: playQueue));
     }
   }
@@ -937,14 +952,22 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   Future<MediaItem?> getMediaItem(int index) async {
     if (state.videos.isNotEmpty) {
       var e = state.videos[index];
+      final thumbnail = ImageObject.getBestThumbnail(e.videoThumbnails)?.url;
+      String? artworkUrl;
+      Map<String, String>? artworkHeaders;
+      if (thumbnail != null && thumbnail.isNotEmpty) {
+        final server = await db.getCurrentlySelectedServer();
+        artworkUrl = invidiousImageUrl(thumbnail, server);
+        artworkHeaders = server.headersForUrl(artworkUrl);
+      }
       return MediaItem(
           id: e.videoId,
           title: e.title ?? '',
           artist: e.author,
           duration: Duration(seconds: e.lengthSeconds ?? 1),
           album: '',
-          artUri: Uri.parse(
-              ImageObject.getBestThumbnail(e.videoThumbnails)?.url ?? ''));
+          artUri: artworkUrl == null ? null : Uri.tryParse(artworkUrl),
+          artHeaders: artworkHeaders);
     } else if (state.offlineVideos.isNotEmpty) {
       var e = state.offlineVideos[index];
       var path = await e.thumbnailPath;
@@ -1037,13 +1060,12 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
 
   void generatePlayQueue() {
     final played = state.playedVideos.toSet();
-    final currentId = state.currentlyPlaying?.videoId ??
-        state.offlineCurrentlyPlaying?.videoId;
+    final currentId = state.currentQueueId;
     if (currentId != null) played.add(currentId);
     List<String> videos =
         (state.videos.isNotEmpty ? state.videos : state.offlineVideos)
-            .where((element) => !played.contains(element.videoId))
-            .map((e) => e.videoId)
+            .where((element) => !played.contains(playbackQueueId(element)))
+            .map(playbackQueueId)
             .toList();
 
     // if we're in shuffle mode, we shuffle the collection
@@ -1158,10 +1180,17 @@ sealed class PlayerState with _$PlayerState {
 
   bool get hasQueue => offlineVideos.length > 1 || videos.length > 1;
 
+  String? get currentQueueId {
+    final video = currentlyPlaying ?? offlineCurrentlyPlaying;
+    return video == null ? null : playbackQueueId(video);
+  }
+
   const PlayerState._();
 
 //
   static PlayerState init(List<Video>? videos) {
-    return PlayerState(videos: videos ?? [], playQueue: ListQueue.from([]));
+    return PlayerState(
+        videos: assignPlaybackQueueIds(videos ?? []),
+        playQueue: ListQueue.from([]));
   }
 }

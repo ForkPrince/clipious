@@ -66,6 +66,12 @@ Android client application for [invidious](https://invidious.io), the privacy fo
 - Mini-player drag fixes (cancel settles to mini/big, drag state resets, top clamped to the viewport with keyboard inset)
 - Audio-focus and MediaSession sync (play/pause re-emit on ready, admitted position published before play/rate events)
 - Relaxed server-setup thumbnail validation (one usable resolved thumbnail is enough)
+- Queue occurrence identity (same video twice in a playlist/queue stays two entries, per-occurrence ids)
+- Invidious image routing (YouTube artwork via the selected instance, size-aware thumbnails, background download artwork)
+- Single-encode query parameters (no double-encoding of search text, continuations survive pagination)
+- Stale-proof selector searches and channel load errors (out-of-order results ignored, retry instead of a hanging spinner)
+- Early seeks applied after setup and player sheets dismiss on Back first
+- Shared media URL helpers; audio sources validated and routed like video playback
 
 ## Installation
 

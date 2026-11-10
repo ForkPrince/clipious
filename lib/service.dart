@@ -273,23 +273,16 @@ class Service {
         url = url.replaceAll(key, value);
       });
 
-      if (useProxy()) {
-        query ??= {};
-        query['local'] = 'true';
-      }
-
-      List<String> queryStr = [];
-      query?.forEach((key, value) {
-        if (value != null) {
-          queryStr.add('$key=$value');
-        }
-      });
-
-      if (queryStr.isNotEmpty) {
-        url += '?${queryStr.join('&')}';
-      }
-
       var uri = Uri.parse(url);
+      final queryParameters = <String, dynamic>{
+        ...uri.queryParametersAll,
+        for (final entry in query?.entries ?? <MapEntry<String, String?>>[])
+          if (entry.value != null) entry.key: entry.value,
+        if (useProxy()) 'local': 'true',
+      };
+      if (queryParameters.isNotEmpty) {
+        uri = uri.replace(queryParameters: queryParameters);
+      }
       log.info('calling ${urlFormatForLog(uri)}');
 
       final Map<String, String> headers = Map.from(server.customHeaders);
@@ -429,7 +422,7 @@ class Service {
       SearchDuration duration = SearchDuration.any}) async {
     String countryCode = db.getSettings(browsingCountry)?.value ?? 'US';
     final req = await buildRequest(urlSearch, query: {
-      'q': Uri.encodeQueryComponent(query),
+      'q': query,
       'type': type?.name,
       'page': page?.toString() ?? '1',
       'sort': sortBy?.name,
@@ -551,8 +544,7 @@ class Service {
 
   Future<SearchSuggestion> getSearchSuggestion(String query) async {
     if (query.isEmpty) return SearchSuggestion(query, []);
-    var request = await buildRequest(urlSearchSuggestions,
-        query: {"q": Uri.encodeQueryComponent(query)});
+    var request = await buildRequest(urlSearchSuggestions, query: {"q": query});
     final response = await _get(request);
     SearchSuggestion search =
         SearchSuggestion.fromJson(handleResponse(response));

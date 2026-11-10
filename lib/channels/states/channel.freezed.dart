@@ -18,6 +18,7 @@ mixin _$ChannelController {
   bool get isSubscribed;
   Channel? get channel;
   bool get loading;
+  bool get hasError;
   bool get smallHeader;
   double get barHeight;
   double get barOpacity;
@@ -42,6 +43,8 @@ mixin _$ChannelController {
                 other.isSubscribed == isSubscribed) &&
             (identical(other.channel, channel) || other.channel == channel) &&
             (identical(other.loading, loading) || other.loading == loading) &&
+            (identical(other.hasError, hasError) ||
+                other.hasError == hasError) &&
             (identical(other.smallHeader, smallHeader) ||
                 other.smallHeader == smallHeader) &&
             (identical(other.barHeight, barHeight) ||
@@ -53,11 +56,11 @@ mixin _$ChannelController {
 
   @override
   int get hashCode => Object.hash(runtimeType, channelId, isSubscribed, channel,
-      loading, smallHeader, barHeight, barOpacity, sortBy);
+      loading, hasError, smallHeader, barHeight, barOpacity, sortBy);
 
   @override
   String toString() {
-    return 'ChannelController(channelId: $channelId, isSubscribed: $isSubscribed, channel: $channel, loading: $loading, smallHeader: $smallHeader, barHeight: $barHeight, barOpacity: $barOpacity, sortBy: $sortBy)';
+    return 'ChannelController(channelId: $channelId, isSubscribed: $isSubscribed, channel: $channel, loading: $loading, hasError: $hasError, smallHeader: $smallHeader, barHeight: $barHeight, barOpacity: $barOpacity, sortBy: $sortBy)';
   }
 }
 
@@ -72,6 +75,7 @@ abstract mixin class $ChannelControllerCopyWith<$Res> {
       bool isSubscribed,
       Channel? channel,
       bool loading,
+      bool hasError,
       bool smallHeader,
       double barHeight,
       double barOpacity,
@@ -95,6 +99,7 @@ class _$ChannelControllerCopyWithImpl<$Res>
     Object? isSubscribed = null,
     Object? channel = freezed,
     Object? loading = null,
+    Object? hasError = null,
     Object? smallHeader = null,
     Object? barHeight = null,
     Object? barOpacity = null,
@@ -116,6 +121,10 @@ class _$ChannelControllerCopyWithImpl<$Res>
       loading: null == loading
           ? _self.loading
           : loading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasError: null == hasError
+          ? _self.hasError
+          : hasError // ignore: cast_nullable_to_non_nullable
               as bool,
       smallHeader: null == smallHeader
           ? _self.smallHeader
@@ -233,6 +242,7 @@ extension ChannelControllerPatterns on ChannelController {
             bool isSubscribed,
             Channel? channel,
             bool loading,
+            bool hasError,
             bool smallHeader,
             double barHeight,
             double barOpacity,
@@ -248,6 +258,7 @@ extension ChannelControllerPatterns on ChannelController {
             _that.isSubscribed,
             _that.channel,
             _that.loading,
+            _that.hasError,
             _that.smallHeader,
             _that.barHeight,
             _that.barOpacity,
@@ -277,6 +288,7 @@ extension ChannelControllerPatterns on ChannelController {
             bool isSubscribed,
             Channel? channel,
             bool loading,
+            bool hasError,
             bool smallHeader,
             double barHeight,
             double barOpacity,
@@ -291,6 +303,7 @@ extension ChannelControllerPatterns on ChannelController {
             _that.isSubscribed,
             _that.channel,
             _that.loading,
+            _that.hasError,
             _that.smallHeader,
             _that.barHeight,
             _that.barOpacity,
@@ -317,6 +330,7 @@ extension ChannelControllerPatterns on ChannelController {
             bool isSubscribed,
             Channel? channel,
             bool loading,
+            bool hasError,
             bool smallHeader,
             double barHeight,
             double barOpacity,
@@ -331,6 +345,7 @@ extension ChannelControllerPatterns on ChannelController {
             _that.isSubscribed,
             _that.channel,
             _that.loading,
+            _that.hasError,
             _that.smallHeader,
             _that.barHeight,
             _that.barOpacity,
@@ -349,6 +364,7 @@ class _ChannelController implements ChannelController {
       this.isSubscribed = false,
       this.channel,
       this.loading = true,
+      this.hasError = false,
       this.smallHeader = false,
       this.barHeight = 200,
       this.barOpacity = 1,
@@ -364,6 +380,9 @@ class _ChannelController implements ChannelController {
   @override
   @JsonKey()
   final bool loading;
+  @override
+  @JsonKey()
+  final bool hasError;
   @override
   @JsonKey()
   final bool smallHeader;
@@ -396,6 +415,8 @@ class _ChannelController implements ChannelController {
                 other.isSubscribed == isSubscribed) &&
             (identical(other.channel, channel) || other.channel == channel) &&
             (identical(other.loading, loading) || other.loading == loading) &&
+            (identical(other.hasError, hasError) ||
+                other.hasError == hasError) &&
             (identical(other.smallHeader, smallHeader) ||
                 other.smallHeader == smallHeader) &&
             (identical(other.barHeight, barHeight) ||
@@ -407,11 +428,11 @@ class _ChannelController implements ChannelController {
 
   @override
   int get hashCode => Object.hash(runtimeType, channelId, isSubscribed, channel,
-      loading, smallHeader, barHeight, barOpacity, sortBy);
+      loading, hasError, smallHeader, barHeight, barOpacity, sortBy);
 
   @override
   String toString() {
-    return 'ChannelController(channelId: $channelId, isSubscribed: $isSubscribed, channel: $channel, loading: $loading, smallHeader: $smallHeader, barHeight: $barHeight, barOpacity: $barOpacity, sortBy: $sortBy)';
+    return 'ChannelController(channelId: $channelId, isSubscribed: $isSubscribed, channel: $channel, loading: $loading, hasError: $hasError, smallHeader: $smallHeader, barHeight: $barHeight, barOpacity: $barOpacity, sortBy: $sortBy)';
   }
 }
 
@@ -428,6 +449,7 @@ abstract mixin class _$ChannelControllerCopyWith<$Res>
       bool isSubscribed,
       Channel? channel,
       bool loading,
+      bool hasError,
       bool smallHeader,
       double barHeight,
       double barOpacity,
@@ -451,6 +473,7 @@ class __$ChannelControllerCopyWithImpl<$Res>
     Object? isSubscribed = null,
     Object? channel = freezed,
     Object? loading = null,
+    Object? hasError = null,
     Object? smallHeader = null,
     Object? barHeight = null,
     Object? barOpacity = null,
@@ -472,6 +495,10 @@ class __$ChannelControllerCopyWithImpl<$Res>
       loading: null == loading
           ? _self.loading
           : loading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasError: null == hasError
+          ? _self.hasError
+          : hasError // ignore: cast_nullable_to_non_nullable
               as bool,
       smallHeader: null == smallHeader
           ? _self.smallHeader

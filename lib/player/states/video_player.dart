@@ -19,51 +19,13 @@ import '../../utils/pretty_bytes.dart';
 import '../../videos/models/video.dart';
 import '../views/components/player_controls.dart';
 import '../views/tv/components/player_controls.dart';
+import '../media_source.dart';
 import 'interfaces/media_player.dart';
 
 part 'video_player.freezed.dart';
 
 final log = Logger('VideoPlayer');
 const _maxPlaybackSources = 10;
-
-bool _sameOrigin(Uri left, Uri right) =>
-    left.scheme.toLowerCase() == right.scheme.toLowerCase() &&
-    left.host.toLowerCase() == right.host.toLowerCase() &&
-    left.port == right.port;
-
-String? _mediaUrl(String? value) {
-  final url = value?.trim();
-  final uri = url == null ? null : Uri.tryParse(url);
-  if (uri == null ||
-      uri.userInfo.isNotEmpty ||
-      (uri.scheme != 'http' && uri.scheme != 'https') ||
-      uri.host.isEmpty) {
-    return null;
-  }
-  return uri.toString();
-}
-
-String? _validMediaUrl(String? value, Server server) {
-  final url = _mediaUrl(value);
-  final uri = url == null ? null : Uri.parse(url);
-  final serverUri = Uri.tryParse(server.url);
-  if (uri == null || serverUri == null) return null;
-  if (_sameOrigin(uri, serverUri)) return uri.toString();
-
-  final host = uri.host.toLowerCase();
-  final trustedVideoHost = host == 'googlevideo.com' ||
-      host.endsWith('.googlevideo.com') ||
-      host == 'youtube.com' ||
-      host.endsWith('.youtube.com');
-  return uri.scheme == 'https' && uri.port == 443 && trustedVideoHost
-      ? uri.toString()
-      : null;
-}
-
-Map<String, String>? _mediaHeaders(Server server, String url) {
-  final headers = server.headersForUrl(url);
-  return headers == null || headers.isEmpty ? null : headers;
-}
 
 String _sourceKey(String url) {
   final uri = Uri.parse(url).normalizePath();
@@ -77,41 +39,6 @@ String _sourceKey(String url) {
         fragment: '',
       )
       .toString();
-}
-
-String _proxyUrl(String url, Server server, bool useProxy,
-    {bool adaptive = false}) {
-  if (!useProxy) return url;
-  if (adaptive) {
-    final uri = Uri.parse(url);
-    return uri.replace(queryParameters: {
-      ...uri.queryParametersAll,
-      'local': ['true']
-    }).toString();
-  }
-  final source = Uri.parse(url);
-  final host = source.host.toLowerCase();
-  if (host != 'googlevideo.com' && !host.endsWith('.googlevideo.com')) {
-    return url;
-  }
-  final target = Uri.tryParse(server.url);
-  if (target == null ||
-      (target.scheme != 'http' && target.scheme != 'https') ||
-      target.host.isEmpty) {
-    return url;
-  }
-  final prefix = target.path.endsWith('/')
-      ? target.path.substring(0, target.path.length - 1)
-      : target.path;
-  return Uri(
-    scheme: target.scheme,
-    userInfo: target.userInfo,
-    host: target.host,
-    port: target.hasPort ? target.port : null,
-    path: '$prefix${source.path}',
-    query: source.hasQuery ? source.query : null,
-    fragment: source.hasFragment ? source.fragment : null,
-  ).toString();
 }
 
 List<BetterPlayerDataSource> _buildPlaybackDataSources(
@@ -137,11 +64,11 @@ List<BetterPlayerDataSource> _buildPlaybackDataSources(
     if (sources.length >= _maxPlaybackSources || !seen.add(_sourceKey(url))) {
       return;
     }
-    final headers = _mediaHeaders(server, url);
+    final headers = mediaHeaders(server, url);
     final matchingResolutions = resolutions == null
         ? null
         : Map.fromEntries(resolutions.entries.where(
-            (entry) => mapEquals(_mediaHeaders(server, entry.value), headers),
+            (entry) => mapEquals(mediaHeaders(server, entry.value), headers),
           ));
     final compatibleResolutions =
         matchingResolutions?.isEmpty ?? true ? null : matchingResolutions;
@@ -158,11 +85,11 @@ List<BetterPlayerDataSource> _buildPlaybackDataSources(
   }
 
   String? adaptiveUrl(String? value) {
-    final url = _validMediaUrl(value, server);
+    final url = validatedMediaUrl(value, server);
     return url == null
         ? null
-        : _validMediaUrl(
-            _proxyUrl(url, server, useProxy, adaptive: true), server);
+        : validatedMediaUrl(
+            proxyMediaUrl(url, server, useProxy, adaptive: true), server);
   }
 
   final hls = adaptiveUrl(video.hlsUrl);
@@ -180,7 +107,7 @@ List<BetterPlayerDataSource> _buildPlaybackDataSources(
   final streams = <({String resolution, String url})>[];
   final streamUrls = <String>{};
   for (final stream in (video.formatStreams ?? []).reversed) {
-    final url = _mediaUrl(stream.url);
+    final url = parseMediaUrl(stream.url);
     if (url == null) continue;
     // Clipious keys non-DASH tracks by qualityLabel (the already-ported
     // non-DASH quality fix); Videre keys them by resolution. Keep the
@@ -195,7 +122,8 @@ List<BetterPlayerDataSource> _buildPlaybackDataSources(
           (value) => value.isNotEmpty,
           orElse: () => 'unknown',
         );
-    final safeUrl = _validMediaUrl(_proxyUrl(url, server, useProxy), server);
+    final safeUrl =
+        validatedMediaUrl(proxyMediaUrl(url, server, useProxy), server);
     if (safeUrl == null || !streamUrls.add(_sourceKey(safeUrl))) continue;
     streams.add((resolution: label, url: safeUrl));
     if (streams.length >= _maxPlaybackSources) {
@@ -248,7 +176,9 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
   Completer<void> _setupCancellation = Completer<void>();
   Function(BetterPlayerEvent)? _videoListener;
   Duration _playbackStartAt = Duration.zero;
+  Duration? _pendingSeek;
   bool _waitingForInitialSeek = false;
+  bool _requestedPlaying = true;
 
   VideoPlayerCubit(super.initialState, super.player, this.settings) {
     onInit();
@@ -297,11 +227,13 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
         break;
       case BetterPlayerEventType.pause:
         type = MediaEventType.pause;
+        if (_controllerSetupAttempt == null) _requestedPlaying = false;
         break;
       case BetterPlayerEventType.setVolume:
         break;
       case BetterPlayerEventType.play:
         type = MediaEventType.play;
+        if (_controllerSetupAttempt == null) _requestedPlaying = true;
         break;
 
       case BetterPlayerEventType.progress:
@@ -578,8 +510,11 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
     if (setupError != null || _sourceFailurePending) {
       _sourceFailurePending = true;
       await _handleSourceFailure(generation, sourceIndex);
-    } else if (seekAfterSetup) {
-      seek(_playbackStartAt);
+    } else {
+      final pendingSeek = _pendingSeek;
+      if (seekAfterSetup || pendingSeek != null) {
+        await seek(pendingSeek ?? _playbackStartAt);
+      }
     }
   }
 
@@ -602,9 +537,9 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
   @override
   togglePlaying() {
     if (videoController != null) {
-      (videoController?.isPlaying() ?? false)
-          ? videoController?.pause()
-          : videoController?.play();
+      final playing = videoController?.isPlaying() ?? false;
+      _requestedPlaying = !playing;
+      playing ? videoController?.pause() : videoController?.play();
       emit(state.copyWith());
     }
   }
@@ -631,6 +566,8 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
     _playbackInitialized = false;
     _terminalErrorSent = false;
     _sourceFailurePending = false;
+    _pendingSeek = null;
+    _requestedPlaying = true;
     var newState = state.copyWith(startAt: startAt);
     _playbackServer = null;
     _playbackVideoId = null;
@@ -759,17 +696,43 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
   @override
   void pause() {
+    _requestedPlaying = false;
     videoController?.pause();
   }
 
   @override
   void play() {
+    _requestedPlaying = true;
     videoController?.play();
   }
 
   @override
-  void seek(Duration position) {
-    videoController?.seekTo(position);
+  Future<void> seek(Duration position) async {
+    final controller = videoController;
+    final generation = _playbackGeneration;
+    if (controller?.videoPlayerController?.value.duration == null) {
+      // TV remote input can arrive before native source initialization. Apply
+      // only the latest position once that source is ready.
+      _pendingSeek = position;
+      return;
+    }
+    _pendingSeek = null;
+    await controller?.seekTo(position);
+    if (isClosed ||
+        generation != _playbackGeneration ||
+        !identical(videoController, controller) ||
+        _terminalErrorSent) {
+      return;
+    }
+    // Native seek completion may restore the pre-seek playing value. A user
+    // pause/play made while the seek was pending must take precedence.
+    if (controller?.isPlaying() != _requestedPlaying) {
+      if (_requestedPlaying) {
+        await controller?.play();
+      } else {
+        await controller?.pause();
+      }
+    }
   }
 
   @override

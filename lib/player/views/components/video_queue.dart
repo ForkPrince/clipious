@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:clipious/downloads/models/downloaded_video.dart';
+import 'package:clipious/player/models/playback_queue.dart';
 import 'package:clipious/player/states/player.dart';
 import 'package:clipious/player/states/video_queue.dart';
 import 'package:clipious/videos/views/components/compact_video.dart';
@@ -16,9 +17,9 @@ class VideoQueue extends StatelessWidget {
   Widget onlineVideoQueue(BuildContext context, int index, Video video) {
     var controller = context.read<PlayerCubit>();
     var state = controller.state;
-    bool isPlaying = video.videoId == state.currentlyPlaying?.videoId;
+    final isPlaying = playbackQueueId(video) == state.currentQueueId;
     return SwipeActionCell(
-      key: ValueKey('$index-${video.videoId}'),
+      key: ValueKey(playbackQueueId(video)),
       trailingActions: isPlaying
           ? []
           : [
@@ -26,7 +27,8 @@ class VideoQueue extends StatelessWidget {
                   performsFirstActionWithFullSwipe: true,
                   onTap: (handler) async {
                     await handler(true);
-                    return controller.removeVideoFromQueue(video.videoId);
+                    return controller
+                        .removeVideoFromQueue(playbackQueueId(video));
                   },
                   color: Colors.red.shade400,
                   icon: const Icon(
@@ -93,19 +95,15 @@ class VideoQueue extends StatelessWidget {
                 builder: (context, scrollController) {
               return BlocConsumer<PlayerCubit, PlayerState>(
                 listenWhen: (previous, current) =>
-                    (previous.currentlyPlaying?.videoId ??
-                        previous.offlineCurrentlyPlaying?.videoId) !=
-                    (current.currentlyPlaying?.videoId ??
-                        current.offlineCurrentlyPlaying?.videoId),
+                    previous.currentQueueId != current.currentQueueId,
                 listener: (context, state) {
                   List<IdedVideo> videos = (state.videos.isNotEmpty
                       ? state.videos
                       : state.offlineVideos);
 
                   final offset = ((videos.indexWhere((element) =>
-                              element.videoId ==
-                              (state.currentlyPlaying?.videoId ??
-                                  state.offlineCurrentlyPlaying?.videoId))) -
+                              playbackQueueId(element) ==
+                              state.currentQueueId)) -
                           1) *
                       (compactVideoHeight + innerHorizontalPadding);
                   bool goingDown = offset > scrollController.offset;

@@ -10,6 +10,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:clipious/downloads/models/downloaded_video.dart';
 import 'package:clipious/extensions.dart';
 import 'package:clipious/globals.dart';
+import 'package:clipious/settings/models/db/server.dart';
+import 'package:clipious/utils/invidious_image.dart';
 import 'package:clipious/utils/models/image_object.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
@@ -164,19 +166,21 @@ class DownloadManagerCubit extends Cubit<DownloadManagerState> {
       emit(state.copyWith(downloadProgresses: progresses));
 
       setVideos();
-      // download thumbnail
+
+      // Optional artwork must not delay the first media request. Start it in
+      // the background and await it only once the media is ready.
+      Future<void>? artwork;
+      final artworkToken = CancelToken();
+      unawaited(cancelToken.whenCancel.then(artworkToken.cancel));
       String? thumbUrl = ImageObject.getBestThumbnail(vid.videoThumbnails)?.url;
       log.fine(thumbUrl);
       if (thumbUrl != null) {
-        //download thumbnail
-        var thumbnailPath = await downloadedVideo.thumbnailPath;
-        log.fine("Downloading thumbnail to: $thumbnailPath");
-        await dio.download(thumbUrl, thumbnailPath,
-            cancelToken: cancelToken,
-            options: Options(headers: server.headersForUrl(thumbUrl)));
+        artwork = _downloadArtwork(
+            dio, downloadedVideo, thumbUrl, server, artworkToken);
       }
 
       if (cancelToken.isCancelled) {
+        artworkToken.cancel();
         return false;
       }
 
@@ -228,6 +232,7 @@ class DownloadManagerCubit extends Cubit<DownloadManagerState> {
         if (audioOnly) {
           final audio = File(audioPath);
           await audio.copy(mediaPath);
+          await artwork;
           onProgress(1, 1, downloadedVideo, step: 2, totalSteps: 2);
           return true;
         } else {
@@ -239,6 +244,7 @@ class DownloadManagerCubit extends Cubit<DownloadManagerState> {
 
           var success = returnCode?.isValueSuccess() ?? false;
           if (success) {
+            await artwork;
             onProgress(1, 1, downloadedVideo, step: 3, totalSteps: 3);
           } else {
             final logs = await session.getLogs();
@@ -261,6 +267,38 @@ class DownloadManagerCubit extends Cubit<DownloadManagerState> {
         if (await video.exists()) {
           await video.delete();
         }
+      }
+    }
+  }
+
+  Future<void> _downloadArtwork(Dio dio, DownloadedVideo video, String thumb,
+      Server server, CancelToken token) async {
+    final deadline = Timer(const Duration(seconds: 5),
+        () => token.cancel('Artwork download deadline'));
+    File? partial;
+    try {
+      final target = File(await video.thumbnailPath);
+      partial = File('${target.path}.part');
+      if (token.isCancelled || await target.exists()) return;
+      final url = invidiousImageUrl(thumb, server);
+      await dio.download(url, partial.path,
+          cancelToken: token,
+          options: Options(
+              headers: server.headersForUrl(url),
+              // Covers are optional; do not try to decode an error response
+              // whose body may not match its advertised content type.
+              receiveDataWhenStatusError: false));
+      if (!token.isCancelled) await partial.rename(target.path);
+    } on DioException {
+      log.fine('Thumbnail unavailable; the media download can continue');
+    } on FileSystemException {
+      log.fine('Thumbnail could not be saved; the media download can continue');
+    } finally {
+      deadline.cancel();
+      try {
+        if (partial != null && await partial.exists()) await partial.delete();
+      } on FileSystemException {
+        log.fine('The artwork download has a leftover temporary file');
       }
     }
   }
@@ -291,6 +329,12 @@ class DownloadManagerCubit extends Cubit<DownloadManagerState> {
       await File(path).delete();
     } catch (e) {
       log.fine('Thumbnail might not be available, that\'s ok');
+    }
+
+    try {
+      await File('${await vid.thumbnailPath}.part').delete();
+    } catch (e) {
+      log.fine('Thumbnail part file might not be available, that\'s ok');
     }
 
     await db.deleteDownload(vid);

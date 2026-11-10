@@ -56,6 +56,8 @@ mixin _$Video {
   String? get authorUrl;
   List<ImageObject> get videoThumbnails;
   @JsonKey(includeFromJson: false, includeToJson: false)
+  String? get queueEntryId;
+  @JsonKey(includeFromJson: false, includeToJson: false)
   bool get filtered;
   @JsonKey(includeFromJson: false, includeToJson: false)
   List<VideoFilter> get matchedFilters;
@@ -143,6 +145,8 @@ mixin _$Video {
                 other.authorUrl == authorUrl) &&
             const DeepCollectionEquality()
                 .equals(other.videoThumbnails, videoThumbnails) &&
+            (identical(other.queueEntryId, queueEntryId) ||
+                other.queueEntryId == queueEntryId) &&
             (identical(other.filtered, filtered) ||
                 other.filtered == filtered) &&
             const DeepCollectionEquality()
@@ -199,6 +203,7 @@ mixin _$Video {
         authorId,
         authorUrl,
         const DeepCollectionEquality().hash(videoThumbnails),
+        queueEntryId,
         filtered,
         const DeepCollectionEquality().hash(matchedFilters),
         filterHide,
@@ -209,7 +214,7 @@ mixin _$Video {
 
   @override
   String toString() {
-    return 'Video(videoId: $videoId, viewCount: $viewCount, published: $published, index: $index, indexId: $indexId, publishedText: $publishedText, isUpcoming: $isUpcoming, premiereTimestamp: $premiereTimestamp, dashUrl: $dashUrl, description: $description, descriptionHtml: $descriptionHtml, keywords: $keywords, likeCount: $likeCount, dislikeCount: $dislikeCount, paid: $paid, premium: $premium, isFamilyFriendly: $isFamilyFriendly, allowedRegions: $allowedRegions, genre: $genre, genreUrl: $genreUrl, authorThumbnails: $authorThumbnails, subCountText: $subCountText, allowRatings: $allowRatings, rating: $rating, isListed: $isListed, liveNow: $liveNow, hlsUrl: $hlsUrl, adaptiveFormats: $adaptiveFormats, formatStreams: $formatStreams, captions: $captions, chapters: $chapters, recommendedVideos: $recommendedVideos, title: $title, lengthSeconds: $lengthSeconds, author: $author, authorId: $authorId, authorUrl: $authorUrl, videoThumbnails: $videoThumbnails, filtered: $filtered, matchedFilters: $matchedFilters, filterHide: $filterHide, deArrowed: $deArrowed, deArrowThumbnailUrl: $deArrowThumbnailUrl, viewCountText: $viewCountText)';
+    return 'Video(videoId: $videoId, viewCount: $viewCount, published: $published, index: $index, indexId: $indexId, publishedText: $publishedText, isUpcoming: $isUpcoming, premiereTimestamp: $premiereTimestamp, dashUrl: $dashUrl, description: $description, descriptionHtml: $descriptionHtml, keywords: $keywords, likeCount: $likeCount, dislikeCount: $dislikeCount, paid: $paid, premium: $premium, isFamilyFriendly: $isFamilyFriendly, allowedRegions: $allowedRegions, genre: $genre, genreUrl: $genreUrl, authorThumbnails: $authorThumbnails, subCountText: $subCountText, allowRatings: $allowRatings, rating: $rating, isListed: $isListed, liveNow: $liveNow, hlsUrl: $hlsUrl, adaptiveFormats: $adaptiveFormats, formatStreams: $formatStreams, captions: $captions, chapters: $chapters, recommendedVideos: $recommendedVideos, title: $title, lengthSeconds: $lengthSeconds, author: $author, authorId: $authorId, authorUrl: $authorUrl, videoThumbnails: $videoThumbnails, queueEntryId: $queueEntryId, filtered: $filtered, matchedFilters: $matchedFilters, filterHide: $filterHide, deArrowed: $deArrowed, deArrowThumbnailUrl: $deArrowThumbnailUrl, viewCountText: $viewCountText)';
   }
 }
 
@@ -257,6 +262,8 @@ abstract mixin class $VideoCopyWith<$Res> {
       String? authorId,
       String? authorUrl,
       List<ImageObject> videoThumbnails,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      String? queueEntryId,
       @JsonKey(includeFromJson: false, includeToJson: false) bool filtered,
       @JsonKey(includeFromJson: false, includeToJson: false)
       List<VideoFilter> matchedFilters,
@@ -317,6 +324,7 @@ class _$VideoCopyWithImpl<$Res> implements $VideoCopyWith<$Res> {
     Object? authorId = freezed,
     Object? authorUrl = freezed,
     Object? videoThumbnails = null,
+    Object? queueEntryId = freezed,
     Object? filtered = null,
     Object? matchedFilters = null,
     Object? filterHide = null,
@@ -477,6 +485,10 @@ class _$VideoCopyWithImpl<$Res> implements $VideoCopyWith<$Res> {
           ? _self.videoThumbnails
           : videoThumbnails // ignore: cast_nullable_to_non_nullable
               as List<ImageObject>,
+      queueEntryId: freezed == queueEntryId
+          ? _self.queueEntryId
+          : queueEntryId // ignore: cast_nullable_to_non_nullable
+              as String?,
       filtered: null == filtered
           ? _self.filtered
           : filtered // ignore: cast_nullable_to_non_nullable
@@ -636,6 +648,8 @@ extension VideoPatterns on Video {
             String? authorUrl,
             List<ImageObject> videoThumbnails,
             @JsonKey(includeFromJson: false, includeToJson: false)
+            String? queueEntryId,
+            @JsonKey(includeFromJson: false, includeToJson: false)
             bool filtered,
             @JsonKey(includeFromJson: false, includeToJson: false)
             List<VideoFilter> matchedFilters,
@@ -691,6 +705,7 @@ extension VideoPatterns on Video {
             _that.authorId,
             _that.authorUrl,
             _that.videoThumbnails,
+            _that.queueEntryId,
             _that.filtered,
             _that.matchedFilters,
             _that.filterHide,
@@ -757,6 +772,8 @@ extension VideoPatterns on Video {
             String? authorUrl,
             List<ImageObject> videoThumbnails,
             @JsonKey(includeFromJson: false, includeToJson: false)
+            String? queueEntryId,
+            @JsonKey(includeFromJson: false, includeToJson: false)
             bool filtered,
             @JsonKey(includeFromJson: false, includeToJson: false)
             List<VideoFilter> matchedFilters,
@@ -811,6 +828,7 @@ extension VideoPatterns on Video {
             _that.authorId,
             _that.authorUrl,
             _that.videoThumbnails,
+            _that.queueEntryId,
             _that.filtered,
             _that.matchedFilters,
             _that.filterHide,
@@ -874,6 +892,8 @@ extension VideoPatterns on Video {
             String? authorUrl,
             List<ImageObject> videoThumbnails,
             @JsonKey(includeFromJson: false, includeToJson: false)
+            String? queueEntryId,
+            @JsonKey(includeFromJson: false, includeToJson: false)
             bool filtered,
             @JsonKey(includeFromJson: false, includeToJson: false)
             List<VideoFilter> matchedFilters,
@@ -928,6 +948,7 @@ extension VideoPatterns on Video {
             _that.authorId,
             _that.authorUrl,
             _that.videoThumbnails,
+            _that.queueEntryId,
             _that.filtered,
             _that.matchedFilters,
             _that.filterHide,
@@ -982,6 +1003,7 @@ class _Video extends Video implements ShareLinks, IdedVideo {
       this.authorId,
       this.authorUrl,
       final List<ImageObject> videoThumbnails = const [],
+      @JsonKey(includeFromJson: false, includeToJson: false) this.queueEntryId,
       @JsonKey(includeFromJson: false, includeToJson: false)
       this.filtered = false,
       @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1158,6 +1180,9 @@ class _Video extends Video implements ShareLinks, IdedVideo {
 
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
+  final String? queueEntryId;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final bool filtered;
   final List<VideoFilter> _matchedFilters;
   @override
@@ -1261,6 +1286,8 @@ class _Video extends Video implements ShareLinks, IdedVideo {
                 other.authorUrl == authorUrl) &&
             const DeepCollectionEquality()
                 .equals(other._videoThumbnails, _videoThumbnails) &&
+            (identical(other.queueEntryId, queueEntryId) ||
+                other.queueEntryId == queueEntryId) &&
             (identical(other.filtered, filtered) ||
                 other.filtered == filtered) &&
             const DeepCollectionEquality()
@@ -1317,6 +1344,7 @@ class _Video extends Video implements ShareLinks, IdedVideo {
         authorId,
         authorUrl,
         const DeepCollectionEquality().hash(_videoThumbnails),
+        queueEntryId,
         filtered,
         const DeepCollectionEquality().hash(_matchedFilters),
         filterHide,
@@ -1327,7 +1355,7 @@ class _Video extends Video implements ShareLinks, IdedVideo {
 
   @override
   String toString() {
-    return 'Video(videoId: $videoId, viewCount: $viewCount, published: $published, index: $index, indexId: $indexId, publishedText: $publishedText, isUpcoming: $isUpcoming, premiereTimestamp: $premiereTimestamp, dashUrl: $dashUrl, description: $description, descriptionHtml: $descriptionHtml, keywords: $keywords, likeCount: $likeCount, dislikeCount: $dislikeCount, paid: $paid, premium: $premium, isFamilyFriendly: $isFamilyFriendly, allowedRegions: $allowedRegions, genre: $genre, genreUrl: $genreUrl, authorThumbnails: $authorThumbnails, subCountText: $subCountText, allowRatings: $allowRatings, rating: $rating, isListed: $isListed, liveNow: $liveNow, hlsUrl: $hlsUrl, adaptiveFormats: $adaptiveFormats, formatStreams: $formatStreams, captions: $captions, chapters: $chapters, recommendedVideos: $recommendedVideos, title: $title, lengthSeconds: $lengthSeconds, author: $author, authorId: $authorId, authorUrl: $authorUrl, videoThumbnails: $videoThumbnails, filtered: $filtered, matchedFilters: $matchedFilters, filterHide: $filterHide, deArrowed: $deArrowed, deArrowThumbnailUrl: $deArrowThumbnailUrl, viewCountText: $viewCountText)';
+    return 'Video(videoId: $videoId, viewCount: $viewCount, published: $published, index: $index, indexId: $indexId, publishedText: $publishedText, isUpcoming: $isUpcoming, premiereTimestamp: $premiereTimestamp, dashUrl: $dashUrl, description: $description, descriptionHtml: $descriptionHtml, keywords: $keywords, likeCount: $likeCount, dislikeCount: $dislikeCount, paid: $paid, premium: $premium, isFamilyFriendly: $isFamilyFriendly, allowedRegions: $allowedRegions, genre: $genre, genreUrl: $genreUrl, authorThumbnails: $authorThumbnails, subCountText: $subCountText, allowRatings: $allowRatings, rating: $rating, isListed: $isListed, liveNow: $liveNow, hlsUrl: $hlsUrl, adaptiveFormats: $adaptiveFormats, formatStreams: $formatStreams, captions: $captions, chapters: $chapters, recommendedVideos: $recommendedVideos, title: $title, lengthSeconds: $lengthSeconds, author: $author, authorId: $authorId, authorUrl: $authorUrl, videoThumbnails: $videoThumbnails, queueEntryId: $queueEntryId, filtered: $filtered, matchedFilters: $matchedFilters, filterHide: $filterHide, deArrowed: $deArrowed, deArrowThumbnailUrl: $deArrowThumbnailUrl, viewCountText: $viewCountText)';
   }
 }
 
@@ -1376,6 +1404,8 @@ abstract mixin class _$VideoCopyWith<$Res> implements $VideoCopyWith<$Res> {
       String? authorId,
       String? authorUrl,
       List<ImageObject> videoThumbnails,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      String? queueEntryId,
       @JsonKey(includeFromJson: false, includeToJson: false) bool filtered,
       @JsonKey(includeFromJson: false, includeToJson: false)
       List<VideoFilter> matchedFilters,
@@ -1436,6 +1466,7 @@ class __$VideoCopyWithImpl<$Res> implements _$VideoCopyWith<$Res> {
     Object? authorId = freezed,
     Object? authorUrl = freezed,
     Object? videoThumbnails = null,
+    Object? queueEntryId = freezed,
     Object? filtered = null,
     Object? matchedFilters = null,
     Object? filterHide = null,
@@ -1596,6 +1627,10 @@ class __$VideoCopyWithImpl<$Res> implements _$VideoCopyWith<$Res> {
           ? _self._videoThumbnails
           : videoThumbnails // ignore: cast_nullable_to_non_nullable
               as List<ImageObject>,
+      queueEntryId: freezed == queueEntryId
+          ? _self.queueEntryId
+          : queueEntryId // ignore: cast_nullable_to_non_nullable
+              as String?,
       filtered: null == filtered
           ? _self.filtered
           : filtered // ignore: cast_nullable_to_non_nullable

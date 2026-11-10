@@ -10,6 +10,7 @@ import 'package:logging/logging.dart';
 
 import '../../settings/states/settings.dart';
 import '../../videos/models/adaptive_format.dart';
+import '../media_source.dart';
 import '../models/media_event.dart';
 
 part 'audio_player.freezed.dart';
@@ -122,30 +123,38 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
 
         if (!offline) {
           assert(state.video!.formatStreams != null);
-          if (service.useProxy()) {
-            // audio only streams don't seem to work when using proxy mode, using formatted streams when proxy is enabled
-            var formatStream = state
-                .video!.formatStreams![state.video!.formatStreams!.length - 1];
-            source = AudioSource.uri(Uri.parse(formatStream.url),
-                headers: server.headersForUrl(formatStream.url));
-          } else {
-            AdaptiveFormat? audio = state.video?.adaptiveFormats!
-                .where((element) => element.type.contains("audio"))
-                .sortByReversed((e) => int.parse(e.bitrate ?? "0"))
-                .first;
-            if (audio != null) {
-              if (startAt == null) {
-                final resumed = db
-                    .getVideoPlaybackProgress(state.video!.videoId)
-                    .resumePosition(
-                        durationSeconds: state.video!.lengthSeconds);
-                if (resumed != Duration.zero) startAt = resumed;
-              }
-              emit(state);
-
-              source = AudioSource.uri(Uri.parse(audio.url),
-                  headers: server.headersForUrl(audio.url));
+          final proxy = service.useProxy();
+          final combined = (state.video!.formatStreams ?? [])
+              .where((stream) => !stream.isLegacyHd720)
+              .toList()
+              .reversed
+              .map((stream) => stream.url);
+          final adaptive = (state.video?.adaptiveFormats ?? <AdaptiveFormat>[])
+              .where((format) => format.type.startsWith('audio/'))
+              .sortByReversed(
+                  (format) => int.tryParse(format.bitrate ?? '') ?? 0)
+              .map((format) => format.url);
+          // Keep the combined proxy source preference, but audio-only
+          // responses must use the same instance route as video playback.
+          final candidates =
+              proxy ? [...combined, ...adaptive] : [...adaptive, ...combined];
+          for (final candidate in candidates) {
+            final parsed = parseMediaUrl(candidate);
+            if (parsed == null) continue;
+            final url =
+                validatedMediaUrl(proxyMediaUrl(parsed, server, proxy), server);
+            if (url == null) continue;
+            if (startAt == null && !proxy) {
+              final resumed = db
+                  .getVideoPlaybackProgress(state.video!.videoId)
+                  .resumePosition(durationSeconds: state.video!.lengthSeconds);
+              if (resumed != Duration.zero) startAt = resumed;
             }
+            emit(state);
+
+            source = AudioSource.uri(Uri.parse(url),
+                headers: mediaHeaders(server, url));
+            break;
           }
         } else {
           String path = await state.offlineVideo!.effectivePath;

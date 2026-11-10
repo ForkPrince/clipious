@@ -109,6 +109,9 @@ sealed class Video with _$Video implements ShareLinks, IdedVideo {
       String? authorId,
       String? authorUrl,
       @Default([]) List<ImageObject> videoThumbnails,
+      // Queue occurrences are local playback state, never Invidious metadata.
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      String? queueEntryId,
       @JsonKey(includeFromJson: false, includeToJson: false)
       @Default(false)
       bool filtered,
@@ -128,6 +131,15 @@ sealed class Video with _$Video implements ShareLinks, IdedVideo {
   const Video._();
 
   factory Video.fromJson(Map<String, Object?> json) => _$VideoFromJson(json);
+
+  /// Playback responses describe the upload; retain its queue occurrence
+  /// when fetching fresh stream URLs.
+  Video preservingQueueEntryIdFrom(Video source) {
+    if (source.videoId != videoId) return this;
+    return queueEntryId == source.queueEntryId
+        ? this
+        : copyWith(queueEntryId: source.queueEntryId);
+  }
 
   @override
   Uri getInvidiousLink(Server server, int? timestamp) {

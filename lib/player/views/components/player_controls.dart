@@ -5,6 +5,7 @@ import 'package:clipious/main.dart';
 import 'package:clipious/player/states/interfaces/media_player.dart';
 import 'package:clipious/player/states/player.dart';
 import 'package:clipious/player/views/components/chapter_slider.dart';
+import 'package:clipious/player/views/components/player_modal_back_handler.dart';
 import 'package:clipious/player/views/components/sleep_timer.dart';
 import 'package:clipious/player/views/components/system_setting_slider.dart';
 import 'package:clipious/settings/states/settings.dart';
@@ -33,38 +34,40 @@ class PlayerControls extends StatelessWidget {
       context: context,
       builder: (context) {
         const double minValue = 0.1, maxValue = 6;
-        return StatefulBuilder(
-          builder: (context, setState) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Slider(
-                min: minValue,
-                max: maxValue,
-                divisions: maxValue ~/ minValue - 1,
-                value: player.getSpeed(),
-                label: '${player.getSpeed().toStringAsFixed(2)}x',
-                onChanged: (value) => setState(() => player.setSpeed(value)),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                      onPressed: () => setState(() => player.setSpeed(
-                          max(minValue, player.getSpeed() - minValue))),
-                      icon: const Icon(Icons.remove)),
-                  SizedBox(
-                      width: 50,
-                      child: Text(
-                        '${player.getSpeed().toStringAsFixed(2)}x',
-                        textAlign: TextAlign.center,
-                      )),
-                  IconButton(
-                      onPressed: () => setState(() => player.setSpeed(
-                          min(maxValue, player.getSpeed() + minValue))),
-                      icon: const Icon(Icons.add)),
-                ],
-              )
-            ],
+        return PlayerModalBackHandler(
+          child: StatefulBuilder(
+            builder: (context, setState) => Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Slider(
+                  min: minValue,
+                  max: maxValue,
+                  divisions: maxValue ~/ minValue - 1,
+                  value: player.getSpeed(),
+                  label: '${player.getSpeed().toStringAsFixed(2)}x',
+                  onChanged: (value) => setState(() => player.setSpeed(value)),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                        onPressed: () => setState(() => player.setSpeed(
+                            max(minValue, player.getSpeed() - minValue))),
+                        icon: const Icon(Icons.remove)),
+                    SizedBox(
+                        width: 50,
+                        child: Text(
+                          '${player.getSpeed().toStringAsFixed(2)}x',
+                          textAlign: TextAlign.center,
+                        )),
+                    IconButton(
+                        onPressed: () => setState(() => player.setSpeed(
+                            min(maxValue, player.getSpeed() + minValue))),
+                        icon: const Icon(Icons.add)),
+                  ],
+                )
+              ],
+            ),
           ),
         );
       },
