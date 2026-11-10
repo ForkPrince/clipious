@@ -40,16 +40,23 @@ class CommentsView extends StatelessWidget {
                 ))
             .toList(growable: true));
 
-        if (state.continuation != null && !state.loadingComments) {
+        if (state.error.isNotEmpty) {
+          widgets.add(Text(state.error));
+        }
+
+        if (!state.loadingComments &&
+            (state.continuation != null || state.error.isNotEmpty)) {
           widgets.add(
             Padding(
               padding: const EdgeInsets.only(top: 4.0),
               child: SizedBox(
                   height: 15,
                   child: FilledButton.tonal(
-                      onPressed: cubit.loadMore,
+                      onPressed: state.error.isNotEmpty
+                          ? cubit.getComments
+                          : cubit.loadMore,
                       child: Text(
-                        locals.loadMore,
+                        state.error.isNotEmpty ? locals.retry : locals.loadMore,
                         style:
                             TextStyle(fontSize: textTheme.labelSmall?.fontSize),
                       ))),
@@ -71,11 +78,9 @@ class CommentsView extends StatelessWidget {
           ));
         }
 
-        return state.error.isNotEmpty
-            ? Text(state.error)
-            : Column(
-                children: widgets,
-              );
+        return Column(
+          children: widgets,
+        );
       }),
     );
   }

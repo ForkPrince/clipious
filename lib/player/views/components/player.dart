@@ -124,7 +124,7 @@ class Player extends StatelessWidget {
                 child: showPlayer
                     ? GestureDetector(
                         child: SafeArea(
-                          bottom: !isDragging,
+                          bottom: !isFullScreen && !isDragging,
                           top: false,
                           left: !isFullScreen,
                           right: !isFullScreen,

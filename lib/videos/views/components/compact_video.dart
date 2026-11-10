@@ -7,6 +7,7 @@ import 'package:clipious/videos/states/compact_video.dart';
 import 'package:clipious/videos/views/components/video_thumbnail.dart';
 
 import 'offline_video_thumbnail.dart';
+import 'video_duration_badge.dart';
 
 const double compactVideoHeight = 70;
 
@@ -93,7 +94,17 @@ class CompactVideo extends StatelessWidget {
                               : video != null
                                   ? VideoThumbnailView(
                                       videoId: videoId,
-                                      thumbnails: video!.thumbnails)
+                                      thumbnails: video!.thumbnails,
+                                      child: video!.isUpcoming
+                                          ? null
+                                          : Align(
+                                              alignment: Alignment.bottomRight,
+                                              child: VideoDurationBadge(
+                                                lengthSeconds:
+                                                    video!.lengthSeconds,
+                                                compact: true,
+                                              ),
+                                            ))
                                   : offlineVideo != null
                                       ? OfflineVideoThumbnail(
                                           video: offlineVideo!,

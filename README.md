@@ -35,6 +35,24 @@ Android client application for [invidious](https://invidious.io), the privacy fo
 - Credential logging removal
 - Non-DASH quality selection fix
 - Disable Impeller on Android to fix black video on TV
+- Comment parsing for current Invidious payloads (singular authorThumbnail, non-list comments)
+- Ignore thumbnail errors after leaving a screen
+- No-op layout reorder guard and search history on by default when unset
+- Maxres-first thumbnails and overlay child stays visible on image failure
+- Propagate documents-directory failure instead of falling back to Directory.current
+- Deep-link video-id validation and log scrubbing (URLs and cookies)
+- Download path traversal protection (safe file ids, joined paths)
+- Aspect-ratio guard for missing decoder size and fullscreen bottom inset fix
+- Empty-buffer crash guard and re-read saved server after token login
+- SponsorBlock skip-loop fix, fetch guards, subtitle bounds check, show zero dislikes
+- Duration badges on compact video thumbnails
+- Grid aspect ratio scales with text size
+- Keep TV settings open while sliders consume remote keys
+- Stale video-load guard and async dislike loading
+- Search suggestion race fix (per-cubit timer, stale-response guard) and TV history fix
+- Stop background playback promptly, owned player-control timers, subscribe-button closed guards
+- Comment load guard, keep comments on error, retry button
+- Tolerant per-format parsing and channelId-keyed subscription continuations
 
 ## Installation
 

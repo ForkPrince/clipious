@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:clipious/offline_subscriptions/models/offline_subscription.dart';
+import 'package:logging/logging.dart';
 
 import '../../globals.dart';
 
@@ -12,6 +13,7 @@ class SubscribeButtonCubit extends Cubit<SubscribeButtonState> {
   }
 
   setAccountSubscription(bool subscribed) async {
+    if (isClosed) return;
     emit(state.copyWith(loading: true));
 
     bool wasSubscribed = state.isAccountSubscribed;
@@ -25,28 +27,46 @@ class SubscribeButtonCubit extends Cubit<SubscribeButtonState> {
     if (!success || isSubscribed == wasSubscribed) {
       return setAccountSubscription(subscribed);
     }
-    emit(state.copyWith(loading: false, isAccountSubscribed: isSubscribed));
+    if (!isClosed) {
+      emit(state.copyWith(loading: false, isAccountSubscribed: isSubscribed));
+    }
   }
 
   setOfflineSubscription(bool subscribed) async {
+    if (isClosed) return;
     emit(state.copyWith(loading: true));
-    if (subscribed) {
-      final channel = await service.getChannel(state.channelId);
-      await db.addOfflineSubscription(OfflineSubscription(
-          channelId: state.channelId, channelName: channel.author));
-    } else {
-      await db.deleteOfflineSubscription(state.channelId);
+    try {
+      if (subscribed) {
+        final channel = await service.getChannel(state.channelId);
+        await db.addOfflineSubscription(OfflineSubscription(
+            channelId: state.channelId, channelName: channel.author));
+      } else {
+        await db.deleteOfflineSubscription(state.channelId);
+      }
+      if (!isClosed) {
+        emit(state.copyWith(isOfflineSubscribed: subscribed));
+      }
+    } finally {
+      if (!isClosed) emit(state.copyWith(loading: false));
     }
-    emit(state.copyWith(isOfflineSubscribed: subscribed, loading: false));
   }
 
   Future<void> onReady() async {
-    var isLoggedIn = await service.isLoggedIn();
-
-    bool isAccountSubscribed =
-        isLoggedIn && await service.isSubscribedToChannel(state.channelId);
-
-    bool isOfflineSubscribed = await db.isOfflineSubscribed(state.channelId);
+    var isLoggedIn = state.isLoggedIn;
+    var isAccountSubscribed = state.isAccountSubscribed;
+    var isOfflineSubscribed = state.isOfflineSubscribed;
+    try {
+      // Local subscriptions still work when the instance is unavailable.
+      isOfflineSubscribed = await db.isOfflineSubscribed(state.channelId);
+      isLoggedIn = await service.isLoggedIn();
+      isAccountSubscribed =
+          isLoggedIn && await service.isSubscribedToChannel(state.channelId);
+    } catch (error, stackTrace) {
+      Logger('SubscribeButton')
+          .warning('Could not load subscription status', error, stackTrace);
+    }
+    // The player may have closed while the instance was answering.
+    if (isClosed) return;
     emit(state.copyWith(
         loading: false,
         isOfflineSubscribed: isOfflineSubscribed,
@@ -55,6 +75,7 @@ class SubscribeButtonCubit extends Cubit<SubscribeButtonState> {
   }
 
   Future<void> unsubscribe() async {
+    if (isClosed) return;
     emit(state.copyWith(loading: true));
 
     if (state.isAccountSubscribed) {
@@ -65,7 +86,7 @@ class SubscribeButtonCubit extends Cubit<SubscribeButtonState> {
       await setOfflineSubscription(false);
     }
 
-    emit(state.copyWith(loading: false));
+    if (!isClosed) emit(state.copyWith(loading: false));
   }
 }
 

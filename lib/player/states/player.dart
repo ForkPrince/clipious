@@ -48,6 +48,7 @@ enum PlayerRepeat { noRepeat, repeatAll, repeatOne }
 class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   final SettingsCubit settings;
   late final AudioSession audioSession;
+  int _sponsorRequestGeneration = 0;
 
   PlayerCubit(super.initialState, this.settings) {
     onReady();
@@ -160,7 +161,8 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         if (state.currentlyPlaying != null) {
           saveProgress(state.currentlyPlaying!.lengthSeconds ?? 0);
         }
-        playNext();
+        // A late completion must not undo a Stop already in progress.
+        if (!state.isClosing) playNext();
         _setPlaying(false);
         break;
       default:
@@ -236,6 +238,9 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   }
 
   void hide() {
+    if (isClosed || state.isClosing) return;
+    // Background playback must stop before the closing animation can run.
+    pause();
     var mediaEvent = MediaEvent(
         state: MediaState.playing,
         type: MediaEventType.miniDisplayChanged,
@@ -245,6 +250,8 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
     Future.delayed(
       animationDuration * 1.5,
       () {
+        // A video switch clears isClosing; a stale hide must not clear it.
+        if (isClosed || !state.isClosing) return;
         emit(state.copyWith(
             isMini: true,
             mediaEvent: mediaEvent,
@@ -351,27 +358,20 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
 
     emit(state.copyWith(position: newPosition));
 
-    // if we're already within the last 5 seconds we don't skip to avoid infinite skip loop on late outro segment
-    if (state.sponsorSegments.isNotEmpty &&
-        state.position.inSeconds <
-            (state.currentlyPlaying?.lengthSeconds ?? maxInt) - 5) {
-      log.fine('sponsor skipped');
-      double positionInMs = currentPosition * 1000;
+    if (state.sponsorSegments.isNotEmpty) {
+      final positionInMs = newPosition.inMilliseconds;
       Pair<int> nextSegment = state.sponsorSegments.firstWhere(
-          (e) => e.first <= positionInMs && positionInMs <= e.last,
+          (e) => e.first <= positionInMs && positionInMs < e.last,
           orElse: () => const Pair<int>(-1, -1));
 
       if (nextSegment.first != -1) {
-        // sometimes when reaching the end of a video, the sponsor skip keeps on being triggered
-        // we remove on second of last segment if it is the case
-        var skipTo = nextSegment.last + 1000;
-
+        log.fine('sponsor skipped');
         emit(state.copyWith(
             mediaEvent: const MediaEvent(
                 state: MediaState.playing,
                 type: MediaEventType.sponsorSkipped)));
-        //for some reasons this needs to be last
-        seek(Duration(milliseconds: skipTo + 1000));
+        // The end is exclusive, so landing there cannot trigger another skip.
+        seek(Duration(milliseconds: nextSegment.last));
 /*
         final ScaffoldMessengerState? scaffold = scaffoldKey.currentState;
 
@@ -534,6 +534,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
 
   /// Switches to a video without changing the queue
   Future<void> _switchToVideo(IdedVideo video, {Duration? startAt}) async {
+    if (state.isClosing) emit(state.copyWith(isClosing: false));
     try {
       // we move the existing video to the stack of played video
       await audioSession.setActive(true);
@@ -765,27 +766,70 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   }
 
   Future<void> setSponsorBlock() async {
-    List<Pair<int>> newSegments = [];
-    if (state.currentlyPlaying != null) {
-      List<SponsorSegmentType> types = SponsorSegmentType.values
-          .where((e) => db.getSettings(e.settingsName())?.value == 'true')
-          .toList();
-
-      if (types.isNotEmpty) {
-        List<SponsorSegment> sponsorSegments = await service.getSponsorSegments(
-            state.currentlyPlaying!.videoId, types);
-        List<Pair<int>> segments = List.from(sponsorSegments.map((e) {
-          Duration start = Duration(seconds: e.segment[0].floor());
-          Duration end = Duration(seconds: e.segment[1].floor());
-          Pair<int> segment = Pair(start.inMilliseconds, end.inMilliseconds);
-          return segment;
-        }));
-
-        newSegments = segments;
-        log.fine('we found ${segments.length} segments to skip');
+    final request = ++_sponsorRequestGeneration;
+    final videoId = state.currentlyPlaying?.videoId ??
+        state.offlineCurrentlyPlaying?.videoId;
+    final types = SponsorSegmentType.values
+        .where((e) => db.getSettings(e.settingsName())?.value == 'true')
+        .toList();
+    List<SponsorSegment> segments = [];
+    if (videoId != null && types.isNotEmpty) {
+      try {
+        segments = await service
+            .getSponsorSegments(videoId, types)
+            .timeout(const Duration(seconds: 3), onTimeout: () => []);
+      } catch (error) {
+        // Optional community metadata must never prevent playback.
+        log.fine('SponsorBlock unavailable', error);
       }
     }
-    emit(state.copyWith(sponsorSegments: newSegments));
+    if (!isClosed &&
+        request == _sponsorRequestGeneration &&
+        (state.currentlyPlaying?.videoId ??
+                state.offlineCurrentlyPlaying?.videoId) ==
+            videoId) {
+      emit(state.copyWith(sponsorSegments: _sponsorIntervals(segments, types)));
+    }
+  }
+
+  List<Pair<int>> _sponsorIntervals(
+      List<SponsorSegment> segments, List<SponsorSegmentType> types) {
+    final length = state.currentlyPlaying?.lengthSeconds ??
+        state.offlineCurrentlyPlaying?.lengthSeconds ??
+        0;
+    final intervals = <Pair<int>>[];
+    for (final segment in segments) {
+      if (segment.actionType != 'skip' ||
+          !types.contains(segment.category) ||
+          segment.segment.length != 2) {
+        continue;
+      }
+      final start = segment.segment[0];
+      final end = segment.segment[1];
+      if (!start.isFinite ||
+          !end.isFinite ||
+          start < 0 ||
+          end <= start ||
+          (length > 0 && start >= length)) {
+        continue;
+      }
+      final boundedEnd = length > 0 ? end.clamp(0, length) : end;
+      final startMs = start * 1000;
+      final endMs = boundedEnd * 1000;
+      if (!startMs.isFinite || !endMs.isFinite || endMs > maxInt) continue;
+      final interval = Pair(startMs.round(), endMs.round());
+      if (interval.last > interval.first) intervals.add(interval);
+    }
+    intervals.sort((a, b) => a.first.compareTo(b.first));
+    final merged = <Pair<int>>[];
+    for (final interval in intervals) {
+      if (merged.isEmpty || interval.first > merged.last.last) {
+        merged.add(interval);
+      } else if (interval.last > merged.last.last) {
+        merged[merged.length - 1] = Pair(merged.last.first, interval.last);
+      }
+    }
+    return merged;
   }
 
   void seek(Duration duration) {

@@ -20,7 +20,9 @@ class AppCustomizerCubit extends Cubit<List<HomeDataSource>> {
   }
 
   Future<void> reorder(int oldIndex, int newIndex) async {
-    var onStart = this.state[settings.state.onOpen];
+    if (newIndex == oldIndex || newIndex == oldIndex + 1) return;
+
+    var onStart = this.state.elementAtOrNull(settings.state.onOpen);
 
     var state = List.of(this.state);
     var source = state.removeAt(oldIndex);
@@ -33,7 +35,7 @@ class AppCustomizerCubit extends Cubit<List<HomeDataSource>> {
     await settings.setAppLayout(state);
     emit(state);
 
-    var newOnStartIndex = state.indexOf(onStart);
+    var newOnStartIndex = onStart == null ? 0 : state.indexOf(onStart);
     await settings.selectOnOpen(newOnStartIndex);
   }
 }

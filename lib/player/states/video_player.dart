@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:clipious/downloads/models/downloaded_video.dart';
-import 'package:clipious/extensions.dart';
 import 'package:clipious/player/models/media_event.dart';
 import 'package:clipious/settings/states/settings.dart';
 import 'package:logging/logging.dart';
@@ -149,9 +148,9 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
         EasyThrottle.throttle('video-buffering', const Duration(seconds: 1),
             () {
           List<DurationRange> durations = event.parameters?['buffered'] ?? [];
-          emit(state.copyWith(
-              bufferPosition:
-                  durations.sortBy((e) => e.end).map((e) => e.end).last));
+          final buffered = durations.fold(Duration.zero,
+              (latest, range) => range.end > latest ? range.end : latest);
+          emit(state.copyWith(bufferPosition: buffered));
           player.setEvent(MediaEvent(
               state: MediaState.playing,
               type: MediaEventType.bufferChanged,
@@ -540,7 +539,9 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
   @override
   selectSubtitle(int index) {
-    var sub = videoController?.betterPlayerSubtitlesSourceList[index];
+    final tracks = videoController?.betterPlayerSubtitlesSourceList;
+    if (tracks == null || index < 0 || index >= tracks.length) return;
+    var sub = tracks[index];
     if (sub != null) {
       videoController?.setupSubtitleSource(sub, sourceInitialize: true);
     }
@@ -605,11 +606,10 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
   @override
   double getAspectRatio() {
-    double width =
-        videoController?.videoPlayerController?.value.size?.width ?? 16;
-    double height =
-        videoController?.videoPlayerController?.value.size?.height ?? 9;
-    return width / height;
+    final size = videoController?.videoPlayerController?.value.size;
+    if (size == null || size.isEmpty) return 16 / 9;
+    final ratio = size.aspectRatio;
+    return ratio.isFinite && ratio > 0 ? ratio : 16 / 9;
   }
 
   @override

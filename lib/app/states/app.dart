@@ -79,7 +79,6 @@ class AppCubit extends Cubit<AppState> {
 
   void openAppLink(String url, bool fullStack) {
     try {
-      log.fine('opening $url, full stack: $fullStack');
       Uri uri = Uri.parse(url);
       String? videoId;
       if (youtubeHosts.contains(uri.host)) {
@@ -92,7 +91,10 @@ class AppCubit extends Cubit<AppState> {
           videoId = uri.pathSegments[0];
         }
 
-        if (videoId != null) {
+        if (videoId != null &&
+            videoId.length == 11 &&
+            RegExp(r'^[A-Za-z0-9_-]{11}$').hasMatch(videoId)) {
+          log.fine('Opening video $videoId, full stack: $fullStack');
           if (fullStack) {
             appRouter.replaceAll([
               MainRoute(children: [
@@ -107,7 +109,8 @@ class AppCubit extends Cubit<AppState> {
       }
     } catch (err, stacktrace) {
       // not a url;
-      log.severe('Couldn\'t open external url: $url', err, stacktrace);
+      log.severe('Couldn\'t open external video link (${err.runtimeType})',
+          null, stacktrace);
     }
   }
 
