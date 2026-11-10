@@ -543,7 +543,7 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
     if (tracks == null || index < 0 || index >= tracks.length) return;
     var sub = tracks[index];
     videoController?.setupSubtitleSource(sub, sourceInitialize: true);
-    }
+  }
 
   @override
   selectVideoTrack(int index) {

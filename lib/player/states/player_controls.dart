@@ -225,8 +225,7 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
       double screenBrightness =
           min(1, max(0, state.screenControlStartValue + movedBy));
 
-      await ScreenBrightness()
-          .setApplicationScreenBrightness(screenBrightness);
+      await ScreenBrightness().setApplicationScreenBrightness(screenBrightness);
       if (isClosed) return;
       emit(state.copyWith(
           systemBrightness: screenBrightness, showBrightnessSlider: true));

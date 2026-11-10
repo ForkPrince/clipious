@@ -99,8 +99,7 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   Future<void> selectCountry(String selected) async {
-    setCountry(countryCodes.firstWhere(
-        (element) => element.name == selected,
+    setCountry(countryCodes.firstWhere((element) => element.name == selected,
         orElse: () => state.country));
   }
 
@@ -319,15 +318,19 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   Future<void> setUseProxy(bool b) async => await _set(useProxySettingName, b);
 
-  Future<void> setBlackBackground(bool b) async => await _set(blackBackgroundSettingName, b);
+  Future<void> setBlackBackground(bool b) async =>
+      await _set(blackBackgroundSettingName, b);
 
-  Future<void> setRememberSubtitles(bool b) async => await _set(rememberLastSubtitle, b);
+  Future<void> setRememberSubtitles(bool b) async =>
+      await _set(rememberLastSubtitle, b);
 
-  Future<void> setRememberPlayBackSpeed(bool b) async => await _set(remeberPlaybackSpeed, b);
+  Future<void> setRememberPlayBackSpeed(bool b) async =>
+      await _set(remeberPlaybackSpeed, b);
 
   Future<void> setFillFullscreen(bool b) async => await _set(fillFullScreen, b);
 
-  Future<void> setForceTvUi(bool b) async => await _set(forceTvUiSettingName, b);
+  Future<void> setForceTvUi(bool b) async =>
+      await _set(forceTvUiSettingName, b);
 
   Future<void> _setLocale(String? s) async {
     await _set(localeSettingName, s);
@@ -337,9 +340,11 @@ class SettingsCubit extends Cubit<SettingsState> {
   Future<void> setSearchHistoryLimit(int b) async =>
       await _set(searchHistoryLimitSettingName, b);
 
-  Future<void> setLastSpeed(double d) async => await _set(lastSpeedSettingName, d);
+  Future<void> setLastSpeed(double d) async =>
+      await _set(lastSpeedSettingName, d);
 
-  Future<void> setPlayerShuffleMode(bool b) async => await _set(playerShuffle, b);
+  Future<void> setPlayerShuffleMode(bool b) async =>
+      await _set(playerShuffle, b);
 
   Future<void> setPlayerRepeatMode(PlayerRepeat repeatMode) async =>
       await _set(playerRepeat, PlayerRepeat.values.indexOf(repeatMode));
@@ -361,12 +366,14 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   Future<void> setUseDash(bool b) async => await _set(useDashSettingName, b);
 
-  Future<void> setAutoplayVideoOnLoad(bool b) async => await _set(playerAutoplayOnLoad, b);
+  Future<void> setAutoplayVideoOnLoad(bool b) async =>
+      await _set(playerAutoplayOnLoad, b);
 
   Future<void> setUseReturnYoutubeDislike(bool b) async =>
       await _set(useReturnYoutubeDislikeSettingName, b);
 
-  Future<void> _setSubtitleSize(double d) async => await _set(subtitleSizeSettingName, d);
+  Future<void> _setSubtitleSize(double d) async =>
+      await _set(subtitleSizeSettingName, d);
 
   Future<void> setSkipSslVerification(bool b) async =>
       await _set(skipSslVerificationSettingName, b);
@@ -374,7 +381,8 @@ class SettingsCubit extends Cubit<SettingsState> {
   Future<void> setForceLandscapeFullScreen(bool b) async =>
       await _set(lockOrientationFullScreen, b);
 
-  Future<void> _setThemeMode(ThemeMode t) async => await _set(themeModeSettingName, t.name);
+  Future<void> _setThemeMode(ThemeMode t) async =>
+      await _set(themeModeSettingName, t.name);
 
   Future<void> setUseSearchHistory(bool b) async =>
       await _set(useSearchHistorySettingName, b);
@@ -397,7 +405,8 @@ class SettingsCubit extends Cubit<SettingsState> {
   Future<void> setBackgroundNotificationFrequency(int i) async =>
       await _set(backgroundCheckFrequency, i);
 
-  Future<void> setSubtitlesBackground(bool b) async => await _set(subtitleBackground, b);
+  Future<void> setSubtitlesBackground(bool b) async =>
+      await _set(subtitleBackground, b);
 
   Future<void> setDearrow(bool b) async => await _set(dearrowSettingName, b);
 
@@ -415,7 +424,8 @@ class SettingsCubit extends Cubit<SettingsState> {
   Future<void> setFullscreenOnRotate(bool b) async =>
       await _set(fullScreenOnLandscapeSettingName, b);
 
-  Future<void> setScreenControls(bool b) async => await _set(screenControlsSettingName, b);
+  Future<void> setScreenControls(bool b) async =>
+      await _set(screenControlsSettingName, b);
 
   Future<void> setReturnYoutubeDislikeUrl(String url) async =>
       await _set(returnYoutubeDislikeUrlSettingName, url);

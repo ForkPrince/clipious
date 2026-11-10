@@ -25,7 +25,8 @@ class TvVideoItem extends StatelessWidget {
       this.onSelect,
       this.onFocusChange});
 
-  KeyEventResult openVideo(BuildContext context, Video e, FocusNode node, KeyEvent event) {
+  KeyEventResult openVideo(
+      BuildContext context, Video e, FocusNode node, KeyEvent event) {
     if (event is KeyUpEvent &&
         isOk(event.logicalKey, physicalKeyboardKey: event.physicalKey)) {
       if (e.filtered) {

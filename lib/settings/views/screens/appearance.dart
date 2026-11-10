@@ -21,26 +21,25 @@ class AppearanceSettingsScreen extends StatelessWidget {
         useSafeArea: true,
         builder: (ctx) => SizedBox(
               height: 200,
-              child: SimpleDialog(
-                  title: Text(locals.themeBrightness),
-                  children: [
-                    RadioGroup<ThemeMode>(
-                      groupValue: state.themeMode,
-                      onChanged: (value) {
-                        Navigator.of(ctx).pop();
-                        cubit.setThemeMode(value);
-                      },
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: ThemeMode.values
-                            .map((e) => RadioListTile<ThemeMode>(
-                                  title: Text(cubit.getThemeLabel(locals, e)),
-                                  value: e,
-                                ))
-                            .toList(),
-                      ),
-                    ),
-                  ]),
+              child:
+                  SimpleDialog(title: Text(locals.themeBrightness), children: [
+                RadioGroup<ThemeMode>(
+                  groupValue: state.themeMode,
+                  onChanged: (value) {
+                    Navigator.of(ctx).pop();
+                    cubit.setThemeMode(value);
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: ThemeMode.values
+                        .map((e) => RadioListTile<ThemeMode>(
+                              title: Text(cubit.getThemeLabel(locals, e)),
+                              value: e,
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ]),
             ));
   }
 

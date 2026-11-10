@@ -52,7 +52,8 @@ class PlaylistListCubit extends Cubit<PlaylistListState> {
     loadPlaylist(state.paginatedList.getItems);
   }
 
-  Future<void> loadPlaylist(Future<List<Playlist>> Function() refreshFunction) async {
+  Future<void> loadPlaylist(
+      Future<List<Playlist>> Function() refreshFunction) async {
     emit(state.copyWith(error: '', loading: true));
     try {
       var playlists = await refreshFunction();

@@ -18,9 +18,9 @@ class HomeView extends StatelessWidget {
   static void openSearch(BuildContext context, String search) {
     AutoRouter.of(context)
         .push(SearchRoute(
-          query: search,
-          searchNow: true,
-        ))
+      query: search,
+      searchNow: true,
+    ))
         .then((value) {
       if (context.mounted) {
         context.read<AppCubit>().updateLayout();
