@@ -70,17 +70,17 @@ class AddServerCubit extends Cubit<AddServerState> {
     }
   }
 
-  setShowAdvanced(bool advanced) {
+  void setShowAdvanced(bool advanced) {
     emit(state.copyWith(showAdvanced: advanced));
   }
 
-  addHeader(String key, String value) {
+  void addHeader(String key, String value) {
     final Map<String, String> headers = Map.from(state.headers);
     headers[key] = value;
     emit(state.copyWith(headers: headers));
   }
 
-  removeHeader(String key) {
+  void removeHeader(String key) {
     final Map<String, String> headers = Map.from(state.headers);
     headers.remove(key);
     emit(state.copyWith(headers: headers));
@@ -101,7 +101,7 @@ class AddServerCubit extends Cubit<AddServerState> {
     return true;
   }
 
-  setAdvancedTest(bool advancedTest) {
+  void setAdvancedTest(bool advancedTest) {
     emit(state.copyWith(advancedTest: advancedTest));
   }
 }

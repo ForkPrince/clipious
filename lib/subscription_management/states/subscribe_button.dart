@@ -12,7 +12,7 @@ class SubscribeButtonCubit extends Cubit<SubscribeButtonState> {
     onReady();
   }
 
-  setAccountSubscription(bool subscribed) async {
+  Future setAccountSubscription(bool subscribed) async {
     if (isClosed) return;
     emit(state.copyWith(loading: true));
 
@@ -32,7 +32,7 @@ class SubscribeButtonCubit extends Cubit<SubscribeButtonState> {
     }
   }
 
-  setOfflineSubscription(bool subscribed) async {
+  Future<void> setOfflineSubscription(bool subscribed) async {
     if (isClosed) return;
     emit(state.copyWith(loading: true));
     try {

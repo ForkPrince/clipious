@@ -25,7 +25,7 @@ class TvAddServerScreen extends StatelessWidget {
         field2Secret: false,
         okText: locals.add, onOk: (key, value) async {
       var cubit = context.read<AddServerCubit>();
-      await cubit.addHeader(key, value);
+      cubit.addHeader(key, value);
       if (context.mounted) {
         Navigator.of(context).pop();
       }
@@ -46,7 +46,7 @@ class TvAddServerScreen extends StatelessWidget {
         okText: locals.add, onOk: (username, password) async {
       var cubit = context.read<AddServerCubit>();
 
-      await cubit.addHeader(
+      cubit.addHeader(
           "Authorization", 'Basic ${encodeBase64('$username:$password')}');
       if (context.mounted) {
         Navigator.of(context).pop();

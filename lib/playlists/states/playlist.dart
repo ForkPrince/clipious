@@ -32,7 +32,7 @@ class PlaylistCubit extends Cubit<PlaylistState> {
     }
   }
 
-  deletePlaylist() async {
+  Future<void> deletePlaylist() async {
     await service.deleteUserPlaylist(state.playlist.playlistId);
   }
 
@@ -47,16 +47,16 @@ class PlaylistCubit extends Cubit<PlaylistState> {
     return false;
   }
 
-  play(bool? isAudio) {
+  void play(bool? isAudio) {
     player.playVideo(state.playlist.videos, audio: isAudio);
   }
 
-  scrollToTop() {
+  void scrollToTop() {
     scrollController.animateTo(0,
         duration: animationDuration ~/ 2, curve: Curves.easeInOutQuad);
   }
 
-  getAllVideos() async {
+  Future<void> getAllVideos() async {
     if (state.playlist.videoCount > 0 &&
         state.playlist.videos.length < state.playlist.videoCount) {
       int page = 1;

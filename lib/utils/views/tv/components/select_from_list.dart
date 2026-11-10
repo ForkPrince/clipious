@@ -17,7 +17,7 @@ class TvSelectFromListScreen extends StatelessWidget {
       required this.onSelect,
       required this.title});
 
-  selectOption(BuildContext context, String s) {
+  void selectOption(BuildContext context, String s) {
     onSelect(s);
     Navigator.of(context).pop();
   }

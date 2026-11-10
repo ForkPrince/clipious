@@ -23,7 +23,7 @@ class PlaylistViewScreen extends StatelessWidget {
   const PlaylistViewScreen(
       {super.key, required this.playlist, required this.canDeleteVideos});
 
-  deletePlayList(BuildContext context) {
+  void deletePlayList(BuildContext context) {
     var cubit = context.read<PlaylistCubit>();
     var locals = AppLocalizations.of(context)!;
     okCancelDialog(context, locals.deletePlayListQ, locals.irreversibleAction,
@@ -36,15 +36,17 @@ class PlaylistViewScreen extends StatelessWidget {
     });
   }
 
-  openVideo(BuildContext context, String videoId) {
+  void openVideo(BuildContext context, String videoId) {
     AutoRouter.of(context).push(VideoRoute(videoId: videoId)).then((value) {
-      context
-          .read<PlaylistCubit>()
-          .refreshPlaylist(userPlaylist: canDeleteVideos);
+      if (context.mounted) {
+        context
+            .read<PlaylistCubit>()
+            .refreshPlaylist(userPlaylist: canDeleteVideos);
+      }
     });
   }
 
-  removeVideoFromPlayList(BuildContext context, Video v) async {
+  Future<void> removeVideoFromPlayList(BuildContext context, Video v) async {
     if (canDeleteVideos) {
       var locals = AppLocalizations.of(context)!;
       var cubit = context.read<PlaylistCubit>();

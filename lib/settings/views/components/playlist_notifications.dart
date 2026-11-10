@@ -11,7 +11,7 @@ import 'package:clipious/utils.dart';
 class PlaylistNotificationList extends StatelessWidget {
   const PlaylistNotificationList({super.key});
 
-  deleteNotification(BuildContext context, PlaylistNotification notif) {
+  void deleteNotification(BuildContext context, PlaylistNotification notif) {
     var cubit = context.read<PlaylistNotificationListCubit>();
     var locals = AppLocalizations.of(context)!;
     okCancelDialog(
@@ -21,7 +21,7 @@ class PlaylistNotificationList extends StatelessWidget {
         () => cubit.deleteNotification(notif));
   }
 
-  openPlaylist(BuildContext context, String playlistId) {
+  void openPlaylist(BuildContext context, String playlistId) {
     service.getPublicPlaylists(playlistId).then((value) => {
           if (context.mounted)
             {

@@ -56,10 +56,11 @@ class PlaylistList extends StatelessWidget {
                         duration: animationDuration,
                         curve: Curves.easeInOutQuad,
                         child: RefreshIndicator(
-                          onRefresh: () =>
-                              !small && state.paginatedList.hasRefresh()
-                                  ? cubit.refreshPlaylists()
-                                  : null,
+                          onRefresh: () async {
+                            if (!small && state.paginatedList.hasRefresh()) {
+                              await cubit.refreshPlaylists();
+                            }
+                          },
                           child: DeviceWidget(
                             forcedTyped: small ? DeviceType.phone : null,
                             phone: ListView.builder(

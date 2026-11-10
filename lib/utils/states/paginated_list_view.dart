@@ -24,14 +24,14 @@ class PaginatedListCubit<T> extends Cubit<PaginatedListViewController<T>> {
     super.close();
   }
 
-  getItems() async {
+  Future<void> getItems() async {
     emit(state.copyWith(loading: true));
     var items = await state.paginatedList.getItems();
 
     emit(state.copyWith(loading: false, items: items));
   }
 
-  getMore() {
+  void getMore() {
     if (state.paginatedList.getHasMore()) {
       if (scrollController.hasClients) {
         if (scrollController.position.maxScrollExtent * 0.9 <

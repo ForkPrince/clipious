@@ -19,8 +19,7 @@ const taskName = "Clipious background refresh task";
 
 Future<void> configureBackgroundService(SettingsCubit settings) async {
   if (settings.state.backgroundNotifications) {
-    await Workmanager()
-        .initialize(callbackDispatcher, isInDebugMode: kDebugMode);
+    await Workmanager().initialize(callbackDispatcher);
   }
 }
 
@@ -56,7 +55,7 @@ void callbackDispatcher() {
   });
 }
 
-_backgroundCheck() async {
+Future<void> _backgroundCheck() async {
   try {
     Logger.root.level =
         kDebugMode ? Level.FINEST : Level.INFO; // defaults to Level.INFO
@@ -86,7 +85,7 @@ Future<AppLocalizations> getLocalization() async {
   return await AppLocalizations.delegate.load(locale);
 }
 
-_handlePlaylistNotifications() async {
+Future<void> _handlePlaylistNotifications() async {
   var notifs = await fileDb.getAllPlaylistNotifications();
   for (var n in notifs) {
     // we get the latest video,
@@ -117,7 +116,7 @@ _handlePlaylistNotifications() async {
   }
 }
 
-_handleChannelNotifications() async {
+Future<void> _handleChannelNotifications() async {
   var notifs = await fileDb.getAllChannelNotifications();
 
   for (var n in notifs) {
@@ -159,7 +158,7 @@ _handleChannelNotifications() async {
   }
 }
 
-_handleSubscriptionsNotifications() async {
+Future<void> _handleSubscriptionsNotifications() async {
   bool isEnabled = await fileDb.getSubscriptionNotifications();
   if (isEnabled && await db.isLoggedInToCurrentServer()) {
     // we need to get the last notification before we call the feed endpoint as it is going to save the last seen video

@@ -4,7 +4,7 @@ import 'package:clipious/notifications/models/db/playlist_notifications.dart';
 import 'package:clipious/notifications/models/db/subscription_notifications.dart';
 import 'package:clipious/utils/file_db.dart';
 
-main() {
+void main() {
   tearDown(() async {
     await FileDB().clearDb();
   });

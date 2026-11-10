@@ -21,7 +21,7 @@ class PlaylistListCubit extends Cubit<PlaylistListState> {
     getPlaylists();
   }
 
-  onScrollEvent() {
+  void onScrollEvent() {
     if (state.paginatedList.getHasMore()) {
       if (scrollController.hasClients) {
         if (scrollController.position.maxScrollExtent * 0.9 ==
@@ -33,7 +33,7 @@ class PlaylistListCubit extends Cubit<PlaylistListState> {
     }
   }
 
-  getMorePlaylists() async {
+  Future<void> getMorePlaylists() async {
     if (!state.loading && state.paginatedList.getHasMore()) {
       loadPlaylist(() async {
         List<Playlist> playlists = await state.paginatedList.getMoreItems();
@@ -44,15 +44,15 @@ class PlaylistListCubit extends Cubit<PlaylistListState> {
     }
   }
 
-  refreshPlaylists() async {
+  Future<void> refreshPlaylists() async {
     loadPlaylist(state.paginatedList.refresh);
   }
 
-  getPlaylists() async {
+  Future<void> getPlaylists() async {
     loadPlaylist(state.paginatedList.getItems);
   }
 
-  loadPlaylist(Future<List<Playlist>> Function() refreshFunction) async {
+  Future<void> loadPlaylist(Future<List<Playlist>> Function() refreshFunction) async {
     emit(state.copyWith(error: '', loading: true));
     try {
       var playlists = await refreshFunction();

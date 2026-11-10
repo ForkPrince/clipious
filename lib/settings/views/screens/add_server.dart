@@ -1,4 +1,3 @@
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,7 +28,7 @@ class AddServerScreen extends StatelessWidget {
         field2Secret: false,
         okText: locals.add, onOk: (key, value) async {
       var cubit = context.read<AddServerCubit>();
-      await cubit.addHeader(key, value);
+      cubit.addHeader(key, value);
       if (context.mounted) {
         Navigator.of(context).pop();
       }
@@ -50,7 +49,7 @@ class AddServerScreen extends StatelessWidget {
         okText: locals.add, onOk: (username, password) async {
       var cubit = context.read<AddServerCubit>();
 
-      await cubit.addHeader(
+      cubit.addHeader(
           "Authorization", 'Basic ${encodeBase64('$username:$password')}');
       if (context.mounted) {
         Navigator.of(context).pop();
@@ -203,8 +202,9 @@ class AddServerScreen extends StatelessWidget {
                                       AutoRouter.of(context).maybePop(server);
                                     }
                                   } catch (e) {
-                                    if (context.mounted)
+                                    if (context.mounted) {
                                       handleError(context, e);
+                                    }
                                   }
                                 },
                           child: state.loading

@@ -12,7 +12,7 @@ import '../../../utils/views/components/select_list_dialog.dart';
 class AppearanceSettingsScreen extends StatelessWidget {
   const AppearanceSettingsScreen({super.key});
 
-  selectTheme(BuildContext context, SettingsState state) {
+  void selectTheme(BuildContext context, SettingsState state) {
     var cubit = context.read<SettingsCubit>();
     var locals = AppLocalizations.of(context)!;
     showDialog(
@@ -23,16 +23,24 @@ class AppearanceSettingsScreen extends StatelessWidget {
               height: 200,
               child: SimpleDialog(
                   title: Text(locals.themeBrightness),
-                  children: ThemeMode.values
-                      .map((e) => RadioListTile(
-                          title: Text(cubit.getThemeLabel(locals, e)),
-                          value: e,
-                          groupValue: state.themeMode,
-                          onChanged: (value) {
-                            Navigator.of(ctx).pop();
-                            cubit.setThemeMode(value);
-                          }))
-                      .toList()),
+                  children: [
+                    RadioGroup<ThemeMode>(
+                      groupValue: state.themeMode,
+                      onChanged: (value) {
+                        Navigator.of(ctx).pop();
+                        cubit.setThemeMode(value);
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: ThemeMode.values
+                            .map((e) => RadioListTile<ThemeMode>(
+                                  title: Text(cubit.getThemeLabel(locals, e)),
+                                  value: e,
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                  ]),
             ));
   }
 
@@ -49,7 +57,7 @@ class AppearanceSettingsScreen extends StatelessWidget {
     };
   }
 
-  customizeNavigationLabel(BuildContext context) {
+  void customizeNavigationLabel(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
     var settings = context.read<SettingsCubit>();
     var colors = Theme.of(context).colorScheme;

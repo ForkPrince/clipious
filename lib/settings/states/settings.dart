@@ -45,83 +45,83 @@ class SettingsCubit extends Cubit<SettingsState> {
     onReady();
   }
 
-  onReady() async {
+  Future<void> onReady() async {
     await getPackageInfo();
     await _getSubscriptionNotification();
   }
 
-  toggleSponsorBlock(bool value) async {
+  Future<void> toggleSponsorBlock(bool value) async {
     await setSponsorBlock(value);
   }
 
-  toggleForceLandscapeFullScreen(bool value) async {
+  Future<void> toggleForceLandscapeFullScreen(bool value) async {
     await setForceLandscapeFullScreen(value);
   }
 
-  toggleFillFullscreen(bool value) async {
+  Future<void> toggleFillFullscreen(bool value) async {
     await setFillFullscreen(value);
   }
 
-  toggleDynamicTheme(bool value) async {
+  Future<void> toggleDynamicTheme(bool value) async {
     await setUseDynamicTheme(value);
     updateApp();
   }
 
-  toggleDash(bool value) async {
+  Future<void> toggleDash(bool value) async {
     await setUseDash(value);
   }
 
-  toggleProxy(bool value) async {
+  Future<void> toggleProxy(bool value) async {
     await setUseProxy(value);
   }
 
-  toggleAutoplayOnLoad(bool value) async {
+  Future<void> toggleAutoplayOnLoad(bool value) async {
     await setAutoplayVideoOnLoad(value);
   }
 
-  toggleReturnYoutubeDislike(bool value) async {
+  Future<void> toggleReturnYoutubeDislike(bool value) async {
     await setUseReturnYoutubeDislike(value);
   }
 
-  toggleSearchHistory(bool value) async {
+  Future<void> toggleSearchHistory(bool value) async {
     await setUseSearchHistory(value);
     if (!value) {
       await db.clearSearchHistory();
     }
   }
 
-  toggleRememberPlaybackSpeed(bool value) async {
+  Future<void> toggleRememberPlaybackSpeed(bool value) async {
     await setRememberPlayBackSpeed(value);
   }
 
-  selectOnOpen(int index) async {
+  Future<void> selectOnOpen(int index) async {
     await setOnOpen(index);
   }
 
   Future<void> selectCountry(String selected) async {
-    await setCountry(countryCodes.firstWhere(
+    setCountry(countryCodes.firstWhere(
         (element) => element.name == selected,
         orElse: () => state.country));
   }
 
-  serverChanged() {
+  void serverChanged() {
     emit(state.copyWith());
   }
 
-  toggleSslVerification(bool value) async {
+  Future<void> toggleSslVerification(bool value) async {
     await setSkipSslVerification(value);
   }
 
-  getPackageInfo() async {
+  Future<void> getPackageInfo() async {
     emit(state.copyWith(packageInfo: packageInfo!));
   }
 
-  toggleBlackBackground(bool value) async {
+  Future<void> toggleBlackBackground(bool value) async {
     await setBlackBackground(value);
     appCubit.rebuildApp();
   }
 
-  changeSkipStep({required bool increase}) async {
+  Future<void> changeSkipStep({required bool increase}) async {
     int index = skipSteps.indexOf(state.skipStep);
     if (increase) {
       if (index < skipSteps.length - 1) {
@@ -134,7 +134,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  changeSubtitleSize({required bool increase}) async {
+  Future<void> changeSubtitleSize({required bool increase}) async {
     if (increase) {
       await _setSubtitleSize(state.subtitleSize + 1);
     } else {
@@ -144,7 +144,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  setSubtitleSize(int value) async {
+  Future<void> setSubtitleSize(int value) async {
     if (value < 1) {
       await _setSubtitleSize(1);
     } else {
@@ -152,11 +152,11 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  toggleRememberSubtitles(bool value) async {
+  Future<void> toggleRememberSubtitles(bool value) async {
     await setRememberSubtitles(value);
   }
 
-  changeSearchHistoryLimit({required bool increase}) async {
+  Future<void> changeSearchHistoryLimit({required bool increase}) async {
     if (increase) {
       if (state.searchHistoryLimit < 30) {
         await setSearchHistoryLimit(state.searchHistoryLimit + 1);
@@ -171,7 +171,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  setHistoryLimit(int value) async {
+  Future<void> setHistoryLimit(int value) async {
     if (value < 1) {
       await setSearchHistoryLimit(1);
     } else if (value <= 30) {
@@ -194,14 +194,14 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  setThemeMode(ThemeMode? theme) async {
+  Future<void> setThemeMode(ThemeMode? theme) async {
     if (theme != null) {
       await _setThemeMode(theme);
     }
     updateApp();
   }
 
-  setLocale(
+  Future<void> setLocale(
       List<Locale> locals, List<String> localStrings, String? locale) async {
     if (locale == null) {
       await db.deleteSetting(localeSettingName);
@@ -221,23 +221,23 @@ class SettingsCubit extends Cubit<SettingsState> {
     updateApp();
   }
 
-  updateApp() {
+  void updateApp() {
     appCubit.rebuildApp();
   }
 
-  setShuffle(bool b) async {
+  Future<void> setShuffle(bool b) async {
     await setPlayerShuffleMode(b);
   }
 
-  setRepeatMode(PlayerRepeat repeat) async {
+  Future<void> setRepeatMode(PlayerRepeat repeat) async {
     await setPlayerRepeatMode(repeat);
   }
 
-  toggleShuffle() {
+  void toggleShuffle() {
     setShuffle(!state.playerShuffleMode);
   }
 
-  setNextRepeatMode() {
+  void setNextRepeatMode() {
     switch (state.playerRepeatMode) {
       case PlayerRepeat.noRepeat:
         setRepeatMode(PlayerRepeat.repeatAll);
@@ -251,7 +251,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  setLastSubtitle(String s) async {
+  Future<void> setLastSubtitle(String s) async {
     await setLastSubtitles(s);
   }
 
@@ -290,7 +290,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     return EnableBackGroundNotificationResponse.ok;
   }
 
-  setBackgroundCheckFrequency(int i) async {
+  Future<void> setBackgroundCheckFrequency(int i) async {
     if (i > 0 && i <= 24) {
       await setBackgroundNotificationFrequency(i);
       EasyDebounce.debounce(
@@ -300,56 +300,56 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  copySettingsAsJson(BuildContext context) {
+  void copySettingsAsJson(BuildContext context) {
     var encoder = const JsonEncoder.withIndent('    ');
     String json = encoder.convert(state.settings);
     Clipboard.setData(ClipboardData(text: json));
   }
 
-  saveSetting(SettingsValue settings) async {
+  Future<void> saveSetting(SettingsValue settings) async {
     await db.saveSetting(settings);
     var newSettings = Map<String, SettingsValue>.from(state.settings);
     newSettings[settings.name] = settings;
     emit(state.copyWith(settings: newSettings));
   }
 
-  setSponsorBlock(bool b) async => await _set(useSponsorBlock, b);
+  Future<void> setSponsorBlock(bool b) async => await _set(useSponsorBlock, b);
 
-  setOnOpen(int i) async => await _set(onOpenSettingName, i);
+  Future<void> setOnOpen(int i) async => await _set(onOpenSettingName, i);
 
-  setUseProxy(bool b) async => await _set(useProxySettingName, b);
+  Future<void> setUseProxy(bool b) async => await _set(useProxySettingName, b);
 
-  setBlackBackground(bool b) async => await _set(blackBackgroundSettingName, b);
+  Future<void> setBlackBackground(bool b) async => await _set(blackBackgroundSettingName, b);
 
-  setRememberSubtitles(bool b) async => await _set(rememberLastSubtitle, b);
+  Future<void> setRememberSubtitles(bool b) async => await _set(rememberLastSubtitle, b);
 
-  setRememberPlayBackSpeed(bool b) async => await _set(remeberPlaybackSpeed, b);
+  Future<void> setRememberPlayBackSpeed(bool b) async => await _set(remeberPlaybackSpeed, b);
 
-  setFillFullscreen(bool b) async => await _set(fillFullScreen, b);
+  Future<void> setFillFullscreen(bool b) async => await _set(fillFullScreen, b);
 
-  setForceTvUi(bool b) async => await _set(forceTvUiSettingName, b);
+  Future<void> setForceTvUi(bool b) async => await _set(forceTvUiSettingName, b);
 
-  _setLocale(String? s) async {
+  Future<void> _setLocale(String? s) async {
     await _set(localeSettingName, s);
     await fileDb.setLocale(s);
   }
 
-  setSearchHistoryLimit(int b) async =>
+  Future<void> setSearchHistoryLimit(int b) async =>
       await _set(searchHistoryLimitSettingName, b);
 
-  setLastSpeed(double d) async => await _set(lastSpeedSettingName, d);
+  Future<void> setLastSpeed(double d) async => await _set(lastSpeedSettingName, d);
 
-  setPlayerShuffleMode(bool b) async => await _set(playerShuffle, b);
+  Future<void> setPlayerShuffleMode(bool b) async => await _set(playerShuffle, b);
 
-  setPlayerRepeatMode(PlayerRepeat repeatMode) async =>
+  Future<void> setPlayerRepeatMode(PlayerRepeat repeatMode) async =>
       await _set(playerRepeat, PlayerRepeat.values.indexOf(repeatMode));
 
-  setLastSubtitles(String s) async => await _set(lastSubtitle, s);
+  Future<void> setLastSubtitles(String s) async => await _set(lastSubtitle, s);
 
-  setPlayRecommendedNext(bool b) async =>
+  Future<void> setPlayRecommendedNext(bool b) async =>
       await _set(playRecommendedNextSettingName, b);
 
-  setCountry(Country c) {
+  void setCountry(Country c) {
     String code = countryCodes
         .firstWhere((element) => element.name == c.name,
             orElse: () => state.country)
@@ -357,67 +357,67 @@ class SettingsCubit extends Cubit<SettingsState> {
     _set(browsingCountry, code);
   }
 
-  setUseDynamicTheme(bool b) async => await _set(dynamicTheme, b);
+  Future<void> setUseDynamicTheme(bool b) async => await _set(dynamicTheme, b);
 
-  setUseDash(bool b) async => await _set(useDashSettingName, b);
+  Future<void> setUseDash(bool b) async => await _set(useDashSettingName, b);
 
-  setAutoplayVideoOnLoad(bool b) async => await _set(playerAutoplayOnLoad, b);
+  Future<void> setAutoplayVideoOnLoad(bool b) async => await _set(playerAutoplayOnLoad, b);
 
-  setUseReturnYoutubeDislike(bool b) async =>
+  Future<void> setUseReturnYoutubeDislike(bool b) async =>
       await _set(useReturnYoutubeDislikeSettingName, b);
 
-  _setSubtitleSize(double d) async => await _set(subtitleSizeSettingName, d);
+  Future<void> _setSubtitleSize(double d) async => await _set(subtitleSizeSettingName, d);
 
-  setSkipSslVerification(bool b) async =>
+  Future<void> setSkipSslVerification(bool b) async =>
       await _set(skipSslVerificationSettingName, b);
 
-  setForceLandscapeFullScreen(bool b) async =>
+  Future<void> setForceLandscapeFullScreen(bool b) async =>
       await _set(lockOrientationFullScreen, b);
 
-  _setThemeMode(ThemeMode t) async => await _set(themeModeSettingName, t.name);
+  Future<void> _setThemeMode(ThemeMode t) async => await _set(themeModeSettingName, t.name);
 
-  setUseSearchHistory(bool b) async =>
+  Future<void> setUseSearchHistory(bool b) async =>
       await _set(useSearchHistorySettingName, b);
 
-  setAppLayout(List<HomeDataSource> layout) async {
+  Future<void> setAppLayout(List<HomeDataSource> layout) async {
     var layoutToString = layout.map((e) => e.name).join(",");
     await _set(appLayoutSettingName, layoutToString);
   }
 
-  setNavigationBarLabelBehavior(
+  Future<void> setNavigationBarLabelBehavior(
           NavigationDestinationLabelBehavior behavior) async =>
       await _set(navigationBarLabelBehaviorSettingName, behavior.name);
 
-  setDistractionFreeMode(bool b) async =>
+  Future<void> setDistractionFreeMode(bool b) async =>
       await _set(distractionFreeModeSettingName, b);
 
-  _setBackgroundNotifications(bool b) async =>
+  Future<void> _setBackgroundNotifications(bool b) async =>
       await _set(backgroundNotificationsSettingName, b);
 
-  setBackgroundNotificationFrequency(int i) async =>
+  Future<void> setBackgroundNotificationFrequency(int i) async =>
       await _set(backgroundCheckFrequency, i);
 
-  setSubtitlesBackground(bool b) async => await _set(subtitleBackground, b);
+  Future<void> setSubtitlesBackground(bool b) async => await _set(subtitleBackground, b);
 
-  setDearrow(bool b) async => await _set(dearrowSettingName, b);
+  Future<void> setDearrow(bool b) async => await _set(dearrowSettingName, b);
 
-  setDearrowThumbnails(bool b) async =>
+  Future<void> setDearrowThumbnails(bool b) async =>
       await _set(dearrowThumbnailsSettingName, b);
 
-  setDearrowNormalizeTitles(bool b) async =>
+  Future<void> setDearrowNormalizeTitles(bool b) async =>
       await _set(dearrowNormalizeTitlesSettingName, b);
 
-  setSkipStep(int s) async => await _set(skipStepSettingName, s);
+  Future<void> setSkipStep(int s) async => await _set(skipStepSettingName, s);
 
-  setSkipExponentially(bool b) async =>
+  Future<void> setSkipExponentially(bool b) async =>
       await _set(skipExponentialSettingName, b);
 
-  setFullscreenOnRotate(bool b) async =>
+  Future<void> setFullscreenOnRotate(bool b) async =>
       await _set(fullScreenOnLandscapeSettingName, b);
 
-  setScreenControls(bool b) async => await _set(screenControlsSettingName, b);
+  Future<void> setScreenControls(bool b) async => await _set(screenControlsSettingName, b);
 
-  setReturnYoutubeDislikeUrl(String url) async =>
+  Future<void> setReturnYoutubeDislikeUrl(String url) async =>
       await _set(returnYoutubeDislikeUrlSettingName, url);
 
   Future<void> _set<T>(String name, T value) async {
@@ -434,18 +434,18 @@ class SettingsCubit extends Cubit<SettingsState> {
     emit(state.copyWith(settings: settings));
   }
 
-  setSubscriptionsNotifications(bool value) async {
+  Future<void> setSubscriptionsNotifications(bool value) async {
     await fileDb.setSubscriptionNotifications(value);
     await _getSubscriptionNotification();
   }
 
-  _getSubscriptionNotification() async {
+  Future<void> _getSubscriptionNotification() async {
     emit(state.copyWith(
         subscriptionNotifications:
             await fileDb.getSubscriptionNotifications()));
   }
 
-  sendFeedBack(UserFeedback feedback) async {
+  Future<void> sendFeedBack(UserFeedback feedback) async {
     try {
       appCubit.setGlobalLoading(true);
       final deviceInfo = await DeviceInfoPlugin().androidInfo;

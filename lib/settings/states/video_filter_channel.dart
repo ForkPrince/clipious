@@ -14,7 +14,7 @@ class VideoFilterChannelCubit extends Cubit<VideoFilterChannelState> {
     onReady();
   }
 
-  onReady() {
+  void onReady() {
     getChannel();
   }
 

@@ -1,4 +1,4 @@
-library app.globals;
+library;
 
 import 'package:flutter/animation.dart';
 import 'package:clipious/service.dart';

@@ -28,19 +28,19 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
   TvPlayerControlsCubit(super.initialState, this.player,
       {this.onEnterRecommendations});
 
-  fastForward() {
+  void fastForward() {
     player.fastForward();
   }
 
-  fastRewind() {
+  void fastRewind() {
     player.rewind();
   }
 
-  displaySettings() {
+  void displaySettings() {
     emit(state.copyWith(showSettings: true, displayControls: false));
   }
 
-  showUi() {
+  void showUi() {
     emit(state.copyWith(controlsOpacity: 1));
     hideControls();
   }
@@ -128,7 +128,7 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
     return KeyEventResult.ignored;
   }
 
-  hideSettings() {
+  void hideSettings() {
     emit(state.copyWith(
         controlsOpacity: 0,
         showSettings: false,
@@ -136,7 +136,7 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
         displayControls: false));
   }
 
-  hideControls() {
+  void hideControls() {
     EasyDebounce.debounce('tv-controls', controlFadeOut, () {
       // Settings remain open while sliders consume held remote key events.
       if (!isClosed && !state.showSettings) {
@@ -149,7 +149,7 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
     });
   }
 
-  displayQueue() {
+  void displayQueue() {
     emit(state.copyWith(showQueue: true, displayControls: false));
   }
 
@@ -159,7 +159,7 @@ class TvPlayerControlsCubit extends Cubit<TvPlayerControlsState> {
     emit(state.copyWith(loading: false));
   }
 
-  onStreamEvent(MediaEvent event) {
+  void onStreamEvent(MediaEvent event) {
     log.fine('Event: ${event.state}, ${event.type}');
     switch (event.state) {
       case MediaState.buffering:

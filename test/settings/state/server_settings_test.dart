@@ -9,7 +9,7 @@ import 'package:clipious/utils/sembast_sqflite_database.dart';
 import '../../globals.dart';
 import '../../test_app_cubit.dart';
 
-main() {
+void main() {
   // Setting a customer override that'll use an unmocked HTTP client
   late AppCubit app;
   setUp(() async {

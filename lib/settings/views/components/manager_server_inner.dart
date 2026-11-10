@@ -19,7 +19,7 @@ class ManagerServersView extends StatelessWidget {
 
   const ManagerServersView({super.key, this.fromWizard = false});
 
-  showPublicServerActions(
+  void showPublicServerActions(
       BuildContext context, ServerListSettingsState controller, Server server) {
     var locals = AppLocalizations.of(context)!;
     ServerListSettingsCubit cubit = context.read<ServerListSettingsCubit>();
@@ -60,12 +60,12 @@ class ManagerServersView extends StatelessWidget {
         });
   }
 
-  saveServer(BuildContext context) async {
+  Future<void> saveServer(BuildContext context) async {
     ServerListSettingsCubit cubit = context.read<ServerListSettingsCubit>();
     _serverServerHandling(context, cubit);
   }
 
-  _serverServerHandling(
+  Future<void> _serverServerHandling(
       BuildContext context, ServerListSettingsCubit cubit) async {
     var locals = AppLocalizations.of(context)!;
     try {
@@ -102,14 +102,14 @@ class ManagerServersView extends StatelessWidget {
     }
   }
 
-  openServer(BuildContext context, Server s) {
+  void openServer(BuildContext context, Server s) {
     var cubit = context.read<ServerListSettingsCubit>();
     AutoRouter.of(context)
         .push(ManageSingleServerRoute(server: s))
         .then((value) => cubit.refreshServers());
   }
 
-  addServer(BuildContext context) async {
+  Future<void> addServer(BuildContext context) async {
     var cubit = context.read<ServerListSettingsCubit>();
     final server = await AutoRouter.of(context).push(const AddServerRoute());
     if (server != null && server is Server && context.mounted) {

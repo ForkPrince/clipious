@@ -24,7 +24,7 @@ class SelectList<T> extends StatelessWidget {
       : assert(values == null || asyncSearch == null,
             'Cannot provide both async search and list of values');
 
-  static show<T>(BuildContext context,
+  static void show<T>(BuildContext context,
       {List<T>? values,
       T? value,
       Future<List<T>> Function(String filter)? asyncSearch,

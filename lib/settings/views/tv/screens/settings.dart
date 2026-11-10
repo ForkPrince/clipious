@@ -21,7 +21,7 @@ var log = Logger('TvSettings');
 class TVSettingsScreen extends StatelessWidget {
   const TVSettingsScreen({super.key});
 
-  openSelectCountry(BuildContext context) {
+  void openSelectCountry(BuildContext context) {
     AppLocalizations locals = AppLocalizations.of(context)!;
     var cubit = context.read<SettingsCubit>();
     var countryNames = countryCodes.map((e) => e.name).toList();
@@ -44,27 +44,27 @@ class TVSettingsScreen extends StatelessWidget {
     ];
   }
 
-  openManageServers(BuildContext context) {
+  void openManageServers(BuildContext context) {
     AutoRouter.of(context).push(const TvSettingsManageServersRoute());
   }
 
-  openSponsorBlockSettings(BuildContext context) {
+  void openSponsorBlockSettings(BuildContext context) {
     AutoRouter.of(context).push(const TvSponsorBlockSettingsRoute());
   }
 
-  openDearrowSettings(BuildContext context) {
+  void openDearrowSettings(BuildContext context) {
     AutoRouter.of(context).push(const TvDearrowSettingsRoute());
   }
 
-  openSearchHistorySettings(BuildContext context) {
+  void openSearchHistorySettings(BuildContext context) {
     AutoRouter.of(context).push(const TvSearchHistorySettingsRoute());
   }
 
-  openAppLayout(BuildContext context) {
+  void openAppLayout(BuildContext context) {
     AutoRouter.of(context).push(const TvAppLayoutSettingsRoute());
   }
 
-  showSelectLanguage(BuildContext context) {
+  void showSelectLanguage(BuildContext context) {
     var localsList = AppLocalizations.supportedLocales;
     var localsStrings =
         localsList.map((e) => e.nativeDisplayLanguageScript).toList();
@@ -92,7 +92,7 @@ class TVSettingsScreen extends StatelessWidget {
     ));
   }
 
-  selectTheme(BuildContext context) {
+  void selectTheme(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
     var cubit = context.read<SettingsCubit>();
     AutoRouter.of(context).push(TvSelectFromListRoute(
@@ -108,7 +108,7 @@ class TVSettingsScreen extends StatelessWidget {
     ));
   }
 
-  showCustomRydUrl(BuildContext context) {
+  void showCustomRydUrl(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
     var cubit = context.read<SettingsCubit>();
     final controller =
@@ -409,7 +409,7 @@ class AdjustmentSettingTile extends StatelessWidget {
       : assert(step == null || possibleValues == null,
             'Can\' have both step and possible values');
 
-  onKeyEvent(FocusNode node, KeyEvent event, BuildContext ctx) {
+  KeyEventResult onKeyEvent(FocusNode node, KeyEvent event, BuildContext ctx) {
     if (event is KeyUpEvent) {
       log.fine('onTvSelect, ${event.logicalKey}, $event');
       if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {

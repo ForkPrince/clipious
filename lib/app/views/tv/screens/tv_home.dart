@@ -30,41 +30,41 @@ GlobalKey trendingTitle = GlobalKey(debugLabel: 'trending title');
 class TvHomeScreen extends StatelessWidget {
   const TvHomeScreen({super.key});
 
-  openSettings(BuildContext context) {
+  void openSettings(BuildContext context) {
     AutoRouter.of(context).push(const TVSettingsRoute());
   }
 
-  openPopular(BuildContext context) {
+  void openPopular(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
     AutoRouter.of(context).push(TvGridRoute(
         paginatedVideoList: SingleEndpointList(service.getPopular),
         title: locals.popular));
   }
 
-  openTrending(BuildContext context) {
+  void openTrending(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
     AutoRouter.of(context).push(TvGridRoute(
         paginatedVideoList: SingleEndpointList(service.getTrending),
         title: locals.trending));
   }
 
-  openSubscriptions(BuildContext context) {
+  void openSubscriptions(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
     AutoRouter.of(context).push(TvGridRoute(
         paginatedVideoList: SubscriptionVideoList(),
         title: locals.subscriptions));
   }
 
-  openSearch(BuildContext context) {
+  void openSearch(BuildContext context) {
     AutoRouter.of(context).push(const TvSearchRoute());
   }
 
-  openPlaylists(BuildContext context) {
+  void openPlaylists(BuildContext context) {
     AutoRouter.of(context).push(TvPlaylistGridRoute(
         playlistList: SingleEndpointList(service.getUserPlaylists)));
   }
 
-  openHistory(BuildContext context) {
+  void openHistory(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
     AutoRouter.of(context).push(TvGridRoute(
         paginatedVideoList: PaginatedHistoryVideoList(),

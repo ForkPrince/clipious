@@ -22,13 +22,13 @@ class ServerListSettingsCubit extends Cubit<ServerListSettingsState> {
     // getPublicServers();
   }
 
-  upsertServer(Server server) async {
+  Future<void> upsertServer(Server server) async {
     await db.upsertServer(server);
 
     await refreshServers();
   }
 
-  refreshServers() async {
+  Future<void> refreshServers() async {
     var dbServers = await db.getServers();
     var servers = state.publicServers
         .where((s) =>
@@ -98,7 +98,7 @@ class ServerListSettingsCubit extends Cubit<ServerListSettingsState> {
         (server.sidCookie?.isNotEmpty ?? false);
   }
 
-  saveServer(Server server) async {
+  Future<void> saveServer(Server server) async {
     await db.upsertServer(server);
     if (state.dbServers.isEmpty) {
       switchServer(server);
@@ -106,7 +106,7 @@ class ServerListSettingsCubit extends Cubit<ServerListSettingsState> {
     await refreshServers();
   }
 
-  switchServer(Server s) async {
+  Future<void> switchServer(Server s) async {
     await db.useServer(s);
     await fileDb.useServer(s);
     await refreshServers();

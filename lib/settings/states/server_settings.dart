@@ -14,7 +14,7 @@ class ServerSettingsCubit extends Cubit<ServerSettingsState> {
     canDelete();
   }
 
-  useServer(bool value) async {
+  Future<void> useServer(bool value) async {
     await db.useServer(state.server);
     await fileDb.useServer(state.server);
     Server s = state.server.copyWith(inUse: true);
@@ -22,7 +22,7 @@ class ServerSettingsCubit extends Cubit<ServerSettingsState> {
     app.setServer(state.server);
   }
 
-  addHeader(String key, String value) {
+  void addHeader(String key, String value) {
     final Map<String, String> headers = Map.from(state.server.customHeaders);
     headers[key] = value;
     emit(state.copyWith.server(customHeaders: headers));
@@ -30,7 +30,7 @@ class ServerSettingsCubit extends Cubit<ServerSettingsState> {
     fileDb.upsertServer(state.server);
   }
 
-  removeHeader(String key) {
+  void removeHeader(String key) {
     final Map<String, String> headers = Map.from(state.server.customHeaders);
     headers.remove(key);
     emit(state.copyWith.server(customHeaders: headers));
@@ -78,7 +78,7 @@ class ServerSettingsCubit extends Cubit<ServerSettingsState> {
     }
   }
 
-  deleteServer() async {
+  Future<void> deleteServer() async {
     await db.deleteServer(state.server);
 
     Server currentServer = await db.getCurrentlySelectedServer();

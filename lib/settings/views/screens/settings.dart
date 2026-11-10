@@ -12,7 +12,7 @@ import 'package:settings_ui/settings_ui.dart';
 
 import '../../states/settings.dart';
 
-settingsTheme(ColorScheme colorScheme) => SettingsThemeData(
+SettingsThemeData settingsTheme(ColorScheme colorScheme) => SettingsThemeData(
     settingsSectionBackground: colorScheme.surface,
     settingsListBackground: colorScheme.surface,
     titleTextColor: colorScheme.primary,
@@ -25,27 +25,27 @@ settingsTheme(ColorScheme colorScheme) => SettingsThemeData(
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
-  manageServers(BuildContext context) {
+  void manageServers(BuildContext context) {
     AutoRouter.of(context).push(const ManageServersRoute());
   }
 
-  openAppLogs(BuildContext context) {
+  void openAppLogs(BuildContext context) {
     AutoRouter.of(context).push(const AppLogsRoute());
   }
 
-  openNotificationSettings(BuildContext context) {
+  void openNotificationSettings(BuildContext context) {
     AutoRouter.of(context).push(const NotificationSettingsRoute());
   }
 
-  openBrowsingSettings(BuildContext context) {
+  void openBrowsingSettings(BuildContext context) {
     AutoRouter.of(context).push(const BrowsingSettingsRoute());
   }
 
-  openVideoPlayerSettings(BuildContext context) {
+  void openVideoPlayerSettings(BuildContext context) {
     AutoRouter.of(context).push(const VideoPlayerSettingsRoute());
   }
 
-  openAppearanceSettings(BuildContext context) {
+  void openAppearanceSettings(BuildContext context) {
     AutoRouter.of(context).push(const AppearanceSettingsRoute());
   }
 

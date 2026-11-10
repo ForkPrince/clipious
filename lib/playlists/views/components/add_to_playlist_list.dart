@@ -30,7 +30,7 @@ class AddToPlaylistList extends StatelessWidget {
 class AddPlayListButton extends StatelessWidget {
   const AddPlayListButton({super.key});
 
-  addPlaylistDialog(BuildContext context) {
+  void addPlaylistDialog(BuildContext context) {
     var cubit = context.read<PlaylistListCubit>();
     showDialog<String>(
         useRootNavigator: false,
@@ -64,7 +64,7 @@ class _AddPlayListFormState extends State<AddPlayListForm> {
   final TextEditingController nameController = TextEditingController(text: '');
   String privacyValue = 'public';
 
-  addPlaylist(BuildContext context) async {
+  Future<void> addPlaylist(BuildContext context) async {
     var locals = AppLocalizations.of(context)!;
     try {
       var id =

@@ -117,8 +117,6 @@ class AppRouter extends RootStackRouter {
 
   @override
   void pop<T extends Object?>([T? result]) {
-    print('YOOOO');
-    // TODO: implement pop
     super.pop(result);
   }
 

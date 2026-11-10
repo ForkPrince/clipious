@@ -23,7 +23,7 @@ class TvPlayerControls extends StatelessWidget {
   const TvPlayerControls(
       {super.key, this.focusNode, this.onEnterRecommendations});
 
-  onVideoQueueSelected(
+  void onVideoQueueSelected(
       BuildContext context, TvPlayerControlsCubit cubit, Video video) {
     cubit.playFromQueue(video);
   }

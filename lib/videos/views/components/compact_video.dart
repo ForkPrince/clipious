@@ -95,7 +95,7 @@ class CompactVideo extends StatelessWidget {
                                   ? VideoThumbnailView(
                                       videoId: videoId,
                                       thumbnails: video!.thumbnails,
-                                      child: video!.isUpcoming
+                                      child: (video!.isUpcoming ?? false)
                                           ? null
                                           : Align(
                                               alignment: Alignment.bottomRight,

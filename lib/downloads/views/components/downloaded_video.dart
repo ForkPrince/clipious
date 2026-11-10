@@ -15,7 +15,7 @@ class DownloadedVideoView extends StatelessWidget {
 
   const DownloadedVideoView({super.key, required this.video});
 
-  openVideoSheet(BuildContext context, DownloadedVideo v) {
+  void openVideoSheet(BuildContext context, DownloadedVideo v) {
     var cubit = context.read<DownloadManagerCubit>();
     final locals = AppLocalizations.of(context)!;
     showSafeModalBottomSheet(

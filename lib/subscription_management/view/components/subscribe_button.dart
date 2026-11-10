@@ -13,7 +13,7 @@ class SubscribeButton extends StatelessWidget {
   const SubscribeButton(
       {super.key, required this.channelId, required this.subCount});
 
-  static showSubscriptionSheet(BuildContext context) {
+  static void showSubscriptionSheet(BuildContext context) {
     final cubit = context.read<SubscribeButtonCubit>();
     final locals = AppLocalizations.of(context)!;
 

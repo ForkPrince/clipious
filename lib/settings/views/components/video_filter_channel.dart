@@ -17,7 +17,7 @@ class VideoFilterChannel extends StatelessWidget {
 
   const VideoFilterChannel({super.key, required this.filters});
 
-  editFilter(BuildContext context, {required VideoFilter filter}) {
+  void editFilter(BuildContext context, {required VideoFilter filter}) {
     var cubit = context.read<VideoFilterCubit>();
 
     AutoRouter.of(context)

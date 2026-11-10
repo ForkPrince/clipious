@@ -12,7 +12,7 @@ import 'settings.dart';
 class SearchHistorySettingsScreen extends StatelessWidget {
   const SearchHistorySettingsScreen({super.key});
 
-  confirmClear(BuildContext context) {
+  void confirmClear(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
     showDialog(
         context: context,

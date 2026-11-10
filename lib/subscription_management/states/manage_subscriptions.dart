@@ -20,7 +20,7 @@ class ManageSubscriptionCubit extends Cubit<ManageSubscriptionsState> {
     refreshSubs();
   }
 
-  unsubscribe(String authorId) async {
+  Future unsubscribe(String authorId) async {
     bool success = await service.unSubscribe(authorId);
     bool isSubscribed = await service.isSubscribedToChannel(authorId);
 
@@ -33,7 +33,7 @@ class ManageSubscriptionCubit extends Cubit<ManageSubscriptionsState> {
     refreshSubs();
   }
 
-  refreshSubs() async {
+  Future<void> refreshSubs() async {
     final isLoggedIn = await service.isLoggedIn();
     emit(state.copyWith(loading: true));
     List<Subscription> subs = [];
@@ -49,7 +49,7 @@ class ManageSubscriptionCubit extends Cubit<ManageSubscriptionsState> {
         offlineSubs: offlineSubs));
   }
 
-  unsubscribeOffline(String channelId) async {
+  Future<void> unsubscribeOffline(String channelId) async {
     await db.deleteOfflineSubscription(channelId);
     refreshSubs();
   }

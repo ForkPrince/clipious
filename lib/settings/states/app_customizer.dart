@@ -7,7 +7,7 @@ class AppCustomizerCubit extends Cubit<List<HomeDataSource>> {
 
   AppCustomizerCubit(super.initialState, this.settings);
 
-  updateSource(HomeDataSource source, bool value) async {
+  Future<void> updateSource(HomeDataSource source, bool value) async {
     var state = List.of(this.state);
 
     if (!value) {

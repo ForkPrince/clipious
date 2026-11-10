@@ -12,7 +12,7 @@ import 'package:settings_ui/settings_ui.dart';
 class VideoPlayerSettingsScreen extends StatelessWidget {
   const VideoPlayerSettingsScreen({super.key});
 
-  openSponsorBlockSettings(BuildContext context) {
+  void openSponsorBlockSettings(BuildContext context) {
     AutoRouter.of(context).push(const SponsorBlockSettingsRoute());
   }
 

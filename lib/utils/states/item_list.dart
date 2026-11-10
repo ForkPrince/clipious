@@ -38,12 +38,12 @@ class ItemListCubit<T> extends Cubit<ItemListState<T>> {
     super.close();
   }
 
-  onReady() {
+  void onReady() {
     getItems();
     scrollController.addListener(onScrollEvent);
   }
 
-  onScrollEvent() {
+  void onScrollEvent() {
     if (scrollController.hasClients) {
       if (scrollController.position.maxScrollExtent * 0.9 <
           scrollController.offset) {
@@ -53,7 +53,7 @@ class ItemListCubit<T> extends Cubit<ItemListState<T>> {
     }
   }
 
-  getMoreItems() async {
+  Future<void> getMoreItems() async {
     if (!state.loading && state.itemList.getHasMore()) {
       loadItems(() async {
         List<T> items = await state.itemList.getMoreItems();
@@ -63,7 +63,7 @@ class ItemListCubit<T> extends Cubit<ItemListState<T>> {
     }
   }
 
-  refreshItems() async {
+  Future<void> refreshItems() async {
     loadItems(state.itemList.refresh);
   }
 
@@ -75,11 +75,11 @@ class ItemListCubit<T> extends Cubit<ItemListState<T>> {
     }
   }
 
-  getItems() async {
+  Future<void> getItems() async {
     loadItems(state.itemList.getItems);
   }
 
-  loadItems(Future<List<T>> Function() refreshFunction) async {
+  Future<void> loadItems(Future<List<T>> Function() refreshFunction) async {
     emit(state.copyWith(error: ItemListErrors.none, loading: true));
     try {
       var items = await refreshFunction();
@@ -101,7 +101,7 @@ class ItemListCubit<T> extends Cubit<ItemListState<T>> {
   }
 
   // similar
-  focusChanged(bool value, int index) {}
+  void focusChanged(bool value, int index) {}
 }
 
 @freezed

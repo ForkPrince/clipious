@@ -106,6 +106,7 @@ sealed class Playlist with _$Playlist {
       bool? isListed,
       int? updated,
       @Default([]) List<Video> videos,
+      // ignore: invalid_annotation_target
       @JsonKey(includeToJson: false, includeFromJson: false)
       @Default(0)
       int removedByFilter}) = _Playlist;

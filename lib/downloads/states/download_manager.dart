@@ -31,11 +31,11 @@ class DownloadProgress {
 
   DownloadProgress(this.cancelToken);
 
-  addListener(Function(double progress) f) {
+  void addListener(Function(double progress) f) {
     listeners.add(f);
   }
 
-  removeListener(Function(double progress) f) {
+  void removeListener(Function(double progress) f) {
     listeners.remove(f);
   }
 }
@@ -47,11 +47,11 @@ class DownloadManagerCubit extends Cubit<DownloadManagerState> {
     onReady();
   }
 
-  onReady() {
+  void onReady() {
     setVideos();
   }
 
-  setVideos() async {
+  Future<void> setVideos() async {
     var vids = List<DownloadedVideo>.from(db.getAllDownloads());
     // checking if we have any video that are not fail, not completed and not currently downloading
     for (int i = 0; i < vids.length; i++) {
@@ -76,7 +76,7 @@ class DownloadManagerCubit extends Cubit<DownloadManagerState> {
         .toList());
   }
 
-  onProgress(int count, int total, DownloadedVideo video,
+  Future<void> onProgress(int count, int total, DownloadedVideo video,
       {required int step, required int totalSteps}) async {
     if (count == total && step == totalSteps) {
       var progresses =

@@ -9,7 +9,7 @@ final log = Logger('WelcomeWizard');
 class WelcomeWizardCubit extends Cubit<Server?> {
   WelcomeWizardCubit(super.initialState);
 
-  getSelectedServer() async {
+  Future<void> getSelectedServer() async {
     try {
       emit(await db.getCurrentlySelectedServer());
       log.info('selected server ${state?.url}');

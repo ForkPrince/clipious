@@ -64,37 +64,37 @@ class TvPlayerSettingsCubit extends Cubit<TvPlayerSettingsState> {
 
   BetterPlayerController? get videoController => player.videoController;
 
-  videoButtonFocusChange(bool focus) {
+  void videoButtonFocusChange(bool focus) {
     if (focus) {
       emit(state.copyWith(selected: Tabs.video));
     }
   }
 
-  audioButtonFocusChange(bool focus) {
+  void audioButtonFocusChange(bool focus) {
     if (focus) {
       emit(state.copyWith(selected: Tabs.audio));
     }
   }
 
-  captionsButtonFocusChange(bool focus) {
+  void captionsButtonFocusChange(bool focus) {
     if (focus) {
       emit(state.copyWith(selected: Tabs.captions));
     }
   }
 
-  sleepTimerButtonFocusChange(bool focus) {
+  void sleepTimerButtonFocusChange(bool focus) {
     if (focus) {
       emit(state.copyWith(selected: Tabs.sleepTimer));
     }
   }
 
-  playbackSpeedButtonFocusChange(bool focus) {
+  void playbackSpeedButtonFocusChange(bool focus) {
     if (focus) {
       emit(state.copyWith(selected: Tabs.playbackSpeed));
     }
   }
 
-  changeVideoTrack(String selected) {
+  void changeVideoTrack(String selected) {
     log.fine('Video quality selected $selected');
 
     if (settings.state.useDash) {
@@ -114,7 +114,7 @@ class TvPlayerSettingsCubit extends Cubit<TvPlayerSettingsState> {
     }
   }
 
-  changeChangeAudioTrack(String selected) {
+  void changeChangeAudioTrack(String selected) {
     log.fine('Audio quality selected $selected');
     BetterPlayerAsmsAudioTrack? track = videoController
         ?.betterPlayerAsmsAudioTracks
@@ -126,7 +126,7 @@ class TvPlayerSettingsCubit extends Cubit<TvPlayerSettingsState> {
     }
   }
 
-  changeSubtitles(String selected) {
+  void changeSubtitles(String selected) {
     log.fine('Subtitles selected $selected');
     BetterPlayerSubtitlesSource? track = videoController
         ?.betterPlayerSubtitlesSourceList
@@ -140,7 +140,7 @@ class TvPlayerSettingsCubit extends Cubit<TvPlayerSettingsState> {
     }
   }
 
-  changePlaybackSpeed(String selected) {
+  void changePlaybackSpeed(String selected) {
     String speed = selected.replaceAll('x', '');
     videoController?.setSpeed(double.parse(speed));
   }

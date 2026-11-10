@@ -9,7 +9,7 @@ part 'single_comment.freezed.dart';
 class SingleCommentCubit extends Cubit<SingleCommentState> {
   SingleCommentCubit(super.initialState);
 
-  toggleShowChildren() {
+  void toggleShowChildren() {
     var state = this.state.copyWith();
     emit(state.copyWith(showingChildren: !state.showingChildren));
   }

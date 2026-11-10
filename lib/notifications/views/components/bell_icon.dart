@@ -18,7 +18,7 @@ class BellIcon<T> extends StatelessWidget {
 
   const BellIcon({super.key, required this.itemId, required this.type});
 
-  toggleNotifications(BuildContext context) async {
+  Future<void> toggleNotifications(BuildContext context) async {
     var cubit = context.read<BellIconCubit>();
     var result = await cubit.toggle();
     switch (result) {

@@ -80,7 +80,7 @@ class VideoFilterSetupScreen extends StatelessWidget {
           ];
   }
 
-  searchChannel(BuildContext context) {
+  void searchChannel(BuildContext context) {
     var cubit = context.read<VideoFilterEditCubit>();
     var locals = AppLocalizations.of(context)!;
     SelectList.show<Channel>(context,
@@ -90,7 +90,7 @@ class VideoFilterSetupScreen extends StatelessWidget {
         title: locals.channel);
   }
 
-  selectTime(BuildContext context, String initialTime,
+  Future<void> selectTime(BuildContext context, String initialTime,
       Function(String newTime) onNewTime) async {
     var split = initialTime.split(":");
     if (split.length == 3) {

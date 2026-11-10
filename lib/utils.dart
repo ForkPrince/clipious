@@ -232,7 +232,7 @@ double getGridAspectRatio(BuildContext context) {
   return 16 / (9 + labelHeight * scale);
 }
 
-okCancelDialog(
+void okCancelDialog(
     BuildContext context, String title, String message, Function() onOk) {
   var locals = AppLocalizations.of(context)!;
   showDialog(
@@ -263,7 +263,7 @@ okCancelDialog(
   );
 }
 
-showTvAlertdialog(BuildContext context, String title, List<Widget> body) {
+void showTvAlertdialog(BuildContext context, String title, List<Widget> body) {
   var locals = AppLocalizations.of(context)!;
   showTvDialog(context: context, builder: (context) => body, actions: [
     TvButton(
@@ -279,7 +279,7 @@ showTvAlertdialog(BuildContext context, String title, List<Widget> body) {
   ]);
 }
 
-showTvDialog(
+void showTvDialog(
     {required BuildContext context,
     String? title,
     required List<Widget> Function(BuildContext context) builder,

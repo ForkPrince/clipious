@@ -67,7 +67,7 @@ class VideoCubit extends Cubit<VideoState> {
     }
   }
 
-  getDownloadStatus() {
+  void getDownloadStatus() {
     var downloadedVideo = db.getDownloadByVideoId(state.videoId);
     initStreamListener();
     if (!isClosed) emit(state.copyWith(downloadedVideo: downloadedVideo));
@@ -82,11 +82,11 @@ class VideoCubit extends Cubit<VideoState> {
     super.close();
   }
 
-  onDownload() {
+  void onDownload() {
     emit(state.copyWith(downloading: true, downloadProgress: 0));
   }
 
-  onDownloadProgress(double progress) {
+  void onDownloadProgress(double progress) {
     if (state.video != null) {
       late bool downloading;
       if (progress < 1) {
@@ -100,13 +100,13 @@ class VideoCubit extends Cubit<VideoState> {
     }
   }
 
-  initStreamListener() {
+  void initStreamListener() {
     if (downloadManager.state.downloadProgresses.containsKey(state.videoId)) {
       downloadManager.addListener(state.videoId, onDownloadProgress);
     }
   }
 
-  togglePlayRecommendedNext(bool? value) {
+  void togglePlayRecommendedNext(bool? value) {
     settings.setPlayRecommendedNext(value ?? false);
   }
 

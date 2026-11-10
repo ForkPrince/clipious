@@ -24,11 +24,11 @@ class VideoInfo extends StatelessWidget {
       this.titleAndChannelInfo = true,
       this.descriptionAndTags = true});
 
-  openChannel(BuildContext context) {
+  void openChannel(BuildContext context) {
     AutoRouter.of(context).push(ChannelRoute(channelId: video.authorId!));
   }
 
-  showSearchWindow(BuildContext context, String query) {
+  void showSearchWindow(BuildContext context, String query) {
     AutoRouter.of(context).push(SearchRoute(
       query: query,
       searchNow: true,

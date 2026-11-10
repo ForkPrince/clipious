@@ -27,7 +27,7 @@ class AddToPlaylistCubit extends Cubit<AddToPlaylistController> {
         0;
   }
 
-  addToPlaylist(String playlistId) async {
+  Future<void> addToPlaylist(String playlistId) async {
     await service.addVideoToPlaylist(playlistId, state.videoId);
     onReady();
   }
@@ -39,7 +39,7 @@ class AddToPlaylistCubit extends Cubit<AddToPlaylistController> {
     await checkVideoLikeStatus();
   }
 
-  getAllPlaylists() async {
+  Future<void> getAllPlaylists() async {
     emit(state.copyWith(loading: true));
     late List<Playlist> playlists;
     if (state.isLoggedIn) {
@@ -57,7 +57,7 @@ class AddToPlaylistCubit extends Cubit<AddToPlaylistController> {
     return pl;
   }
 
-  checkVideoLikeStatus() async {
+  Future<void> checkVideoLikeStatus() async {
     Playlist? p = await likePlaylist();
     Video? video = p?.videos
         .firstWhereOrNull((element) => element.videoId == state.videoId);
@@ -76,7 +76,7 @@ class AddToPlaylistCubit extends Cubit<AddToPlaylistController> {
     return likePlaylist();
   }
 
-  countPlaylistsForVideo() async {
+  Future<void> countPlaylistsForVideo() async {
     int playListCount = state.playlists
         .where((list) =>
             list.videos.indexWhere((video) => video.videoId == state.videoId) >=
@@ -115,7 +115,7 @@ class AddToPlaylistCubit extends Cubit<AddToPlaylistController> {
     onReady();
   }
 
-  saveVideoToPlaylist(String selectedPlaylistId) async {
+  Future<void> saveVideoToPlaylist(String selectedPlaylistId) async {
     await service.addVideoToPlaylist(selectedPlaylistId, state.videoId);
     await onReady();
   }

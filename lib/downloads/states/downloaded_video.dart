@@ -59,7 +59,7 @@ class DownloadedVideoCubit extends Cubit<DownloadedVideoState> {
       await setThumbnail();
     }
     if (progress == 1) {
-      await setComplete();
+      setComplete();
     }
     emit(state.copyWith(progress: progress));
   }
@@ -77,7 +77,7 @@ class DownloadedVideoCubit extends Cubit<DownloadedVideoState> {
     }
   }
 
-  setComplete() {
+  void setComplete() {
     log.fine("Video ${state.video!.videoId} download complete");
     var downloadById = db.getDownloadByVideoId(state.video!.videoId);
     emit(state.copyWith(progress: 1, video: downloadById));

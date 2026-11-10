@@ -6,7 +6,7 @@ part 'comments_container.freezed.dart';
 class CommentsContainerCubit extends Cubit<CommentsContainerState> {
   CommentsContainerCubit(super.initialState);
 
-  changeSorting(String? value) {
+  void changeSorting(String? value) {
     var state = this.state.copyWith();
     if (value != state.sortBy) {
       emit(state.copyWith(sortBy: value ?? 'top'));

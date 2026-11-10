@@ -15,14 +15,14 @@ import '../../videos/models/db/history_video_cache.dart';
 import '../../videos/models/db/progress.dart';
 
 abstract class IDbClient {
-  close();
+  Future<void> close();
 
   Server? getServer(String url);
 
   /// Call super at the end
   @mustCallSuper
   @mustBeOverridden
-  upsertServer(Server server) async {
+  Future<void> upsertServer(Server server) async {
     var servers = await getServers();
     if (servers.length == 1) {
       await useServer(server);
@@ -31,22 +31,22 @@ abstract class IDbClient {
 
   Future<List<Server>> getServers();
 
-  deleteServerById(Server server);
+  Future<void> deleteServerById(Server server);
 
-  deleteServer(Server server) async {
+  Future<void> deleteServer(Server server) async {
     if ((await getServers()).length >= 2) {
       await deleteServerById(server);
       if (server.inUse) {
-        getCurrentlySelectedServer();
+        await getCurrentlySelectedServer();
       }
     }
   }
 
-  saveSetting(SettingsValue setting);
+  Future<void> saveSetting(SettingsValue setting);
 
   List<SettingsValue> getAllSettings();
 
-  deleteSetting(String name);
+  Future<void> deleteSetting(String name);
 
   SettingsValue? getSettings(String name);
 
@@ -76,7 +76,7 @@ abstract class IDbClient {
 
   double getVideoProgress(String videoId);
 
-  saveProgress(Progress progress);
+  Future<void> saveProgress(Progress progress);
 
   Future<void> useServer(Server server);
 

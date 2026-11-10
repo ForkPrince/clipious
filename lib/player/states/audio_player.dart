@@ -40,7 +40,7 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
     audioPlayer?.dispose();
   }
 
-  initPlayer() {
+  void initPlayer() {
     if (audioPlayer == null) {
       audioPlayer = AudioPlayer();
       audioPlayer?.playerStateStream.listen(onStateStreamChange,
@@ -53,7 +53,7 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
     }
   }
 
-  onStateStreamChange(PlayerState state) {
+  void onStateStreamChange(PlayerState state) {
     log.fine('Player state event $state');
     switch (state.processingState) {
       case ProcessingState.idle:
@@ -75,7 +75,7 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
     }
   }
 
-  onDurationChanged(Duration? duration) async {
+  Future<void> onDurationChanged(Duration? duration) async {
     emit(state.copyWith(loading: false));
     if (!isClosed) emit(state);
     player.setEvent(MediaEvent(
@@ -84,7 +84,7 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
         value: duration ?? const Duration(seconds: 1)));
   }
 
-  onPositionChanged(Duration position) {
+  void onPositionChanged(Duration position) {
     EasyThrottle.throttle('audio-progress', const Duration(seconds: 1), () {
       emit(state.copyWith(audioPosition: position));
       player.setEvent(MediaEvent(
@@ -290,9 +290,7 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
   }
 
   @override
-  selectAudioTrack(int index) {
-    return 0;
-  }
+  void selectAudioTrack(int index) {}
 
   @override
   selectSubtitle(int index) {}

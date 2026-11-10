@@ -27,7 +27,7 @@ class AddToPlayListButton extends StatelessWidget {
       this.type = AddToPlayListButtonType.appBar,
       this.afterAdd});
 
-  showAddToPlaylistDialog(BuildContext context) {
+  void showAddToPlaylistDialog(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
     var cubit = context.read<AddToPlaylistCubit>();
     AddToPlaylistDialog.showAddToPlaylistDialog(context,

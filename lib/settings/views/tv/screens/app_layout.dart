@@ -11,7 +11,7 @@ import 'package:clipious/utils/views/tv/components/tv_overscan.dart';
 class TvAppLayoutSettingsScreen extends StatelessWidget {
   const TvAppLayoutSettingsScreen({super.key});
 
-  toggleDataSource(BuildContext context, HomeDataSource ds) async {
+  Future<void> toggleDataSource(BuildContext context, HomeDataSource ds) async {
     var settings = context.read<SettingsCubit>();
     var current = settings.state.appLayout;
     var defaults = HomeDataSource.defaultSettings();

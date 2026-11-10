@@ -51,7 +51,7 @@ enum NotificationTypes {
       this.importance = NotificationImportance.Default});
 }
 
-initializeNotifications() {
+void initializeNotifications() {
   var defaultIcon = 'resource://drawable/app_icon';
   AwesomeNotifications().initialize(
       defaultIcon,
@@ -135,7 +135,7 @@ class NotificationController {
 // Your code goes here
 }
 
-sendNotification(String title, String message,
+Future<void> sendNotification(String title, String message,
     {required NotificationTypes type,
     Map<String, String>? payload,
     int id = 0}) async {

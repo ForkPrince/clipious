@@ -57,7 +57,7 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
     }
   }
 
-  forwardEvent(BetterPlayerEvent event) {
+  void forwardEvent(BetterPlayerEvent event) {
     MediaEventType? type;
     MediaState mediaState = MediaState.playing;
 
@@ -140,7 +140,7 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
     player.setEvent(MediaEvent(state: mediaState, type: type));
   }
 
-  onVideoListener(BetterPlayerEvent event) {
+  void onVideoListener(BetterPlayerEvent event) {
     forwardEvent(event);
 
     switch (event.betterPlayerEventType) {
@@ -542,10 +542,8 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
     final tracks = videoController?.betterPlayerSubtitlesSourceList;
     if (tracks == null || index < 0 || index >= tracks.length) return;
     var sub = tracks[index];
-    if (sub != null) {
-      videoController?.setupSubtitleSource(sub, sourceInitialize: true);
+    videoController?.setupSubtitleSource(sub, sourceInitialize: true);
     }
-  }
 
   @override
   selectVideoTrack(int index) {

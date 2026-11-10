@@ -13,7 +13,7 @@ class TvExpandableText extends StatelessWidget {
   const TvExpandableText(
       {super.key, required this.text, this.maxLines, this.fontSize});
 
-  showText(BuildContext context) {
+  void showText(BuildContext context) {
     AutoRouter.of(context).push(TvPlainTextRoute(text: text));
   }
 

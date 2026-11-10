@@ -48,38 +48,44 @@ class SearchFiltersButton extends StatelessWidget {
                     content: SingleChildScrollView(
                       child: ListBody(children: <Widget>[
                         Text(locals.searchUploadDate),
-                        ...SearchDate.values.map((value) {
-                          return ListTile(
-                            title: Text(value.getLabel(locals)),
-                            leading: Radio<SearchDate>(
-                              value: value,
-                              groupValue: state.date,
-                              onChanged: onDateChanged,
-                            ),
-                          );
-                        }),
+                        RadioGroup<SearchDate>(
+                          groupValue: state.date,
+                          onChanged: onDateChanged,
+                          child: Column(
+                            children: SearchDate.values
+                                .map((value) => RadioListTile<SearchDate>(
+                                      title: Text(value.getLabel(locals)),
+                                      value: value,
+                                    ))
+                                .toList(),
+                          ),
+                        ),
                         Text(locals.searchDuration),
-                        ...SearchDuration.values.map((value) {
-                          return ListTile(
-                            title: Text(value.getLabel(locals)),
-                            leading: Radio<SearchDuration>(
-                              value: value,
-                              groupValue: state.duration,
-                              onChanged: onDurationChanged,
-                            ),
-                          );
-                        }),
+                        RadioGroup<SearchDuration>(
+                          groupValue: state.duration,
+                          onChanged: onDurationChanged,
+                          child: Column(
+                            children: SearchDuration.values
+                                .map((value) => RadioListTile<SearchDuration>(
+                                      title: Text(value.getLabel(locals)),
+                                      value: value,
+                                    ))
+                                .toList(),
+                          ),
+                        ),
                         Text(locals.searchSortBy),
-                        ...SearchSortBy.values.map((value) {
-                          return ListTile(
-                            title: Text(value.getLabel(locals)),
-                            leading: Radio<SearchSortBy>(
-                              value: value,
-                              groupValue: state.sortBy,
-                              onChanged: onSortByChanged,
-                            ),
-                          );
-                        }),
+                        RadioGroup<SearchSortBy>(
+                          groupValue: state.sortBy,
+                          onChanged: onSortByChanged,
+                          child: Column(
+                            children: SearchSortBy.values
+                                .map((value) => RadioListTile<SearchSortBy>(
+                                      title: Text(value.getLabel(locals)),
+                                      value: value,
+                                    ))
+                                .toList(),
+                          ),
+                        ),
                       ]),
                     ),
                     actions: <Widget>[

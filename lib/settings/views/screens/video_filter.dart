@@ -14,7 +14,7 @@ import '../../states/video_filter.dart';
 class VideoFilterSettingsScreen extends StatelessWidget {
   const VideoFilterSettingsScreen({super.key});
 
-  createFilter(BuildContext context, {String? channelId}) {
+  void createFilter(BuildContext context, {String? channelId}) {
     var cubit = context.read<VideoFilterCubit>();
 
     AutoRouter.of(context)

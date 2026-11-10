@@ -10,7 +10,7 @@ import 'package:clipious/utils.dart';
 class ChannelNotificationList extends StatelessWidget {
   const ChannelNotificationList({super.key});
 
-  deleteNotification(BuildContext context, ChannelNotification notif) {
+  void deleteNotification(BuildContext context, ChannelNotification notif) {
     var cubit = context.read<ChannelNotificationListCubit>();
     var locals = AppLocalizations.of(context)!;
     okCancelDialog(

@@ -11,15 +11,15 @@ class SearchFiltersCubit<T extends SearchFiltersState>
     extends Cubit<SearchFiltersState> {
   SearchFiltersCubit(super.initialState);
 
-  setDate(SearchDate? newValue) {
+  void setDate(SearchDate? newValue) {
     emit(state.copyWith(date: newValue ?? SearchDate.any));
   }
 
-  setDuration(SearchDuration? newValue) {
+  void setDuration(SearchDuration? newValue) {
     emit(state.copyWith(duration: newValue ?? SearchDuration.any));
   }
 
-  setSortBy(SearchSortBy? newValue) {
+  void setSortBy(SearchSortBy? newValue) {
     emit(state.copyWith(sortBy: newValue ?? SearchSortBy.relevance));
   }
 }
@@ -27,7 +27,7 @@ class SearchFiltersCubit<T extends SearchFiltersState>
 @freezed
 sealed class SearchFiltersState with _$SearchFiltersState {
   const factory SearchFiltersState(
-      {@Default(SearchDate.any) date,
-      @Default(SearchDuration.any) duration,
-      @Default(SearchSortBy.relevance) sortBy}) = _SearchFiltersState;
+      {@Default(SearchDate.any) SearchDate date,
+      @Default(SearchDuration.any) SearchDuration duration,
+      @Default(SearchSortBy.relevance) SearchSortBy sortBy}) = _SearchFiltersState;
 }

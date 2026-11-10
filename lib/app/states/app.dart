@@ -23,7 +23,7 @@ class AppCubit extends Cubit<AppState> {
     initState();
   }
 
-  initState() async {
+  Future<void> initState() async {
     Server? server;
     try {
       server = await db.getCurrentlySelectedServer();
@@ -42,7 +42,7 @@ class AppCubit extends Cubit<AppState> {
         firstIndex: firstIndex, homeLayout: homeLayout, server: server));
   }
 
-  onReady() async {
+  Future<void> onReady() async {
     intentDataStreamSubscription =
         ReceiveSharingIntent.instance.getMediaStream().listen((shared) {
       final String? value = shared
@@ -114,19 +114,19 @@ class AppCubit extends Cubit<AppState> {
     }
   }
 
-  selectIndex(int index) {
+  void selectIndex(int index) {
     emit(state.copyWith(firstIndex: index));
   }
 
-  rebuildApp() {
+  void rebuildApp() {
     emit(state.copyWith());
   }
 
-  setServer(Server s) {
+  void setServer(Server s) {
     emit(state.copyWith(server: s, firstIndex: 0));
   }
 
-  updateLayout() {
+  void updateLayout() {
     emit(state.copyWith(homeLayout: db.getHomeLayout()));
   }
 
@@ -135,7 +135,7 @@ class AppCubit extends Cubit<AppState> {
       (state.server?.sidCookie?.isNotEmpty ?? false);
 
   // Set the whole app in a loading state.
-  setGlobalLoading(bool loading) {
+  void setGlobalLoading(bool loading) {
     emit(state.copyWith(globalLoading: loading));
   }
 }

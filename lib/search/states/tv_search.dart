@@ -29,15 +29,15 @@ class TvSearchCubit extends Cubit<TvSearchState> {
     return KeyEventResult.ignored;
   }
 
-  setHasVideo(bool hasVideos) {
+  void setHasVideo(bool hasVideos) {
     emit(state.copyWith(hasVideos: hasVideos));
   }
 
-  setHasChannels(bool hasChannels) {
+  void setHasChannels(bool hasChannels) {
     emit(state.copyWith(hasChannels: hasChannels));
   }
 
-  setHasPlaylists(bool hasPlaylists) {
+  void setHasPlaylists(bool hasPlaylists) {
     emit(state.copyWith(hasPlaylists: hasPlaylists));
   }
 }

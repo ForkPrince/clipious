@@ -29,7 +29,7 @@ class ChannelCubit extends Cubit<ChannelController> {
   }
 */
 
-  toggleSubscription() async {
+  Future<void> toggleSubscription() async {
     var state = this.state.copyWith();
     if (state.channel != null) {
       if (state.isSubscribed) {

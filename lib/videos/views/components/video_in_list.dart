@@ -41,7 +41,7 @@ class VideoListItem extends StatelessWidget {
       : assert(video == null || offlineVideo == null,
             'cannot provide both video and offline video\n');
 
-  openVideo(BuildContext context) {
+  void openVideo(BuildContext context) {
     if (video != null) {
       if (openVideoOverride != null) {
         openVideoOverride!(context, video!);

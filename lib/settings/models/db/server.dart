@@ -13,8 +13,11 @@ sealed class Server with _$Server {
       {required String url,
       String? authToken,
       String? sidCookie,
+      // ignore: invalid_annotation_target
       @JsonKey(includeFromJson: false, includeToJson: false) Duration? ping,
+      // ignore: invalid_annotation_target
       @JsonKey(includeFromJson: false, includeToJson: false) String? flag,
+      // ignore: invalid_annotation_target
       @JsonKey(includeFromJson: false, includeToJson: false) String? region,
       @Default({}) Map<String, String> customHeaders,
       @Default(false) bool inUse}) = _Server;

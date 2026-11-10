@@ -24,7 +24,7 @@ class AddToPlaylistDialog extends StatelessWidget {
       required this.playlists,
       required this.onAdd});
 
-  static showAddToPlaylistDialog(BuildContext context,
+  static void showAddToPlaylistDialog(BuildContext context,
       {required String videoId,
       required List<Playlist> playlists,
       required Function(String selectedPlaylistId) onAdd}) {
@@ -41,7 +41,7 @@ class AddToPlaylistDialog extends StatelessWidget {
         });
   }
 
-  addToPlaylist(BuildContext context, String playlistId) async {
+  Future<void> addToPlaylist(BuildContext context, String playlistId) async {
     var locals = AppLocalizations.of(context)!;
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     try {
@@ -63,7 +63,7 @@ class AddToPlaylistDialog extends StatelessWidget {
     }
   }
 
-  newPlaylistAndAdd(BuildContext context) {
+  void newPlaylistAndAdd(BuildContext context) {
     showDialog<String>(
         context: context,
         useRootNavigator: false,
@@ -73,7 +73,7 @@ class AddToPlaylistDialog extends StatelessWidget {
             ));
   }
 
-  openServerSettings(BuildContext context) async {
+  Future<void> openServerSettings(BuildContext context) async {
     AutoRouter.of(context).push(
         ManageSingleServerRoute(server: await db.getCurrentlySelectedServer()));
   }

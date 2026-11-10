@@ -151,11 +151,6 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String nReplies(num count) {
-    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
-      locale: localeName,
-    );
-    final String countString = countNumberFormat.format(count);
-
     return 'কমেন্টের সংখ্যা';
   }
 

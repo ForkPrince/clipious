@@ -20,7 +20,7 @@ class SingleCommentView extends StatelessWidget {
   const SingleCommentView(
       {super.key, required this.comment, required this.video});
 
-  openChannel(BuildContext context, String authorId) {
+  void openChannel(BuildContext context, String authorId) {
     AutoRouter.of(context).push(ChannelRoute(channelId: authorId));
   }
 

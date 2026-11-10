@@ -16,7 +16,7 @@ import '../components/app_customizer.dart';
 class BrowsingSettingsScreen extends StatelessWidget {
   const BrowsingSettingsScreen({super.key});
 
-  customizeApp(BuildContext context) {
+  void customizeApp(BuildContext context) {
     showDialog(
         barrierDismissible: true,
         useRootNavigator: false,
@@ -25,7 +25,7 @@ class BrowsingSettingsScreen extends StatelessWidget {
             content: SizedBox(width: 300, child: AppCustomizer())));
   }
 
-  customRydInstanceDialog(BuildContext context) async {
+  Future<void> customRydInstanceDialog(BuildContext context) async {
     SettingsCubit cubit = context.read<SettingsCubit>();
     final controller =
         TextEditingController(text: cubit.state.returnYoutubeDislikeUrl);
@@ -105,7 +105,7 @@ class BrowsingSettingsScreen extends StatelessWidget {
     }
   }
 
-  showSelectLanguage(BuildContext context, SettingsState controller) {
+  void showSelectLanguage(BuildContext context, SettingsState controller) {
     var localsList = AppLocalizations.supportedLocales;
     var localsStrings =
         localsList.map((e) => e.nativeDisplayLanguageScript).toList();
@@ -148,7 +148,7 @@ class BrowsingSettingsScreen extends StatelessWidget {
     ];
   }
 
-  searchCountry(BuildContext context, SettingsState controller) {
+  void searchCountry(BuildContext context, SettingsState controller) {
     var locals = AppLocalizations.of(context)!;
     var cubit = context.read<SettingsCubit>();
     var colors = Theme.of(context).colorScheme;
@@ -166,15 +166,15 @@ class BrowsingSettingsScreen extends StatelessWidget {
         title: locals.selectBrowsingCountry);
   }
 
-  openVideoFilterSettings(BuildContext context) {
+  void openVideoFilterSettings(BuildContext context) {
     AutoRouter.of(context).push(const VideoFilterSettingsRoute());
   }
 
-  openSearchHistorySettings(BuildContext context) {
+  void openSearchHistorySettings(BuildContext context) {
     AutoRouter.of(context).push(const SearchHistorySettingsRoute());
   }
 
-  openDearrowSettings(BuildContext context) {
+  void openDearrowSettings(BuildContext context) {
     AutoRouter.of(context).push(const DeArrowSettingsRoute());
   }
 

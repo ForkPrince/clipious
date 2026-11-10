@@ -7,7 +7,7 @@ class TvHomeCubit extends Cubit<bool> {
   ScrollController scrollController = ScrollController();
   TvHomeCubit(super.initialState);
 
-  menuItemFocusChanged(bool focus) {
+  void menuItemFocusChanged(bool focus) {
     if (focus) {
       EasyDebounce.cancel('expand-home-menu');
       emit(true);
@@ -25,7 +25,7 @@ class TvHomeCubit extends Cubit<bool> {
     super.close();
   }
 
-  scrollToTop() {
+  void scrollToTop() {
     scrollController.animateTo(0,
         duration: animationDuration, curve: Curves.easeInOutQuad);
   }

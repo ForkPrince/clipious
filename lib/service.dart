@@ -86,7 +86,7 @@ class Service {
     return kDebugMode ? uri.toString() : '${uri?.replace(host: 'xxxxxxxxxx')}';
   }
 
-  handleResponse(Response response) {
+  dynamic handleResponse(Response response) {
     var body = utf8.decode(response.bodyBytes);
     log.info(
         "Response from ${response.request?.method} ${urlFormatForLog(response.request?.url)}, status: ${response.statusCode}");
@@ -178,7 +178,7 @@ class Service {
     }
   }
 
-  handleErrors(Response response) {}
+  void handleErrors(Response response) {}
 
   Future<Video> getVideo(String videoId, {Server? serverOverride}) async {
     var req = await buildRequest(urlGetVideo,

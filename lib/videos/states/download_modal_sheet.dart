@@ -14,7 +14,7 @@ class DownloadModalSheetCubit extends Cubit<DownloadModalSheetState> {
     init();
   }
 
-  init() async {
+  Future<void> init() async {
     emit(state.copyWith(loading: true));
     final vid = await service.getVideo(video.videoId);
 
@@ -31,11 +31,11 @@ class DownloadModalSheetCubit extends Cubit<DownloadModalSheetState> {
         quality: qualities.last.qualityLabel!));
   }
 
-  setAudioOnly(bool value) {
+  void setAudioOnly(bool value) {
     emit(state.copyWith(audioOnly: value));
   }
 
-  setQuality(String? quality) {
+  void setQuality(String? quality) {
     if (quality != null) {
       emit(state.copyWith(quality: quality));
     }

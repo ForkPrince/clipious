@@ -358,7 +358,7 @@ class TvSearchScreen extends StatelessWidget {
     );
   }
 
-  openChannel(BuildContext context, Channel c) {
+  void openChannel(BuildContext context, Channel c) {
     AutoRouter.of(context).push(TvChannelRoute(channelId: c.authorId));
   }
 }

@@ -16,7 +16,7 @@ class CompactVideoCubit extends Cubit<CompactVideoState> {
     getThumbnail();
   }
 
-  getThumbnail() async {
+  Future<void> getThumbnail() async {
     if (state.offlineVideo != null) {
       try {
         var path = await state.offlineVideo?.thumbnailPath;

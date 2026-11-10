@@ -30,7 +30,7 @@ class PlaylistInList extends StatelessWidget {
       this.thumbnailsHeight = 95,
       this.isTablet = false});
 
-  openPlayList(BuildContext context) {
+  void openPlayList(BuildContext context) {
     var cubit = context.read<PlaylistListCubit>();
     AutoRouter.of(context)
         .push(PlaylistViewRoute(
@@ -38,7 +38,7 @@ class PlaylistInList extends StatelessWidget {
         .then((value) => cubit.refreshPlaylists());
   }
 
-  openTvPlaylist(BuildContext context) {
+  void openTvPlaylist(BuildContext context) {
     AutoRouter.of(context)
         .push(TvPlaylistRoute(playlist: playlist, canDeleteVideos: false));
   }

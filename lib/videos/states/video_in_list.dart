@@ -13,7 +13,7 @@ class VideoInListCubit extends Cubit<VideoInListState> {
     onReady();
   }
 
-  onReady() {
+  void onReady() {
     updateProgress();
     maybeDeArrow();
   }
@@ -31,13 +31,13 @@ class VideoInListCubit extends Cubit<VideoInListState> {
     } catch (_) {}
   }
 
-  updateProgress() {
+  void updateProgress() {
     if (state.video != null) {
       setProgress(db.getVideoProgress(state.video!.videoId));
     }
   }
 
-  setProgress(double progress) {
+  void setProgress(double progress) {
     if (state.video != null) {
       emit(state.copyWith(progress: progress));
     }

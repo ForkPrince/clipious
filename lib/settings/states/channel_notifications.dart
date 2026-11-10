@@ -6,9 +6,9 @@ import 'package:clipious/notifications/models/db/playlist_notifications.dart';
 abstract class NotificationListCubit<T> extends Cubit<List<T>> {
   NotificationListCubit(super.initialState);
 
-  getNotifications();
+  Future<void> getNotifications();
 
-  deleteNotification(T notif);
+  Future<void> deleteNotification(T notif);
 }
 
 class ChannelNotificationListCubit

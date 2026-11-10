@@ -36,7 +36,7 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
     showControls();
   }
 
-  onStreamEvent(MediaEvent event) {
+  void onStreamEvent(MediaEvent event) {
     log.fine('Event: ${event.state}, ${event.type}');
     switch (event.state) {
       case MediaState.buffering:
@@ -165,19 +165,19 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
     emit(state.copyWith(errored: false));
   }
 
-  setDuration(Duration duration) {
+  void setDuration(Duration duration) {
     emit(state.copyWith(duration: duration));
   }
 
-  setFullScreenState(FullScreenState fsState) {
+  void setFullScreenState(FullScreenState fsState) {
     emit(state.copyWith(fullScreenState: fsState));
   }
 
-  setMuted(bool muted) {
+  void setMuted(bool muted) {
     emit(state.copyWith(muted: muted));
   }
 
-  setBuffer(Duration buffer) {
+  void setBuffer(Duration buffer) {
     emit(state.copyWith(buffer: buffer));
   }
 
@@ -207,7 +207,7 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
   }
 
   Future<void> startBrightnessAdjustments(DragStartDetails details) async {
-    final currentBrightness = await ScreenBrightness().current;
+    final currentBrightness = await ScreenBrightness().application;
     if (isClosed) return;
     emit(state.copyWith(
         systemBrightness: currentBrightness,
@@ -225,7 +225,8 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
       double screenBrightness =
           min(1, max(0, state.screenControlStartValue + movedBy));
 
-      await ScreenBrightness().setScreenBrightness(screenBrightness);
+      await ScreenBrightness()
+          .setApplicationScreenBrightness(screenBrightness);
       if (isClosed) return;
       emit(state.copyWith(
           systemBrightness: screenBrightness, showBrightnessSlider: true));

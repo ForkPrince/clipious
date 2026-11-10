@@ -126,7 +126,7 @@ class VideoFilterEditCubit extends Cubit<VideoFilterEditState> {
     }
   }
 
-  selectChannel(Channel? value) {
+  void selectChannel(Channel? value) {
     var filter = state.filter?.copyWith();
     filter?.channelId = value?.authorId;
     emit(state.copyWith(channel: value, filter: filter));
@@ -138,7 +138,7 @@ class VideoFilterEditCubit extends Cubit<VideoFilterEditState> {
     emit(state.copyWith(filter: filter));
   }
 
-  channelClear() {
+  void channelClear() {
     var filter = state.filter?.copyWith();
     filter?.channelId = null;
     emit(state.copyWith(channel: null, filter: filter));
@@ -160,7 +160,7 @@ class VideoFilterEditCubit extends Cubit<VideoFilterEditState> {
     emit(state.copyWith(filter: filter));
   }
 
-  toggleDay(int e) {
+  void toggleDay(int e) {
     var days = List.of(state.filter?.daysOfWeek ?? wholeWeek);
     if (days.contains(e)) {
       if (days.length >= 2) days.remove(e);
@@ -179,7 +179,7 @@ class VideoFilterEditCubit extends Cubit<VideoFilterEditState> {
       (state.filter?.startTime ?? defaultStartTime) != defaultStartTime ||
       (state.filter?.endTime ?? defaultEndTime) != defaultEndTime;
 
-  setStartTime(String newTime) {
+  void setStartTime(String newTime) {
     var comparison = newTime.compareTo(state.filter?.endTime ?? defaultEndTime);
     if (comparison < 0) {
       var filter = state.filter?.copyWith();
@@ -188,7 +188,7 @@ class VideoFilterEditCubit extends Cubit<VideoFilterEditState> {
     }
   }
 
-  setEndTime(String newTime) {
+  void setEndTime(String newTime) {
     var comparison =
         newTime.compareTo(state.filter?.startTime ?? defaultStartTime);
     if (comparison > 0) {

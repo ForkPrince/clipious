@@ -6,7 +6,7 @@ part 'select_list.freezed.dart';
 class SelectListCubit<T> extends Cubit<SelectListState<T>> {
   SelectListCubit(super.initialState);
 
-  filterItems(
+  Future<void> filterItems(
       Future<List<T>> Function(String filter)? asyncSearch,
       bool Function(String filter, T value)? searchFilter,
       List<T>? values,

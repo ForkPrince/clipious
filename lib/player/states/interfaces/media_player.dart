@@ -128,11 +128,11 @@ abstract class MediaPlayerCubit<T extends MediaPlayerState> extends Cubit<T> {
 
   int selectedSubtitle();
 
-  selectVideoTrack(int index);
+  void selectVideoTrack(int index);
 
-  selectAudioTrack(int index);
+  void selectAudioTrack(int index);
 
-  selectSubtitle(int index);
+  void selectSubtitle(int index);
 
   bool isMuted();
 

@@ -96,7 +96,7 @@ class TvManageSingleServerScreen extends StatelessWidget {
         field2Title: locals.value,
         okText: locals.add, onOk: (key, value) async {
       var cubit = context.read<ServerSettingsCubit>();
-      await cubit.addHeader(key, value);
+      cubit.addHeader(key, value);
       if (context.mounted) {
         Navigator.of(context).pop();
       }
@@ -117,7 +117,7 @@ class TvManageSingleServerScreen extends StatelessWidget {
         okText: locals.add, onOk: (username, password) async {
       var cubit = context.read<ServerSettingsCubit>();
 
-      await cubit.addHeader(
+      cubit.addHeader(
           "Authorization", 'Basic ${encodeBase64('$username:$password')}');
       if (context.mounted) {
         Navigator.of(context).pop();

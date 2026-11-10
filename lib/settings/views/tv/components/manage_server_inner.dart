@@ -12,14 +12,14 @@ import '../screens/settings.dart';
 class TvManageServersInner extends StatelessWidget {
   const TvManageServersInner({super.key});
 
-  openServer(BuildContext context, Server s) {
+  void openServer(BuildContext context, Server s) {
     var cubit = context.read<ServerListSettingsCubit>();
     AutoRouter.of(context)
         .push(TvManageSingleServerRoute(server: s))
         .then((value) => cubit.refreshServers());
   }
 
-  addServer(BuildContext context) async {
+  Future<void> addServer(BuildContext context) async {
     var cubit = context.read<ServerListSettingsCubit>();
     final server = await AutoRouter.of(context).push(const TvAddServerRoute());
     if (server != null && server is Server && context.mounted) {

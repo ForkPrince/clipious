@@ -27,15 +27,15 @@ class MainContentScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainContentScreen> {
-  openSettings(BuildContext context) {
+  void openSettings(BuildContext context) {
     AutoRouter.of(context).push(const SettingsRoute());
   }
 
-  openSubscriptionManagement(BuildContext context) {
+  void openSubscriptionManagement(BuildContext context) {
     AutoRouter.of(context).push(const ManageSubscriptionsRoute());
   }
 
-  openLayoutEditor(BuildContext context) {
+  void openLayoutEditor(BuildContext context) {
     var app = context.read<AppCubit>();
     AutoRouter.of(context)
         .push(const EditHomeLayoutRoute())

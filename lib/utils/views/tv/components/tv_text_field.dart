@@ -36,7 +36,7 @@ class TvTextField extends StatelessWidget {
       this.decoration,
       this.keyboardType});
 
-  openTextField(BuildContext context) {
+  void openTextField(BuildContext context) {
     AutoRouter.of(context).push(TvTextFieldRoute(
         controller: controller,
         autocorrect: autocorrect,

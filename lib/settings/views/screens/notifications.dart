@@ -12,7 +12,7 @@ import 'package:settings_ui/settings_ui.dart';
 class NotificationSettingsScreen extends StatelessWidget {
   const NotificationSettingsScreen({super.key});
 
-  enableBackgroundService(BuildContext context, bool enable) async {
+  Future<void> enableBackgroundService(BuildContext context, bool enable) async {
     var settings = context.read<SettingsCubit>();
     await settings.setBackgroundNotifications(enable);
   }

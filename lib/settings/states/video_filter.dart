@@ -15,11 +15,11 @@ class VideoFilterCubit extends Cubit<VideoFilterState> {
     refreshFilters();
   }
 
-  onReady() {
+  void onReady() {
     refreshFilters();
   }
 
-  refreshFilters() {
+  void refreshFilters() {
     var filters = db.getAllFilters();
     filters.sort((a, b) {
       if (a.channelId == null && b.channelId != null) {

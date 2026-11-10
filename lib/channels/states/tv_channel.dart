@@ -27,7 +27,7 @@ class TvChannelCubit extends Cubit<TvChannelController> {
     super.close();
   }
 
-  scrollToTop(bool scroll) {
+  void scrollToTop(bool scroll) {
     if (scroll) {
       scrollController.animateTo(0,
           duration: animationDuration ~/ 2, curve: Curves.easeInOutQuad);
@@ -36,35 +36,35 @@ class TvChannelCubit extends Cubit<TvChannelController> {
 
   // we only update those values if is false because with continuation there could be no new values but we still want to display those
   // meaning we expect it to be modified once.
-  setHasPlaylists(bool value) {
+  void setHasPlaylists(bool value) {
     var state = this.state.copyWith();
     if (!state.hasPlaylist) {
       emit(state.copyWith(hasPlaylist: value));
     }
   }
 
-  setHasStreams(bool value) {
+  void setHasStreams(bool value) {
     var state = this.state.copyWith();
     if (!state.hasStreams) {
       emit(state.copyWith(hasStreams: value));
     }
   }
 
-  setHasVideos(bool value) {
+  void setHasVideos(bool value) {
     var state = this.state.copyWith();
     if (!state.hasVideos) {
       emit(state.copyWith(hasVideos: value));
     }
   }
 
-  setHasShorts(bool value) {
+  void setHasShorts(bool value) {
     var state = this.state.copyWith();
     if (!state.hasShorts) {
       emit(state.copyWith(hasShorts: value));
     }
   }
 
-  scrollTo(GlobalKey key, bool focus) {
+  void scrollTo(GlobalKey key, bool focus) {
     if (key.currentContext != null && focus) {
       Scrollable.ensureVisible(key.currentContext!,
           alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtStart,

@@ -15,13 +15,17 @@ const double smallVideoViewHeight = 140;
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
-  static openSearch(BuildContext context, String search) {
+  static void openSearch(BuildContext context, String search) {
     AutoRouter.of(context)
         .push(SearchRoute(
           query: search,
           searchNow: true,
         ))
-        .then((value) => context.read<AppCubit>().updateLayout());
+        .then((value) {
+      if (context.mounted) {
+        context.read<AppCubit>().updateLayout();
+      }
+    });
   }
 
   List<Widget> getSmallSources(

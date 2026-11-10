@@ -12,7 +12,7 @@ class SearchableSelectFromListCubit<T>
 
   SearchableSelectFromListCubit(super.initialState, this.fetchItems);
 
-  searchItems(String query) {
+  void searchItems(String query) {
     emit(state.copyWith(loading: true));
     fetchItems(query)
         .then((value) => emit(state.copyWith(items: value, loading: false)));

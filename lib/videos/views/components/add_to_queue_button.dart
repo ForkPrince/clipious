@@ -20,7 +20,7 @@ class AddToQueueButton extends StatelessWidget {
                     0));
   }
 
-  addToQueue(BuildContext context) {
+  void addToQueue(BuildContext context) {
     var cubit = context.read<PlayerCubit>();
     cubit.queueVideos(videos);
   }

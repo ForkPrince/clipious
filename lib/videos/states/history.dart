@@ -13,12 +13,12 @@ class HistoryCubit extends Cubit<void> {
 
   HistoryCubit(super.initialState, this.historyListCubit);
 
-  removeFromHistory(String videoId) async {
+  Future<void> removeFromHistory(String videoId) async {
     await service.deleteFromUserHistory(videoId);
     historyListCubit.refreshItems();
   }
 
-  clearHistory() async {
+  Future<void> clearHistory() async {
     await service.clearUserHistory();
     historyListCubit.refreshItems();
   }
@@ -33,7 +33,7 @@ class HistoryItemCubit extends Cubit<HistoryItemState> {
     getVideo();
   }
 
-  getVideo() async {
+  Future<void> getVideo() async {
     emit(state.copyWith(loading: true));
 
     var cachedVid = await HistoryVideoCache.fromVideoIdToVideo(state.videoId);
