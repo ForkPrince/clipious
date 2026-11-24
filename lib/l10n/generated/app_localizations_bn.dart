@@ -151,6 +151,11 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String nReplies(num count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+    );
+    final String countString = countNumberFormat.format(count);
+
     return 'কমেন্টের সংখ্যা';
   }
 
@@ -280,6 +285,12 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get videoPlayer => 'Video player';
+
+  @override
+  String get voiceReply => 'Voice reply';
+
+  @override
+  String get voiceReplyAudioUnavailable => 'Voice reply audio is not available';
 
   @override
   String get videoListed => 'Public';

@@ -301,6 +301,12 @@ class AppLocalizationsAz extends AppLocalizations {
   String get videoPlayer => 'Video oynadıcı';
 
   @override
+  String get voiceReply => 'Voice reply';
+
+  @override
+  String get voiceReplyAudioUnavailable => 'Voice reply audio is not available';
+
+  @override
   String get videoListed => 'İctimai';
 
   @override

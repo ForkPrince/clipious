@@ -300,6 +300,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get videoPlayer => 'مشغل الفيديو';
 
   @override
+  String get voiceReply => 'Voice reply';
+
+  @override
+  String get voiceReplyAudioUnavailable => 'Voice reply audio is not available';
+
+  @override
   String get videoListed => 'عام';
 
   @override

@@ -304,6 +304,12 @@ class AppLocalizationsTa extends AppLocalizations {
   String get videoPlayer => 'வீடியோ பிளேயர்';
 
   @override
+  String get voiceReply => 'Voice reply';
+
+  @override
+  String get voiceReplyAudioUnavailable => 'Voice reply audio is not available';
+
+  @override
   String get videoListed => 'பொது';
 
   @override

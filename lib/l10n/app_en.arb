@@ -359,6 +359,14 @@
   "@videoPlayer": {
     "description": "Title for video player related options"
   },
+  "voiceReply": "Voice reply",
+  "@voiceReply": {
+    "description": "Label for a creator voice reply on a comment"
+  },
+  "voiceReplyAudioUnavailable": "Voice reply audio is not available",
+  "@voiceReplyAudioUnavailable": {
+    "description": "Note shown when a voice reply has a transcript but no playable audio"
+  },
   "videoListed": "Public",
   "@videoListed": {
     "description": "Status of a publicly available video"

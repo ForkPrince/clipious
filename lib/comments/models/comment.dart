@@ -1,4 +1,6 @@
+import 'package:clipious/comments/models/comment_attachment.dart';
 import 'package:clipious/comments/models/comment_replies.dart';
+import 'package:clipious/comments/models/comment_voice_reply.dart';
 import 'package:clipious/comments/models/creator_heart.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -20,6 +22,8 @@ class Comment {
   bool authorIsChannelOwner = false;
   CreatorHeart? creatorHeart;
   CommentReplies? replies;
+  CommentAttachment? attachment;
+  CommentVoiceReply? voiceReply;
 
   Comment(
       this.author,
@@ -33,7 +37,9 @@ class Comment {
       this.commentId,
       this.authorIsChannelOwner,
       this.creatorHeart,
-      this.replies);
+      this.replies,
+      [this.attachment,
+      this.voiceReply]);
 
   factory Comment.fromJson(Map<String, dynamic> json) {
     final normalized = Map<String, dynamic>.from(json);

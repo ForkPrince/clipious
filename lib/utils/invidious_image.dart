@@ -30,6 +30,12 @@ String invidiousImageUrl(String url, Server server) {
     } else if (RegExp(r'^/vi_webp/[^/]+/[^/]+\.webp$').hasMatch(image.path)) {
       path = image.path.replaceFirst('/vi_webp/', '/vi/');
       path = '${path.substring(0, path.length - 5)}.jpg';
+    } else if (RegExp(r'^/c_exp/[^/]+/[^/]+$').hasMatch(image.path)) {
+      // Comment GIF/image attachments (animated WebP). Served through the
+      // instance's /ytimg proxy on forks with comment-media support
+      // (TwintStudio Invidious); the path after the prefix is proxied from
+      // the i.ytimg.com pool, like /ggpht is for avatars.
+      path = '/ytimg${image.path}';
     }
   }
 

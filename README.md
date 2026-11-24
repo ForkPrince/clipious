@@ -26,6 +26,7 @@ Android client application for [invidious](https://invidious.io), the privacy fo
 - **Show channel icons on search**: Display channel thumbnails in search results
 - **Add video history on TV**: Browse watched videos from the TV home menu
 - **TV recommendations**: Show recommended videos right in the player
+- **Media in Comments**: Display media (images, audio) within comments (requires an [invidious fork](https://git.serversmp.xyz/TwintStudio/invidious))
 
 ### Patches from [Videre](https://github.com/DVBeckwitt/Videre)
 

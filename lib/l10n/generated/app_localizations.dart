@@ -677,6 +677,18 @@ abstract class AppLocalizations {
   /// **'Video player'**
   String get videoPlayer;
 
+  /// Label for a creator voice reply on a comment
+  ///
+  /// In en, this message translates to:
+  /// **'Voice reply'**
+  String get voiceReply;
+
+  /// Note shown when a voice reply has a transcript but no playable audio
+  ///
+  /// In en, this message translates to:
+  /// **'Voice reply audio is not available'**
+  String get voiceReplyAudioUnavailable;
+
   /// Status of a publicly available video
   ///
   /// In en, this message translates to:

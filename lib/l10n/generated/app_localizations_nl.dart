@@ -301,6 +301,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get videoPlayer => 'Videospeler';
 
   @override
+  String get voiceReply => 'Voice reply';
+
+  @override
+  String get voiceReplyAudioUnavailable => 'Voice reply audio is not available';
+
+  @override
   String get videoListed => 'Publiek';
 
   @override

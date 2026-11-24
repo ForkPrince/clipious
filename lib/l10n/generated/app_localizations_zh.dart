@@ -293,6 +293,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get videoPlayer => '正在播放';
 
   @override
+  String get voiceReply => 'Voice reply';
+
+  @override
+  String get voiceReplyAudioUnavailable => 'Voice reply audio is not available';
+
+  @override
   String get videoListed => '公开';
 
   @override

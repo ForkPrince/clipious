@@ -36,6 +36,15 @@ void main() {
     }
   });
 
+  test('comment GIF paths use the instance /ytimg proxy', () {
+    const gifPath =
+        '/c_exp/UgxCWLozQOezZao-19d4AaABAg/IMafAXACgPDdI_webp_animated_original_aspect_ratio.webp?sqp=CIGmtNcGGOCoAQ==&rs=AOn4CLD6Fr7uz48Vrso5SgKGuaCHZ0-4Zw';
+    for (final host in ['i.ytimg.com', 'i1.ytimg.com', 'i9.ytimg.com']) {
+      expect(invidiousImageUrl('https://$host$gifPath', server),
+          'https://instance.example/ytimg$gifPath');
+    }
+  });
+
   test(
       'relative and proxied images remain on the instance without double proxy',
       () {
@@ -73,6 +82,8 @@ void main() {
       'https://evil.example/yt3.googleusercontent.com/avatar',
       'https://i.ytimg.com.evil.example/vi/id/default.jpg',
       'https://other-instance.example/ggpht/avatar',
+      'https://i.ytimg.com.evil.example/c_exp/id/file.webp',
+      'https://i.ytimg.com/other/path.jpg',
       'file:///offline/thumbnail.jpg',
       '',
       'http://[invalid',

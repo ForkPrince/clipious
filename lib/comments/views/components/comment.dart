@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:clipious/comments/states/single_comment.dart';
+import 'package:clipious/comments/views/components/comment_voice_reply.dart';
 import 'package:clipious/comments/views/components/comments.dart';
 import 'package:clipious/router.dart';
 import 'package:clipious/utils/views/components/text_linkified.dart';
@@ -118,6 +119,82 @@ class SingleCommentView extends StatelessWidget {
                         video: video,
                         player: player,
                       ),
+                      Builder(builder: (context) {
+                        final attachment = state.comment.attachment;
+                        if (attachment == null || !attachment.isImage) {
+                          return const SizedBox.shrink();
+                        }
+                        final thumbnails = attachment.thumbnails;
+                        if (thumbnails.isEmpty) {
+                          final unavailable = attachment.unavailableText ?? '';
+                          if (unavailable.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Text(
+                              unavailable,
+                              style:
+                                  const TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                          );
+                        }
+                        final width = attachment.width;
+                        final height = attachment.height;
+                        final aspectRatio = width != null &&
+                                height != null &&
+                                width > 0 &&
+                                height > 0
+                            ? width / height
+                            : 4 / 3;
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: LayoutBuilder(builder: (context, constraints) {
+                            final displayWidth = constraints.maxWidth.isFinite
+                                ? constraints.maxWidth
+                                : 220.0;
+                            return Thumbnail(
+                              width: displayWidth,
+                              height: displayWidth / aspectRatio,
+                              images: thumbnails,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8)),
+                            );
+                          }),
+                        );
+                      }),
+                      Builder(builder: (context) {
+                        final voiceReply = state.comment.voiceReply;
+                        final attachment = state.comment.attachment;
+                        final transcript = voiceReply?.transcript ??
+                            (attachment?.isAudio == true
+                                ? attachment?.transcript
+                                : null);
+                        final audioUrl = voiceReply?.audioUrl ??
+                            (attachment?.isAudio == true
+                                ? attachment?.audioUrl
+                                : null);
+                        final unavailableText = voiceReply?.unavailableText ??
+                            (attachment?.isAudio == true
+                                ? attachment?.unavailableText
+                                : null);
+                        final hasVoiceReply =
+                            voiceReply != null || attachment?.isAudio == true;
+                        if (!hasVoiceReply ||
+                            ((transcript?.isEmpty ?? true) &&
+                                (audioUrl?.isEmpty ?? true) &&
+                                (unavailableText?.isEmpty ?? true))) {
+                          return const SizedBox.shrink();
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: CommentVoiceReplyView(
+                            transcript: transcript,
+                            unavailableText: unavailableText,
+                            audioUrl: audioUrl,
+                          ),
+                        );
+                      }),
                       Row(
                         children: [
                           Visibility(

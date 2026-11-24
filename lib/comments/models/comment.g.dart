@@ -25,6 +25,14 @@ Comment _$CommentFromJson(Map<String, dynamic> json) => Comment(
       json['replies'] == null
           ? null
           : CommentReplies.fromJson(json['replies'] as Map<String, dynamic>),
+      json['attachment'] == null
+          ? null
+          : CommentAttachment.fromJson(
+              json['attachment'] as Map<String, dynamic>),
+      json['voiceReply'] == null
+          ? null
+          : CommentVoiceReply.fromJson(
+              json['voiceReply'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$CommentToJson(Comment instance) => <String, dynamic>{
@@ -40,4 +48,6 @@ Map<String, dynamic> _$CommentToJson(Comment instance) => <String, dynamic>{
       'authorIsChannelOwner': instance.authorIsChannelOwner,
       'creatorHeart': instance.creatorHeart,
       'replies': instance.replies,
+      'attachment': instance.attachment,
+      'voiceReply': instance.voiceReply,
     };

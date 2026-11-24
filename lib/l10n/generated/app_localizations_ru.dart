@@ -302,6 +302,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get videoPlayer => 'Видеопроигрыватель';
 
   @override
+  String get voiceReply => 'Voice reply';
+
+  @override
+  String get voiceReplyAudioUnavailable => 'Voice reply audio is not available';
+
+  @override
   String get videoListed => 'Публично';
 
   @override
